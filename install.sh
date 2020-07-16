@@ -13,8 +13,10 @@ declare -a MIRROR_DEVICES=( \
 )
 BOOT_PARTITION_SIZE=3
 SWAP_PARTITION_SIZE=64
-MAIN_POOL_NAME=manna_ssd
-MIRROR_POOL_NAME=manna_spin
+LIBVIRT_PARTITION_SIZE=512
+SYSTEM_POOL_NAME=manna_ssd
+STORAGE_POOL_NAME=manna_spin
+LIBVIRT_POOL_NAME=libvirt
 KEY_BOOT=$(mktemp -p /dev/shm )
 KEY_ZFS=$(mktemp -p /dev/shm )
 INSTALL_DIR="/mnt/nixos"
@@ -63,6 +65,7 @@ echo
 sudo swapoff "${swapPartition}" || ${TRUE}
 sudo umount "${INSTALL_DIR}/boot/efi" || ${TRUE}
 sudo umount "${INSTALL_DIR}/boot" || ${TRUE}
+sudo umount "${INSTALL_DIR}/home" || ${TRUE}
 sudo umount "${INSTALL_DIR}" || ${TRUE}
 
 sudo cryptsetup close $CRYPT_BOOT_DEV || ${TRUE}
@@ -71,7 +74,9 @@ if [ -e "${bootMainPartition}" ]; then
   sudo dd if=/dev/zero of=${bootMainPartition} bs=2M count=10 >/dev/null
 fi
 
-sudo zpool destroy "${MAIN_POOL_NAME}" || ${TRUE}
+for pool in "${SYSTEM_POOL_NAME}" "${LIBVIRT_POOL_NAME}" "${STORAGE_POOL_NAME}"; do
+  sudo zpool destroy "${pool}" || ${TRUE}
+done
 # sudo -- sgdisk --zap-all ${INSTALL_DEVICE}
 for mirror in "${INSTALL_DEVICE}" "${MIRROR_DEVICES[@]}"; do
   sudo sgdisk --zap-all ${mirror}
@@ -110,7 +115,7 @@ echo "Formatting.."
 echo
 
 if [[ "${#MIRROR_DEVICES[@]}" > 0 ]]; then
-  system_zpool_devices="mirror ${rootPartition} ${MIRROR_DEVICES[@]/%/-5}"
+  system_zpool_devices="mirror ${rootPartition} ${MIRROR_DEVICES[@]/%/-part5}"
 else
   system_zpool_devices="${rootPartition}"
 fi
@@ -130,14 +135,93 @@ sudo zpool create \
   -O "keylocation=file://${KEY_ZFS}" \
   -O mountpoint=none \
   -O compression=on \
-  "${MAIN_POOL_NAME}" \
+  "${SYSTEM_POOL_NAME}" \
   ${system_zpool_devices}
 
 # Reserve some diskspace for copy-on-write if disk is full
 sudo zfs create \
   -o refreservation=1G \
   -o mountpoint=none \
-  "${MAIN_POOL_NAME}/reserved"
+  "${SYSTEM_POOL_NAME}/reserved"
+
+make_storage_mounts() {
+  pool=$1; shift
+
+  sudo zfs create \
+    -o mountpoint=legacy \
+    -o canmount=noauto \
+    "${pool}/home"
+
+
+  sudo zfs create \
+    -o canmount=off \
+    -o mountpoint=none \
+    "${pool}/Virtualisation"
+
+  sudo zfs create \
+    -o canmount=off \
+    -o mountpoint=none \
+    "${pool}/Virtualisation/LXD"
+
+  sudo zfs create \
+    -o canmount=off \
+    -o mountpoint=none \
+    "${pool}/Virtualisation/docker"
+
+  sudo zfs create \
+    -V "${LIBVIRT_PARTITION_SIZE}GB" \
+    -b "$(getconf PAGESIZE)" \
+    -o compression=zle \
+    -o logbias=throughput \
+    -o sync=always \
+    -o primarycache=metadata \
+    -o secondarycache=none \
+    "${pool}/Virtualisation/libvirt"
+
+  sudo zpool create \
+    -f \
+    -O atime=on \
+    -O relatime=on \
+    -O acltype=posixacl \
+    -O xattr=sa \
+    -O aclinherit=passthrough \
+    -O dnodesize=auto \
+    -O normalization=formD \
+    -o ashift=12 \
+    -O mountpoint=none \
+    -O compression=off \
+    "${LIBVIRT_POOL_NAME}" \
+    "/dev/zvol/${pool}/Virtualisation/libvirt"
+}
+
+if [[ "${#MIRROR_DEVICES[@]}" > 0 ]]; then
+  sudo zpool create \
+    -f \
+    -O atime=on \
+    -O relatime=on \
+    -O acltype=posixacl \
+    -O xattr=sa \
+    -O aclinherit=passthrough \
+    -O dnodesize=auto \
+    -O normalization=formD \
+    -o ashift=12 \
+    -O encryption=on \
+    -O keyformat=raw \
+    -O "keylocation=file://${KEY_ZFS}" \
+    -O mountpoint=none \
+    -O compression=on \
+    "${STORAGE_POOL_NAME}" \
+    ${MIRROR_DEVICES[@]/%/-part6}
+
+  sudo zfs create \
+    -o refreservation=1G \
+    -o mountpoint=none \
+    "${STORAGE_POOL_NAME}/reserved"
+
+  make_storage_mounts "${STORAGE_POOL_NAME}"
+else
+  make_storage_mounts "${SYSTEM_POOL_NAME}"
+fi
 
 # sudo zfs create \
 #   -V "${SWAP_PARTITION_SIZE}GB" \
@@ -148,19 +232,19 @@ sudo zfs create \
 #   -o primarycache=metadata \
 #   -o secondarycache=none \
 #   -o com.sun:auto-snapshot=false \
-#   "${MAIN_POOL_NAME}/swap"
+#   "${SYSTEM_POOL_NAME}/swap"
 
 sudo mkswap -L swap ${swapPartition}
 
 sudo zfs create \
   -o canmount=off \
   -o mountpoint=none \
-  "${MAIN_POOL_NAME}/NixOS"
+  "${SYSTEM_POOL_NAME}/NixOS"
 
 sudo zfs create \
   -o mountpoint=legacy \
-  -o canmount=on \
-  "${MAIN_POOL_NAME}/NixOS/root"
+  -o canmount=noauto \
+  "${SYSTEM_POOL_NAME}/NixOS/root"
 
 
 sudo mkfs.fat -F 32 -n boot "${efiMainPartition}"
@@ -191,7 +275,13 @@ sudo mkfs.ext4 /dev/mapper/${CRYPT_BOOT_DEV}
 
 sudo mkdir -p "${INSTALL_DIR}"
 
-sudo mount -t zfs "${MAIN_POOL_NAME}/NixOS/root" "${INSTALL_DIR}"
+sudo mount -t zfs "${SYSTEM_POOL_NAME}/NixOS/root" "${INSTALL_DIR}"
+sudo mkdir "${INSTALL_DIR}/home"
+if [[ "${#MIRROR_DEVICES[@]}" > 0 ]]; then
+  sudo mount -t zfs "${STORAGE_POOL_NAME}/home" "${INSTALL_DIR}/home"
+else
+  sudo mount -t zfs "${SYSTEM_POOL_NAME}/home" "${INSTALL_DIR}/home"
+fi
 sudo mkdir "${INSTALL_DIR}/boot"
 sudo mount /dev/mapper/${CRYPT_BOOT_DEV} "${INSTALL_DIR}/boot"
 
@@ -235,6 +325,6 @@ for filename in configuration.nix dropbox.nix users.nix virtualization.nix x11.n
 done
 
 echo "nixos-install"
-sudo zfs set keylocation=file:///keyfileZfs.bin "${MAIN_POOL_NAME}"
+sudo zfs set keylocation=file:///keyfileZfs.bin "${SYSTEM_POOL_NAME}"
 sudo PATH="$PATH" NIX_PATH="$NIX_PATH" $(which nixos-install) --show-trace --no-root-passwd --root "${INSTALL_DIR}"
 
