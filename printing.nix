@@ -13,5 +13,5 @@
       startWhenNeeded = true;
     };
     system-config-printer.enable = true;
-  }
+  };
 }

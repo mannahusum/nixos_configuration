@@ -11,7 +11,7 @@ declare -a MIRROR_DEVICES=( \
   "/dev/disk/by-id/ata-ST2000LM003_HN-M201RAD_S377J9AG900498" \
   "/dev/disk/by-id/ata-ST2000LM015-2E8174_WCC2LAF1"\
 )
-# BOOT_PARTITION_SIZE=3GB
+BOOT_PARTITION_SIZE=3
 SWAP_PARTITION_SIZE=64
 MAIN_POOL_NAME=manna_ssd
 MIRROR_POOL_NAME=manna_spin
@@ -43,17 +43,17 @@ echo
 echo "Initializing"
 echo
 
-swapPartition="/dev/zvol/${MAIN_POOL_NAME}/swap"
 efiMainPartition="${INSTALL_DEVICE}-part2"
-bootPartition="${INSTALL_DEVICE}-part3"
-rootPartition="${INSTALL_DEVICE}-part4"
+bootMainPartition="${INSTALL_DEVICE}-part3"
+swapPartition="${INSTALL_DEVICE}-part4"
+rootPartition="${INSTALL_DEVICE}-part5"
 
 echo
 echo "Creating keys"
 echo
 
-dd if=/dev/urandom of=$KEY_BOOT bs=1024 count=4
-dd if=/dev/urandom of=$KEY_ZFS bs=32 count=1
+dd if=/dev/urandom of=$KEY_BOOT bs=1024 count=4 >/dev/null
+dd if=/dev/urandom of=$KEY_ZFS bs=32 count=1 >/dev/null
 
 
 echo
@@ -67,38 +67,53 @@ sudo umount "${INSTALL_DIR}" || ${TRUE}
 
 sudo cryptsetup close $CRYPT_BOOT_DEV || ${TRUE}
 
-if [ -e "${bootPartition}" ]; then
-  sudo dd if=/dev/zero of=${bootPartition} bs=2M count=10
+if [ -e "${bootMainPartition}" ]; then
+  sudo dd if=/dev/zero of=${bootMainPartition} bs=2M count=10 >/dev/null
 fi
 
 sudo zpool destroy "${MAIN_POOL_NAME}" || ${TRUE}
-sudo -- sgdisk --zap-all ${INSTALL_DEVICE}
-sudo dd if=/dev/zero of=${INSTALL_DEVICE} bs=2M count=10
+# sudo -- sgdisk --zap-all ${INSTALL_DEVICE}
+for mirror in "${INSTALL_DEVICE}" "${MIRROR_DEVICES[@]}"; do
+  sudo sgdisk --zap-all ${mirror}
+  sudo dd if=/dev/zero of=${mirror} bs=2M count=10 >/dev/null
+done
 
 
 echo
 echo "Partitioning.."
 echo
 
-sudo -- parted --script ${INSTALL_DEVICE} -- \
-  unit MiB \
-  mklabel gpt \
-  mkpart primary 1 3 \
-  name 1 grub \
-  mkpart esp fat32 3 514 \
-  name 2 efi \
-  mkpart primary 514 3072 \
-  name 3 boot \
-  mkpart primary 3072 100% \
-  set 1 bios_grub on \
-  set 2 boot on \
+sudo sgdisk \
+  -n1:+:+2M -c 1:grub -t 1:ef02 -A 1:set:2 \
+  -n2:+:+512M -c 2:efi -t 2:ef00 \
+  -n3:+:+${BOOT_PARTITION_SIZE}G -c 3:boot -t 3:8300 \
+  -n4:+:+${SWAP_PARTITION_SIZE}G -c 4:swap -t 4:8300 \
+  -n5:+:- -c 5:system -t 5:8300 \
+  ${INSTALL_DEVICE} >/dev/null
 
+sectors_in_system=$(sudo LANG=C sgdisk -i5 ${INSTALL_DEVICE} | grep -i size | cut -d' ' -f3)
+
+for mirror in "${MIRROR_DEVICES[@]}"; do
+  sudo sgdisk \
+    -n1:+:+2M -c 1:grub -t 1:ef02 -A 1:set:2 \
+    -n2:+:+512M -c 2:efi -t 2:ef00 \
+    -n3:+:+${BOOT_PARTITION_SIZE}G -c 3:boot -t 3:8300 \
+    -n5:+:+${sectors_in_system} -c 5:system -t 5:8300 \
+    -n6:+:- -c 6:storage -t 6:8300 \
+    ${mirror} >/dev/null
+done
 
 sleep 3
 
 echo
 echo "Formatting.."
 echo
+
+if [[ "${#MIRROR_DEVICES[@]}" > 0 ]]; then
+  system_zpool_devices="mirror ${rootPartition} ${MIRROR_DEVICES[@]/%/-5}"
+else
+  system_zpool_devices="${rootPartition}"
+fi
 
 sudo zpool create \
   -f \
@@ -116,7 +131,7 @@ sudo zpool create \
   -O mountpoint=none \
   -O compression=on \
   "${MAIN_POOL_NAME}" \
-  "${rootPartition}"
+  ${system_zpool_devices}
 
 # Reserve some diskspace for copy-on-write if disk is full
 sudo zfs create \
@@ -124,16 +139,16 @@ sudo zfs create \
   -o mountpoint=none \
   "${MAIN_POOL_NAME}/reserved"
 
-sudo zfs create \
-  -V "${SWAP_PARTITION_SIZE}GB" \
-  -b "$(getconf PAGESIZE)" \
-  -o compression=zle \
-  -o logbias=throughput \
-  -o sync=always \
-  -o primarycache=metadata \
-  -o secondarycache=none \
-  -o com.sun:auto-snapshot=false \
-  "${MAIN_POOL_NAME}/swap"
+# sudo zfs create \
+#   -V "${SWAP_PARTITION_SIZE}GB" \
+#   -b "$(getconf PAGESIZE)" \
+#   -o compression=zle \
+#   -o logbias=throughput \
+#   -o sync=always \
+#   -o primarycache=metadata \
+#   -o secondarycache=none \
+#   -o com.sun:auto-snapshot=false \
+#   "${MAIN_POOL_NAME}/swap"
 
 sudo mkswap -L swap ${swapPartition}
 
@@ -156,19 +171,19 @@ sudo cryptsetup luksFormat \
   -c aes-xts-plain64 \
   -s 256 \
   --pbkdf pbkdf2 \
-  "${bootPartition}" "${KEY_BOOT}"
+  "${bootMainPartition}" "${KEY_BOOT}"
 
 sudo cryptsetup luksAddKey \
   --batch-mode \
   --key-file "${KEY_BOOT}" \
   --pbkdf pbkdf2 \
-  "${bootPartition}" \
+  "${bootMainPartition}" \
   "${PASSPHRASE_FILE}"
 
 sudo cryptsetup open \
   --type luks \
   --key-file \
-  "${KEY_BOOT}" "${bootPartition}" ${CRYPT_BOOT_DEV}
+  "${KEY_BOOT}" "${bootMainPartition}" ${CRYPT_BOOT_DEV}
 
 sudo mkfs.ext4 /dev/mapper/${CRYPT_BOOT_DEV}
 
@@ -189,8 +204,8 @@ pushd "${INSTALL_DIR}/boot"
   sudo chmod 000 "${INSTALL_DIR}/boot/initrd.keys.gz" "${INSTALL_DIR}/boot/"keyfile*.bin
 popd
 
-bootPartitionUuid=$(blkid -o value -s UUID ${bootPartition})
-bootPartitionByUuid="/dev/disk/by-uuid/${bootPartitionUuid}"
+bootMainPartitionUuid=$(blkid -o value -s UUID ${bootMainPartition})
+bootMainPartitionByUuid="/dev/disk/by-uuid/${bootMainPartitionUuid}"
 sudo mkdir "${INSTALL_DIR}/boot/efi"
 sudo mount "${efiMainPartition}" "${INSTALL_DIR}/boot/efi"
 
@@ -199,17 +214,23 @@ sudo swapon "${swapPartition}"
 sudo -- `which nixos-generate-config` --root "${INSTALL_DIR}"
 sudo swapon -a
 
-sedCmds="--posix "
-for replaceVar in INSTALL_DEVICE bootPartitionByUuid CRYPT_BOOT_DEV; do
-  sedCmds+=" -e "
-  sedCmds+="s\$##$replaceVar##\$$(eval "echo \${$replaceVar}")\$"
-done
-echo $sedCmds
-for sedfile in configuration.nix bootdevice.nix; do
-  sed $sedCmds "$DIR/${sedfile}" | \
-    sudo tee "${INSTALL_DIR}/etc/nixos/${sedfile}" >/dev/null
-done
-for filename in dropbox.nix users.nix virtualization.nix x11.nix xscreensaver.nix passwords.nix 79dachboden5.cer; do
+{
+cat <<EOF
+  { boot, ... }:
+
+  {
+    boot = {
+      initrd.luks.devices."${CRYPT_BOOT_DEV}" = {
+        # preLVM = true;
+        keyFile = "/keyfileBoot.bin";
+        allowDiscards = true;
+      };
+      loader.grub.devices = [ "${INSTALL_DEVICE}" ]; # or "nodev" for efi only
+    };
+  }
+EOF
+} | sudo tee "${INSTALL_DIR}/etc/nixos/bootdevice.nix" >/dev/null
+for filename in configuration.nix dropbox.nix users.nix virtualization.nix x11.nix xscreensaver.nix passwords.nix printing.nix 79dachboden5.cer; do
   sudo cp "${filename}" "${INSTALL_DIR}/etc/nixos/${filename}"
 done
 

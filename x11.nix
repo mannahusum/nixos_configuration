@@ -37,11 +37,9 @@
   };
 
   # Enable the X11 windowing system.
-  # services.xserver.enable = true;
   services = {
     xserver = {
       enable = true;
-      autorun = false;
       libinput.enable = true;
       # videoDrivers = [ "intel" ];
       # videoDrivers = [ "modesetting" "intel" "nvidia" ];
@@ -65,7 +63,8 @@
         };
       };
     };
-  };
 
-  systemd.defaultUnit = "graphical.target";
+    # systemd.defaultUnit = "graphical.target";
+  };
+  systemd.services.lxd.path = with pkgs; [ nvidia-docker ];
 }
