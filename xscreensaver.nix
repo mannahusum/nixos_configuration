@@ -26,9 +26,9 @@
   };
   programs.xss-lock = {
     enable = true;
-    extraOptions = [
-      "--session=$XDG_SESSION_ID"
-    ];
+    # extraOptions = [
+    #   ''--session=''${XDG_SESSION_ID}''
+    # ];
     lockerCommand = "${pkgs.xscreensaver.out}/bin/xscreensaver-command --lock";
   };
 }

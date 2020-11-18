@@ -6,6 +6,8 @@
     xorg.xf86videointel
     xorg.xf86inputsynaptics
     xorg.xorgserver
+    steam
+    steam-run-native
   ];
 
   # Enable sound.
@@ -20,11 +22,6 @@
       extraPackages32 = with pkgs.pkgsi686Linux; [
         libva
       ];
-    };
-    nvidia.prime = {
-      sync.enable= true;
-      nvidiaBusId = "PCI:1:0:0";
-      intelBusId = "PCI:0:2:0";
     };
   };
 
@@ -41,9 +38,6 @@
     xserver = {
       enable = true;
       libinput.enable = true;
-      # videoDrivers = [ "intel" ];
-      # videoDrivers = [ "modesetting" "intel" "nvidia" ];
-      videoDrivers = [ "nvidia" ];
       layout = "de,de,gr";
       xkbModel = "pc105";
       xkbVariant = "neo,,";
@@ -52,11 +46,14 @@
         enable = true;
         package = pkgs.awesome;
       };
+      desktopManager.gnome3.enable = true;
       displayManager = {
         defaultSession = "none+awesome";
+        # defaultSession = "gnome-xorg";
+        autoLogin.enable = false;
+        gdm.enable = false;
         lightdm = {
           enable = true;
-          autoLogin.enable = false;
           greeter = {
             enable = true;
           };
@@ -66,5 +63,4 @@
 
     # systemd.defaultUnit = "graphical.target";
   };
-  systemd.services.lxd.path = with pkgs; [ nvidia-docker ];
 }

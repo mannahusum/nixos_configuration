@@ -1,12 +1,5 @@
 { virtualisation, users, nixpkgs, pkgs, ... }:
 {
-  nixpkgs.config.packageOverrides = pkgs: {
-    lxc = pkgs.lxc.overrideAttrs ({
-      buildInputs ? [], ...
-    }: {
-      buildInputs = buildInputs ++ [ pkgs.nvidia-docker ];
-    });
-  };
   virtualisation = {
     docker = {
       autoPrune = {
@@ -38,6 +31,7 @@
       zfsSupport = true;
     };
   };
+  systemd.services.lxd.path = with pkgs; [ (callPackage ./pkgs/nvidia-docker-new {}) ];
   users.extraUsers.root = {
     subUidRanges = [
       {

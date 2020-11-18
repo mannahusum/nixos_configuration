@@ -17,15 +17,21 @@ LIBVIRT_PARTITION_SIZE=512
 SYSTEM_POOL_NAME=manna_ssd
 STORAGE_POOL_NAME=manna_spin
 LIBVIRT_POOL_NAME=libvirt
-KEY_BOOT=$(mktemp -p /dev/shm )
-KEY_ZFS=$(mktemp -p /dev/shm )
+declare -A KEYS=(
+  [Boot]=$(mktemp -p /dev/shm)
+  [Swap]=$(mktemp -p /dev/shm)
+  [Zfs]=$(mktemp -p /dev/shm)
+)
+KEYS_DIR="/etc/keys"
 INSTALL_DIR="/mnt/nixos"
 NIX_VERSION=20.03
 PASSPHRASE_FILE="${DIR}/passphrase.txt"
 TRUE=$(which true)
 CRYPT_BOOT_DEV=mannassdboot
+CRYPT_SWAP_DEV=mannassdswap
+CRYPT_BOOTBACKUP_DEV=mannaspinboot
 
-# Check for nixos dependencies:
+# # Check for nixos dependencies:
 
 [ -d /nix ] || curl https://nixos.org/nix/install | sh
 
@@ -45,8 +51,35 @@ echo
 echo "Initializing"
 echo
 
-efiMainPartition="${INSTALL_DEVICE}-part2"
-bootMainPartition="${INSTALL_DEVICE}-part3"
+get_keyfile_name() {
+  usage=$1; shift
+
+  echo "keyfile${usage}.bin"
+}
+
+get_keyfile_location() {
+  usage=$1; shift
+
+  echo "$KEYS_DIR/$(get_keyfile_name ${usage})"
+}
+
+get_bootpartition() {
+  device=$1; shift
+
+  echo -n "${device}-part3"
+}
+
+get_efipartition() {
+  device=$1; shift
+
+  echo -n "${device}-part2"
+}
+
+get_uuid() {
+  partition=$1; shift
+  sudo blkid --match-tag UUID --output value ${partition}
+}
+
 swapPartition="${INSTALL_DEVICE}-part4"
 rootPartition="${INSTALL_DEVICE}-part5"
 
@@ -54,25 +87,47 @@ echo
 echo "Creating keys"
 echo
 
-dd if=/dev/urandom of=$KEY_BOOT bs=1024 count=4 >/dev/null
-dd if=/dev/urandom of=$KEY_ZFS bs=32 count=1 >/dev/null
-
+dd if=/dev/urandom of=${KEYS[Boot]} bs=1024 count=4 >/dev/null 2>&1
+dd if=/dev/urandom of=${KEYS[Swap]} bs=1024 count=4 >/dev/null 2>&1
+dd if=/dev/urandom of=${KEYS[Zfs]} bs=32 count=1 >/dev/null 2>&1
+for key in ${KEYS[@]}; do
+  chmod 666 $key
+done
 
 echo
 echo "Cleaning up"
 echo
 
-sudo swapoff "${swapPartition}" || ${TRUE}
-sudo umount "${INSTALL_DIR}/boot/efi" || ${TRUE}
-sudo umount "${INSTALL_DIR}/boot" || ${TRUE}
+remove_boot() {
+  mountpoint=$1; shift
+  cryptname=$1; shift
+  device=$1; shift
+
+  bootPartition="$(get_bootpartition ${device})"
+
+  sudo umount "${INSTALL_DIR}${mountpoint}/efi" || ${TRUE}
+  sudo umount "${INSTALL_DIR}${mountpoint}" || ${TRUE}
+  sudo cryptsetup close $cryptname || ${TRUE}
+  if [ -e "${bootPartition}" ]; then
+    sudo dd if=/dev/zero of=${bootPartition} bs=2M count=10 >/dev/null
+fi
+
+}
+
+sudo swapoff "/dev/mapper/${CRYPT_SWAP_DEV}" || ${TRUE}
+sudo cryptsetup close "${CRYPT_SWAP_DEV}" || ${TRUE}
+backupbootcount=0
+for mirror in "${MIRROR_DEVICES[@]}"; do
+  remove_boot \
+    "/boot${backupbootcount}" \
+    "${CRYPT_BOOTBACKUP_DEV}${backupbootcount}" \
+    "${mirror}"
+  backupbootcount=$(expr $backupbootcount + 1)
+done
+remove_boot /boot "$CRYPT_BOOT_DEV" "${INSTALL_DEVICE}"
 sudo umount "${INSTALL_DIR}/home" || ${TRUE}
 sudo umount "${INSTALL_DIR}" || ${TRUE}
 
-sudo cryptsetup close $CRYPT_BOOT_DEV || ${TRUE}
-
-if [ -e "${bootMainPartition}" ]; then
-  sudo dd if=/dev/zero of=${bootMainPartition} bs=2M count=10 >/dev/null
-fi
 
 for pool in "${SYSTEM_POOL_NAME}" "${LIBVIRT_POOL_NAME}" "${STORAGE_POOL_NAME}"; do
   sudo zpool destroy "${pool}" || ${TRUE}
@@ -132,7 +187,7 @@ sudo zpool create \
   -o ashift=12 \
   -O encryption=on \
   -O keyformat=raw \
-  -O "keylocation=file://${KEY_ZFS}" \
+  -O "keylocation=file://${KEYS[Zfs]}" \
   -O mountpoint=none \
   -O compression=on \
   "${SYSTEM_POOL_NAME}" \
@@ -207,11 +262,11 @@ if [[ "${#MIRROR_DEVICES[@]}" > 0 ]]; then
     -o ashift=12 \
     -O encryption=on \
     -O keyformat=raw \
-    -O "keylocation=file://${KEY_ZFS}" \
+    -O "keylocation=file://${KEYS[Zfs]}" \
     -O mountpoint=none \
     -O compression=on \
     "${STORAGE_POOL_NAME}" \
-    ${MIRROR_DEVICES[@]/%/-part6}
+    mirror ${MIRROR_DEVICES[@]/%/-part6}
 
   sudo zfs create \
     -o refreservation=1G \
@@ -222,19 +277,6 @@ if [[ "${#MIRROR_DEVICES[@]}" > 0 ]]; then
 else
   make_storage_mounts "${SYSTEM_POOL_NAME}"
 fi
-
-# sudo zfs create \
-#   -V "${SWAP_PARTITION_SIZE}GB" \
-#   -b "$(getconf PAGESIZE)" \
-#   -o compression=zle \
-#   -o logbias=throughput \
-#   -o sync=always \
-#   -o primarycache=metadata \
-#   -o secondarycache=none \
-#   -o com.sun:auto-snapshot=false \
-#   "${SYSTEM_POOL_NAME}/swap"
-
-sudo mkswap -L swap ${swapPartition}
 
 sudo zfs create \
   -o canmount=off \
@@ -247,29 +289,6 @@ sudo zfs create \
   "${SYSTEM_POOL_NAME}/NixOS/root"
 
 
-sudo mkfs.fat -F 32 -n boot "${efiMainPartition}"
-
-sudo cryptsetup luksFormat \
-  --batch-mode \
-  --type luks1 \
-  -c aes-xts-plain64 \
-  -s 256 \
-  --pbkdf pbkdf2 \
-  "${bootMainPartition}" "${KEY_BOOT}"
-
-sudo cryptsetup luksAddKey \
-  --batch-mode \
-  --key-file "${KEY_BOOT}" \
-  --pbkdf pbkdf2 \
-  "${bootMainPartition}" \
-  "${PASSPHRASE_FILE}"
-
-sudo cryptsetup open \
-  --type luks \
-  --key-file \
-  "${KEY_BOOT}" "${bootMainPartition}" ${CRYPT_BOOT_DEV}
-
-sudo mkfs.ext4 /dev/mapper/${CRYPT_BOOT_DEV}
 
 # echo "Installing.."
 
@@ -282,49 +301,177 @@ if [[ "${#MIRROR_DEVICES[@]}" > 0 ]]; then
 else
   sudo mount -t zfs "${SYSTEM_POOL_NAME}/home" "${INSTALL_DIR}/home"
 fi
-sudo mkdir "${INSTALL_DIR}/boot"
-sudo mount /dev/mapper/${CRYPT_BOOT_DEV} "${INSTALL_DIR}/boot"
 
-sudo cp "${KEY_BOOT}" "${INSTALL_DIR}/boot/keyfileBoot.bin"
-sudo cp "${KEY_ZFS}" "${INSTALL_DIR}/boot/keyfileZfs.bin"
+make_boot_filesystem() {
+  mountpoint=$1; shift
+  cryptname=$1; shift
+  device=$1; shift
 
-pushd "${INSTALL_DIR}/boot"
-  sudo rm -f "${INSTALL_DIR}/boot/initrd.keys.gz"
-  find keyfile*.bin -print0 | sort -z | sudo cpio -o -H newc -R +0:+0 --reproducible --null | gzip -9 | sudo tee "${INSTALL_DIR}/boot/initrd.keys.gz" >/dev/null
-  sudo chmod 000 "${INSTALL_DIR}/boot/initrd.keys.gz" "${INSTALL_DIR}/boot/"keyfile*.bin
-popd
+  bootPartition="$(get_bootpartition ${device})"
+  efiPartition="$(get_efipartition ${device})"
 
-bootMainPartitionUuid=$(blkid -o value -s UUID ${bootMainPartition})
-bootMainPartitionByUuid="/dev/disk/by-uuid/${bootMainPartitionUuid}"
-sudo mkdir "${INSTALL_DIR}/boot/efi"
-sudo mount "${efiMainPartition}" "${INSTALL_DIR}/boot/efi"
+  sudo mkfs.fat -F 32 "${efiPartition}"
+
+  sudo cryptsetup luksFormat \
+    --batch-mode \
+    --type luks1 \
+    -c aes-xts-plain64 \
+    -s 256 \
+    --pbkdf pbkdf2 \
+    "${bootPartition}" "${KEYS[Boot]}"
+
+  sudo cryptsetup luksAddKey \
+    --batch-mode \
+    --key-file "${KEYS[Boot]}" \
+    --pbkdf pbkdf2 \
+    "${bootPartition}" \
+    "${PASSPHRASE_FILE}"
+
+  sudo cryptsetup open \
+    --type luks \
+    --key-file \
+    "${KEYS[Boot]}" "${bootPartition}" ${cryptname}
+
+  sudo mkfs.ext4 /dev/mapper/${cryptname}
+
+  sudo mkdir "${INSTALL_DIR}${mountpoint}"
+  sudo mount /dev/mapper/${cryptname} "${INSTALL_DIR}${mountpoint}"
+
+  sudo mkdir "${INSTALL_DIR}${mountpoint}/efi"
+  sudo mount "${efiPartition}" "${INSTALL_DIR}${mountpoint}/efi"
+}
+
+# Copy KeyFiles
+sudo mkdir -p "${INSTALL_DIR}${KEYS_DIR}"
+for usage in "${!KEYS[@]}"; do
+  sudo cp "${KEYS[$usage]}" "${INSTALL_DIR}$(get_keyfile_location $usage)"
+done
+sudo chmod 000 "${INSTALL_DIR}$KEYS_DIR/"*
+
+make_boot_filesystem \
+  /boot \
+  "$CRYPT_BOOT_DEV" \
+  "${INSTALL_DEVICE}"
+
+for ((backupbootcount=0; backupbootcount<${#MIRROR_DEVICES[@]}; backupbootcount++)); do
+  make_boot_filesystem \
+    "/boot${backupbootcount}" \
+    "${CRYPT_BOOTBACKUP_DEV}${backupbootcount}" \
+    "${MIRROR_DEVICES[$backupbootcount]}"
+done
+
+
+# swap
+sudo cryptsetup luksFormat \
+  --batch-mode \
+  --type luks1 \
+  -c aes-xts-plain64 \
+  -s 256 \
+  --pbkdf pbkdf2 \
+  "${swapPartition}" "${KEYS[Swap]}"
+
+sudo cryptsetup open \
+  --type luks \
+  --key-file \
+  "${KEYS[Swap]}" "${swapPartition}" ${CRYPT_SWAP_DEV}
+
+sudo mkswap -L swap "/dev/mapper/${CRYPT_SWAP_DEV}"
 
 sudo swapoff -a
-sudo swapon "${swapPartition}"
 sudo -- `which nixos-generate-config` --root "${INSTALL_DIR}"
 sudo swapon -a
 
+print_initrd_crypt_boot() {
+  devicename=$1; shift
+  partition=$1; shift
+
+  cat <<EOF
+    "${devicename}" = {
+      # preLVM = true;
+      keyFile = "/$(get_keyfile_name Boot)";
+      allowDiscards = true;
+      device = "/dev/disk/by-uuid/$(get_uuid ${partition})";
+    };
+EOF
+}
+
 {
 cat <<EOF
-  { boot, ... }:
+  { boot, swapDevices, ... }:
 
   {
     boot = {
-      initrd.luks.devices."${CRYPT_BOOT_DEV}" = {
-        # preLVM = true;
-        keyFile = "/keyfileBoot.bin";
-        allowDiscards = true;
+      initrd = {
+        secrets = {
+EOF
+for usage in "${!KEYS[@]}"; do
+cat <<EOF
+          "/$(get_keyfile_name $usage)" = "$(get_keyfile_location $usage)";
+EOF
+done
+cat <<EOF
+        };
+        luks.devices = {
+EOF
+print_initrd_crypt_boot \
+  "${CRYPT_BOOT_DEV}" \
+  "$(get_bootpartition ${INSTALL_DEVICE})"
+for ((c=0; c<${#MIRROR_DEVICES[@]}; c++)); do
+  print_initrd_crypt_boot \
+    "${CRYPT_BOOTBACKUP_DEV}$c" \
+    $(get_bootpartition ${MIRROR_DEVICES[$c]})
+done
+cat <<EOF
+        };
       };
-      loader.grub.devices = [ "${INSTALL_DEVICE}" ]; # or "nodev" for efi only
+      loader.grub= {
+        devices = [
+          "${INSTALL_DEVICE}"
+        ]; # or "nodev" for efi only
+        mirroredBoots = [
+EOF
+echo  "${MIRROR_DEVICES[@]}" 1>&2
+for ((backupbootcount=0; backupbootcount<${#MIRROR_DEVICES[@]}; backupbootcount++)); do
+  mirror=${MIRROR_DEVICES[$backupbootcount]}
+  cat <<EOF
+          {
+            devices = [
+              "${mirror}"
+            ];
+            path = "/boot$backupbootcount";
+            efiBootloaderId="NixOS-backup-$backupbootcount";
+            efiSysMountPoint="/boot$backupbootcount/efi";
+          }
+
+EOF
+done
+
+cat <<EOF
+        ];
+      };
     };
+    swapDevices = [
+      {
+        device = "/dev/disk/by-uuid/$(get_uuid /dev/mapper/${CRYPT_SWAP_DEV})";
+        encrypted = {
+          enable = true;
+          keyFile = "/$(get_keyfile_name Swap)";
+          label = "${CRYPT_SWAP_DEV}";
+          blkDev = "/dev/disk/by-uuid/$(get_uuid ${swapPartition})";
+        };
+      }
+    ];
   }
 EOF
 } | sudo tee "${INSTALL_DIR}/etc/nixos/bootdevice.nix" >/dev/null
-for filename in configuration.nix dropbox.nix users.nix virtualization.nix x11.nix xscreensaver.nix passwords.nix printing.nix 79dachboden5.cer; do
-  sudo cp "${filename}" "${INSTALL_DIR}/etc/nixos/${filename}"
+for filename in *.nix pkgs 79dachboden5.cer; do
+  sudo cp -r "${filename}" "${INSTALL_DIR}/etc/nixos/${filename}"
 done
 
 echo "nixos-install"
-sudo zfs set keylocation=file:///keyfileZfs.bin "${SYSTEM_POOL_NAME}"
+sudo zfs set keylocation=file:///$(get_keyfile_name Zfs) "${SYSTEM_POOL_NAME}"
+if [[ "${#MIRROR_DEVICES[@]}" > 0 ]]; then
+  sudo zfs set keylocation=file:///etc/keys/$(get_keyfile_name Zfs) "${STORAGE_POOL_NAME}"
+fi
 sudo PATH="$PATH" NIX_PATH="$NIX_PATH" $(which nixos-install) --show-trace --no-root-passwd --root "${INSTALL_DIR}"
 
