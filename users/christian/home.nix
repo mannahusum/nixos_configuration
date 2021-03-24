@@ -129,14 +129,18 @@ with lib;
       }
     )
     bashInteractive
+    bat # cat clone
     cadaver
     coreutils-full
+    cyrus_sasl
     dpt-rp1
     duff
     enscript
     fdupes
     feh
+    ffmpeg-full
     file
+    firefox
     fzf
     gcc
     glxinfo
@@ -144,12 +148,14 @@ with lib;
     gnumake
     homePython38
     hplip
-    innoextract
+    inetutils
     inkscape
+    innoextract
     libsecret
     lsof
     lsscsi
     lutris
+    mkpasswd
     mlterm
     ncurses
     # nerdfonts
@@ -169,9 +175,9 @@ with lib;
     qutebrowser
     ranger
     ripgrep
-    cyrus_sasl
     screen
     scummvm
+    simple-scan
     smartmontools
     sxiv
     tabbed
@@ -183,8 +189,8 @@ with lib;
     usbutils
     # vimHugeX
     vulkan-tools
-    wineWowPackages.stable
     winetricks
+    wineWowPackages.stable
     wipe
     xorg.xdpyinfo
     xorg.xkill
@@ -220,6 +226,7 @@ with lib;
       enable = true;
       browsers = [
         "chrome"
+        "firefox"
       ];
     };
 
