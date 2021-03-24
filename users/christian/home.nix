@@ -5,6 +5,8 @@ with lib;
   home.keyboard = null;
 
   imports = [
+    ./fontconfig.nix
+
     ./alacritty.nix
     ./awesome.nix
     ./calibre.nix
@@ -158,7 +160,6 @@ with lib;
     mkpasswd
     mlterm
     ncurses
-    # nerdfonts
     nix-prefetch-git
     nodejs
     nodePackages.typescript

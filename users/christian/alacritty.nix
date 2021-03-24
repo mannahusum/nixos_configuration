@@ -91,12 +91,15 @@ in
   home.packages = with pkgs; [
     alacritty
   ];
+  fonts.fonts = with pkgs; [
+    nerdfonts
+  ];
   programs.alacritty = {
     enable = true;
     settings = {
       font = {
         normal = {
-          family = "FuraCode Nerd Font Mono";
+          family = "FiraCode Nerd Font Mono";
           style = "Regular";
         };
         size = 5.0;
