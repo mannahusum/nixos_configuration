@@ -11,6 +11,7 @@
       "lxd"
       "render"
       "scanner"
+      "transmission"
       "video"
       "wheel"
       "networkmanager"
@@ -31,9 +32,8 @@
     #   }
     # ];
     packages = with pkgs; [
-      bashInteractive
+      dash
       coreutils-full
-      git
     ];
   };
 }

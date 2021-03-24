@@ -68,14 +68,14 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     cacert
+    efitools
     file
+    findutils
     gptfdisk
     less
     lesspipe
     lm_sensors
-    findutils
     mlocate
-    efitools
     vim
     wget
     xsaneGimp
@@ -116,7 +116,7 @@
     iotop.enable = true;
     java.enable = true;
     less.enable = true;
-    nm-applet.enable = true;
+    # nm-applet.enable = true;
     npm.enable = true;
     # ssh = {
     #   forwardX11 = true;
@@ -132,11 +132,29 @@
       enable = true;
       nssmdns = true;
       ipv6 = true;
+      publish = {
+        enable = true;
+        addresses = true;
+        hinfo = true;
+        userServices = true;
+        workstation = true;
+      };
+      openFirewall = true;
     };
     locate ={
       enable = true;
       locate = pkgs.mlocate;
       localuser = null;
+      prunePaths = [
+        "/tmp"
+        "/var/tmp"
+        "/var/cache"
+        "/var/lock"
+        "/var/run"
+        "/var/spool"
+        "/nix/store"
+        "/home/christian/pron"
+      ];
     };
     openssh.enable = true;
     unbound = {
@@ -152,29 +170,16 @@
     openssh = {
       forwardX11 = true;
     };
+    transmission = {
+      enable = true;
+    };
   };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
-
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
-  # services.xserver.layout = "us";
-  # services.xserver.xkbOptions = "eurosign:e";
-
-  # Enable touchpad support.
-  # services.xserver.libinput.enable = true;
-
-  # Enable the KDE Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
-  # services.xserver.desktopManager.plasma5.enable = true;
+  networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -189,6 +194,7 @@
     };
 
     allowUnfree = true;
+    allowBroken = true;
   };
 
   security = {

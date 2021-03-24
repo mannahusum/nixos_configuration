@@ -1,4 +1,4 @@
-{ pkgs, sound, environment, hardware, services, ... }:
+{ pkgs, environment, hardware, services, security, programs, ... }:
 {
   environment.systemPackages = with pkgs; [
     xorg.xf86inputevdev
@@ -11,7 +11,6 @@
   ];
 
   # Enable sound.
-  sound.enable = true;
   hardware = {
     pulseaudio = {
       enable = true;
@@ -49,18 +48,20 @@
       desktopManager.gnome3.enable = true;
       displayManager = {
         defaultSession = "none+awesome";
-        # defaultSession = "gnome-xorg";
         autoLogin.enable = false;
-        gdm.enable = false;
+
         lightdm = {
           enable = true;
           greeter = {
             enable = true;
           };
         };
+
       };
     };
 
-    # systemd.defaultUnit = "graphical.target";
   };
+
+  security.pam.services.lightdm.enableGnomeKeyring = true;
+  programs.seahorse.enable = true;
 }

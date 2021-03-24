@@ -6,6 +6,7 @@
 {
   imports =
     [
+      ./music.nix
       ./bootdevice.nix
       ./hardware-configuration.nix
     ];
@@ -75,8 +76,5 @@
       nvidia-docker = pkgs.callPackage ../pkgs/nvidia-docker-new {};
     };
   };
-
-  # Enable the X11 windowing system.
-  services.xserver.videoDrivers = [ "nvidia" ];
 
 }

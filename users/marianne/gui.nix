@@ -15,12 +15,6 @@
 
 
     home-manager.users.marianne = {
-      home.stateVersion = "20.09";
-      home.username = "marianne";
-
-      # home.packages = with pkgs; [
-      #   gnome3
-      # ];
 
       xsession = {
         enable = true;

@@ -8,8 +8,6 @@
 
   users.users.christian = {
     packages = with pkgs; [
-      awesome
-      vimHugeX
       xterm
     ];
   };
