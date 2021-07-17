@@ -89,9 +89,9 @@ in {
   # Enable the X11 windowing system.
   services.xserver = {
     videoDrivers = [ "nvidia" ];
-    monitorSection = ''
-      DisplaySize 345 193
-    '';
+    # monitorSection = ''
+    #   DisplaySize 345 193
+    # '';
   };
 
   hardware = {
