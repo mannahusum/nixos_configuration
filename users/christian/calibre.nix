@@ -8,6 +8,7 @@
         oldAttrs: rec {
           buildInputs = oldAttrs.buildInputs ++ (
             with self.python38.pkgs; [
+              pkgs.xdg_utils
               tkinter
               zeroconf
             ]
