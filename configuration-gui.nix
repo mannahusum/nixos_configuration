@@ -59,7 +59,6 @@
     ];
 
     packages = with pkgs; [
-      kbdKeymaps.neo
       terminus_font
     ];
 
