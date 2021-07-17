@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ nixpkgs, config, pkgs, ... }:
 {
   imports =
     [
@@ -53,7 +53,7 @@
     };
   };
 
-  boot.blacklistedKernelModules = [ "i915" ];
+  boot.blacklistedKernelModules = [ "i926" ];
 
   services = {
     thinkfan = {
