@@ -212,5 +212,12 @@
     };
     sudo.wheelNeedsPassword = false;
   };
-  system.stateVersion = "20.09"; # Did you read the comment?
+  # system.stateVersion = "20.09"; # Did you read the comment?
+
+  nix = {
+    package = pkgs.nixUnstable;
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+  };
 }
