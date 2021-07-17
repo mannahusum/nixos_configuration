@@ -122,4 +122,7 @@ in {
   services.upower = {
     enable = true;
   };
+
+  services.pcscd.enable = true;
+  services.udev.packages = [ pkgs.yubikey-personalization ];
 }
