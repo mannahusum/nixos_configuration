@@ -2,8 +2,11 @@
 with lib;
 
 let
+  get_password_command = account: "${pkgs.pass.out}/bin/pass \"${account.passpath}\"";
+in let
   contactHome = "${config.xdg.cacheHome}/contacts";
   calendarHome = "${config.xdg.cacheHome}/calendars";
+  maildirs = "${config.home.homeDirectory}/Maildir";
 
   wudika = {
     name = "WuDiKa";
@@ -38,12 +41,12 @@ let
       drafts = "Draft";
     };
     username = "manshufude@yahoo.com";
-    passpath = "EmailApp/Yahoo";
+    passpath = "EmailApp/manshufude@yahoo.com";
   };
 
   mailboxesConfigFile = account: "neomutt/${toLower account.name}-mailboxes.sh";
 
-  maildirhead = account: "${config.home.homeDirectory}/Maildir/${toLower account.name}/";
+  maildirhead = account: "${maildirs}/${toLower account.name}/";
 
   specialMailbox = account: name: subdir: ''
     if [ -d "${maildirhead account}/${subdir}" ]; then
@@ -83,11 +86,8 @@ let
     popd 2>&1 >/dev/null
   '';
 
-  get_password_command = account: "${pkgs.pass.out}/bin/pass \"${account.passpath}/${account.username}\"";
-  get_password_vdirsyncer = account: ''"command", "${pkgs.pass.out}/bin/pass", "${account.passpath}/${account.username}"'';
+  get_password_vdirsyncer = account: ''"command", "'' + (get_password_command account);
   vdirsyncer_get_readonly = account: if (builtins.hasAttr "read_only" account && isBool account.read_only && account.read_only) then "read_only = true" else "";
-  # get_password_vdirsyncer =
-  #   account: builtins.foldl' (left: right: ''${left}, ${right}'') (map (token: ''"${token}"'') (splitstring (get_password_command account)));
 
   vdirsyncer_kontakte = account: ''
       [pair ${account.name}_Kontakte]
@@ -176,9 +176,9 @@ in
     "khard/khard.conf".text =''
       [addressbooks]
       [[wudika]]
-      path = ~/${config.xdg.cacheHome}/contacts/wudika/Contacts/
+      path = ${config.xdg.cacheHome}/contacts/wudika/Contacts/
       [[markomannia]]
-      path = ~/${config.xdg.cacheHome}/contacts/markomannia/addressbook/
+      path = ${config.xdg.cacheHome}/contacts/markomannia/addressbook/
 
 
       [general]
@@ -251,12 +251,11 @@ in
       address = "${wudika.email}";
       userName = "${wudika.email}";
       aliases = [ "sigma@fl-markomannia.de" ];
-      # passwordCommand = "${pkgs.libsecret.out}/bin/secret-tool lookup email ${wudika.email}";
 
       passwordCommand = get_password_command wudika;
       gpg = {
         signByDefault = true;
-        key = "F1A1F1A33787F28359E60BFB1DBDE5EC541E1874";
+        key = "48E40D6E619CE1E2336A6DE46E5663473DF0E5AF";
       };
       imap = {
         host = "ssl.wudika.de";
@@ -325,11 +324,15 @@ in
       let
         ncursesToSlang = replacement: package: if hasPrefix "ncurses-" package.name then replacement else package;
       in {
+        emaillua = super.lua.withPackages(ps: with ps; [ luasql-sqlite3 luautf8 ]);
         neomutt = super.neomutt.overrideAttrs (oldAttrs: rec {
-          buildInputs = map (ncursesToSlang self.slang) oldAttrs.buildInputs;
+          version="20210205";
+          buildInputs = (map (ncursesToSlang self.slang) oldAttrs.buildInputs) ++ [ self.emaillua ];
           configureFlags = oldAttrs.configureFlags ++ [
             "--with-slang=${self.slang.dev}"
             "--with-ui=slang"
+            "--lua"
+            "--with-lua=${self.emaillua}"
           ];
         });
       }
@@ -337,6 +340,7 @@ in
   ];
   home.packages = with pkgs; [
     khard
+    emaillua
     mblaze
     mu
     neomutt
@@ -358,9 +362,49 @@ in
       editor = "${pkgs.vimHugeX.out}/bin/vim";
       binds = [
         {
-          map = "editor";
+          map = [ "editor" ];
           key = "<Tab>";
           action = "complete-query";
+        }
+        {
+          map = [ "index" ];
+          key = "\\Cu";
+          action = "sidebar-first";
+        }
+        {
+          map = [ "index" ];
+          key = "\\Co";
+          action = "sidebar-last";
+        }
+        {
+          map = [ "index" ];
+          key = "\\Cw";
+          action = "sidebar-page-down";
+        }
+        {
+          map = [ "index" ];
+          key = "\\Cx";
+          action = "sidebar-page-up";
+        }
+        {
+          map = [ "index" ];
+          key = "\\Ca";
+          action = "sidebar-next";
+        }
+        {
+          map = [ "index" ];
+          key = "\\Cl";
+          action = "sidebar-prev";
+        }
+        {
+          map = [ "index" ];
+          key = "\\Cp";
+          action = "sidebar-open";
+        }
+        {
+          map = [ "index" ];
+          key = "\\Cä";
+          action = "sidebar-toggle-virtual";
         }
       ];
       sidebar = {
@@ -388,6 +432,14 @@ in
         set nosave_empty
         set tilde
         set nouse_domain
+
+        set autocrypt
+        set autocrypt_dir = "${config.xdg.cacheHome}/neomutt/autocrypt"
+        set crypt_autosign
+        set crypt_autopgp
+        set header_cache = "${config.xdg.cacheHome}/neomutt/headers"
+
+        set nm_default_uri = "notmuch://${maildirs}"
       '';
     };
   };
@@ -396,4 +448,6 @@ in
     lieer.enable = true;
     mbsync.enable = true;
   };
+
+  #TODO: Import gpg-key into autocrypt keyring
 }
