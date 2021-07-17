@@ -8,10 +8,8 @@
     ];
   };
   xdg.configFile = {
-    "awesome/rc.lua".source = pkgs.substituteAll {
-      # terminal = "${pkgs.tabbed.out}/bin/tabbed -c ${pkgs.alacritty.out}/bin/alacritty --embed";
-      terminal = "${pkgs.alacritty.out}/bin/alacritty";
-      src = ./rc.lua;
+    "awesome/rc.lua" = {
+      text = (builtins.replaceStrings ["xterm"] ["${pkgs.alacritty.out}/bin/alacritty"] (builtins.readFile "${pkgs.awesome.out}/etc/xdg/awesome/rc.lua"));
     };
   };
 }
