@@ -80,15 +80,12 @@
       #   atasmart /dev/disk/by-id/wwn-0x5001b448bb115a46 (15)
       # '';
     };
+    geoclue2 = {
+      enable = true;
+      enableWifi = true;
     };
   };
 
   hardware.bluetooth.enable = true;
-
-  nixpkgs.config = {
-    packageOverrides = super: let self = super.pkgs; in {
-      nvidia-docker = pkgs.callPackage ../pkgs/nvidia-docker-new {};
-    };
-  };
 
 }
