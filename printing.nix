@@ -31,7 +31,7 @@
     };
     sane = {
       enable = true;
-      extraBackends = [ pkgs.hplipWithPlugin ];
+      extraBackends = [ pkgs.hplipWithPlugin pkgs.utsushi ];
     };
   };
 }
