@@ -1,9 +1,12 @@
 { pkgs, services, ... }:
 {
-  services.xscreensaver = {
-    enable = true;
-    settings = {
-      newLoginCommand = "${pkgs.lightdm.out}/bin/dm-tool switch-to-greeter";
+  services = {
+    caffeine.enable = true;
+    xscreensaver = {
+      enable = true;
+      settings = {
+        newLoginCommand = "${pkgs.lightdm.out}/bin/dm-tool switch-to-greeter";
+      };
     };
   };
 
