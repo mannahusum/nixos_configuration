@@ -1,7 +1,10 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, config, lib, nixpkgs, ... }:
 with lib;
 
 {
+
+  # inherit nixpkgs;
+
   home.keyboard = null;
 
   imports = [
@@ -17,7 +20,12 @@ with lib;
     ./mnemosyne.nix
     ./music.nix
     ./mplayer.nix
+    ./passwordsafe.nix
+    ./pulseaudio.nix
+    ./qemu.nix
     ./ssh.nix
+    ./taskwarrior.nix
+    ./todoist.nix
     # ./sway.nix
     ./xscreensaver.nix
     ./zathura.nix
@@ -135,6 +143,7 @@ with lib;
     cadaver
     coreutils-full
     cyrus_sasl
+    dmidecode
     dpt-rp1
     duff
     enscript
@@ -144,10 +153,10 @@ with lib;
     file
     firefox
     fzf
-    gcc
     glxinfo
     gnome3.gnome-font-viewer
     gnumake
+    gocr
     homePython38
     hplip
     inetutils
@@ -156,7 +165,8 @@ with lib;
     libsecret
     lsof
     lsscsi
-    lutris
+    manpages
+    # lutris
     mkpasswd
     mlterm
     ncurses
@@ -183,44 +193,51 @@ with lib;
     sxiv
     tabbed
     tcpdump
+    tesseract4
     texlive.combined.scheme-full
+    tigervnc
+    tldr
     units
     unzip
     uqm
     usbutils
     # vimHugeX
+    virt-viewer
     vulkan-tools
     winetricks
     wineWowPackages.stable
     wipe
+    woeusb
+    xclip
+    xsel
     xorg.xdpyinfo
     xorg.xkill
+    xournalpp
     yarn
+    yubioath-desktop
+    inotify-tools
   ];
+
+  home.file.".XCompose".source = ./XCompose;
 
   programs = {
 
-    home-manager = {
-      enable = true;
-    };
+    exa.enable = true;
+    topgrade.enable = true;
+    home-manager.enable = true;
 
     bash = {
       enable = true;
       historyControl = [ "ignorespace" ];
       historyIgnore = [ "mplayer" ];
-    };
-
-    password-store = {
-      enable = true;
-      settings = {
-        PASSWORD_STORE_KEY = "F1A1F1A33787F28359E60BFB1DBDE5EC541E1874";
-        PASSWORD_STORE_DIR = "${config.home.homeDirectory}/.password-store";
-      };
+      initExtra = ''
+        GPG_TTY=$(tty)
+      '';
     };
 
     direnv = {
       enable = true;
-      enableNixDirenvIntegration = true;
+      nix-direnv.enable = true;
     };
 
     browserpass = {
