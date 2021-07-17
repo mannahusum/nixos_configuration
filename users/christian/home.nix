@@ -16,7 +16,6 @@ with lib;
     ./email.nix
     ./git.nix
     ./google-chrome.nix
-    # ./kitty.nix
     ./mnemosyne.nix
     ./music.nix
     ./mplayer.nix
