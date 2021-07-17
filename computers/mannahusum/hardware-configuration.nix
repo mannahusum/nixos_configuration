@@ -2,8 +2,13 @@
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
 { config, lib, pkgs, modulesPath, boot, ... }:
-
-{
+let
+  unstable = import
+    (builtins.fetchTarball https://github.com/nixos/nixpkgs/tarball/master)
+    # reuse the current configuration
+    { config = config.nixpkgs.config; };
+in {
+  # boot.kernelPackages = unstable.linuxPackages_5_10;
   boot.kernelPatches = [ {
     name = "snd10k1";
     patch = null;
