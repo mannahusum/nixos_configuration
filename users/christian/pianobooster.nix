@@ -1,4 +1,4 @@
-{ stdenv, fetchFromGitHub, cmake, pkg-config, qttools
+{ lib, fetchFromGitHub, cmake, pkg-config, qttools
 , alsaLib, ftgl, libGLU, libjack2, qtbase, rtmidi,
 mkDerivation
 }:
@@ -22,7 +22,7 @@ mkDerivation rec {
     "-DOpenGL_GL_PREFERENCE=GLVND"
   ];
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "A MIDI file player that teaches you how to play the piano";
     homepage = "https://github.com/captnfab/PianoBooster";
     license = licenses.gpl3Plus;
