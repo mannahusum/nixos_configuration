@@ -10,4 +10,12 @@
       ./configuration-gui.nix
     ];
 
+  nixpkgs.overlays = [
+    (_: prev: {
+
+      prev.linuxPackagesFor = kernel:
+        (prev.linuxPackagesFor kernel).extend (_: _: { ati_drivers_x11 = null; });
+
+    })
+  ];
 }
