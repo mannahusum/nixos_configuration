@@ -35,6 +35,11 @@
       fsType = "zfs";
     };
 
+  fileSystems."/var/lib/docker" =
+    { device = "manna_spin/Virtualisation/docker";
+      fsType = "zfs";
+    };
+
   fileSystems."/boot" =
     { device = "/dev/disk/by-uuid/579e7ce5-0041-4d6d-b20a-a8d136bd95ee";
       fsType = "ext4";
