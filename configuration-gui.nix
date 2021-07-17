@@ -162,9 +162,9 @@
     };
     openssh.enable = true;
     unbound = {
-      allowedAccess = [
-        "127.0.0.0/24"
-        "::1"
+      settings.server.access-control = [
+        "127.0.0.0/24 allow"
+        "::1/128 allow"
       ];
       enable = true;
     };
