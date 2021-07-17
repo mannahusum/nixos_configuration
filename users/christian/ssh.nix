@@ -22,11 +22,11 @@ in {
       };
     };
   };
-  home = {
-    activation.installSSHprivateKey = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      $DRY_RUN_CMD mkdir -p $HOME/.ssh/controlmasters
-      $DRY_RUN_CMD install -D -m600 ${./private/id_rsa} $HOME/.ssh/id_rsa
-    '';
-  };
+  # home = {
+  #   activation.installSSHprivateKey = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  #     $DRY_RUN_CMD mkdir -p $HOME/.ssh/controlmasters
+  #     $DRY_RUN_CMD install -D -m600 ${./private/id_rsa} $HOME/.ssh/id_rsa
+  #   '';
+  # };
 }
 
