@@ -11,7 +11,7 @@
       ./xscreensaver.nix
       ./guiusers.nix
       ./dropbox.nix
-      # ./virtualization.nix
+      ./virtualization.nix
       ./printing.nix
       ./passwords.nix
       ./raspberry-pi-zero-buildtools.nix
