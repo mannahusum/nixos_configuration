@@ -25,7 +25,6 @@ with lib;
     ./ssh.nix
     ./taskwarrior.nix
     ./todoist.nix
-    # ./sway.nix
     ./xscreensaver.nix
     ./zathura.nix
     ./vim.nix
