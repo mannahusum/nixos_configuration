@@ -59,13 +59,27 @@
     thinkfan = {
       enable = true;
       smartSupport = true;
-      sensors = ''
-        tp_thermal /proc/acpi/ibm/thermal (0,0,0,0,0,0,0,0)
-        hwmon /sys/class/hwmon/hwmon4/temp1_input (0)
-        atasmart /dev/disk/by-id/wwn-0x57c354817e8ac175 (15)
-        # atasmart /dev/disk/by-id/wwn-0x5000c5009d522fb3 (15)
-        atasmart /dev/disk/by-id/wwn-0x5001b448bb115a46 (15)
-      '';
+      sensors = [
+        {
+          type = "tpacpi";
+          query = "/proc/acpi/ibm/thermal";
+        }
+
+      ];
+      fans = [
+        {
+          type = "tpacpi";
+          query = "/proc/acpi/ibm/fan";
+        }
+      ];
+      # sensors = ''
+      #   tp_thermal /proc/acpi/ibm/thermal (0,0,0,0,0,0,0,0)
+      #   hwmon /sys/class/hwmon/hwmon4/temp1_input (0)
+      #   atasmart /dev/disk/by-id/wwn-0x57c354817e8ac175 (15)
+      #   # atasmart /dev/disk/by-id/wwn-0x5000c5009d522fb3 (15)
+      #   atasmart /dev/disk/by-id/wwn-0x5001b448bb115a46 (15)
+      # '';
+    };
     };
   };
 
