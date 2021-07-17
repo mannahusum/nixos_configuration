@@ -40,12 +40,12 @@
       layout = "de,de,gr";
       xkbModel = "pc105";
       xkbVariant = "neo,,";
-      xkbOptions = "";
+      xkbOptions = ",,";
       windowManager.awesome = {
         enable = true;
         package = pkgs.awesome;
       };
-      desktopManager.gnome3.enable = true;
+      desktopManager.gnome.enable = true;
       displayManager = {
         defaultSession = "none+awesome";
         autoLogin.enable = false;
