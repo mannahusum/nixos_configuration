@@ -6,8 +6,12 @@
     ];
     file.".config/pass-git-helper/git-pass-mapping.ini" = {
       text = ''
+[DEFAULT]
+username_extractor=regex_search
+regex_username=^user: (.*)$
+
 [github.com*]
-target=github.com/mannahusum
+target=github-gist
       '';
     };
   };
