@@ -1,4 +1,4 @@
-{ pkgs, services, ... }:
+{ lib, pkgs, services, ... }:
 {
   services = {
     caffeine.enable = true;
@@ -10,15 +10,19 @@
     };
   };
 
-  xresources.extraConfig = builtins.readFile (
-    (
-      pkgs.fetchFromGitHub {
-          owner = "solarized";
-          repo = "xresources";
-          rev = "0c426297b558965d462f0e45f87eb16a10586c53";
-          sha256 = "1h013bmcl8ba49wxcnxqgp4grma3d6zrsszr320wr6i7anl4fdln";
-      }
-    ).out + "/Xresources.dark"
-  );
+  xresources.extraConfig = let
+    solarized_dark = (
+    builtins.readFile (
+      (
+        pkgs.fetchFromGitHub {
+            owner = "solarized";
+            repo = "xresources";
+            rev = "0c426297b558965d462f0e45f87eb16a10586c53";
+            sha256 = "1h013bmcl8ba49wxcnxqgp4grma3d6zrsszr320wr6i7anl4fdln";
+        }
+      ).out + "/Xresources.dark"
+    ));
+  in builtins.concatStringsSep "\n" [ solarized_dark "Xft.dpi: 163"];
+
 
 }
