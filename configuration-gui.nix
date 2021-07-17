@@ -92,7 +92,7 @@
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
-  programs.ssh.forwardX11 = true;
+  # programs.ssh.forwardX11 = true;
   programs = {
     adb.enable = true;
     bash = {
