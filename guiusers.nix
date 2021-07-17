@@ -4,7 +4,6 @@
     [
       ./users.nix
       ./users/christian/gui.nix
-      ./users/marianne/gui.nix
     ];
 
   networking.firewall = {
