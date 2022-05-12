@@ -135,6 +135,23 @@ in let
 in
 {
 
+  xdg.desktopEntries.neomutt = {
+    categories = [ "Office" "Network" "Email" ];
+    comment="Simple text-based Mail User Agent";
+    exec="neomutt";
+    genericName="Email";
+    name="NeoMutt";
+    mimeType=[
+      "x-scheme-handler/mailto"
+    ];
+    terminal=true;
+    type="Application";
+  };
+  xdg.mimeApps.defaultApplications."x-scheme-handler/mailto"= [
+    "neomutt.desktop"
+  ];
+
+
   xdg.configFile = {
     "${mailboxesConfigFile wudika}" = {
       executable = true;
@@ -218,9 +235,11 @@ in
 
       lieer = {
         enable = true;
-        dropNonExistingLabels = true;
+        settings = {
+          replace_slash_with_dot = true;
+          drop_non_existing_label = true;
+        };
         notmuchSetupWarning = true;
-        replaceSlashWithDot = true;
         sync = {
           enable = true;
         };
