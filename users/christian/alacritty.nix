@@ -86,10 +86,34 @@ let
       white =   "#fdf6e3"; # base3
     };
   };
+
+  writeShellScriptBinAndSymlink = name: text: pkgs.symlinkJoin {
+    name = name;
+    paths = [
+      (pkgs.writeShellScriptBin name text)
+    ];
+  };
+
 in
 {
   home.packages = with pkgs; [
     alacritty
+    (
+      writeShellScriptBinAndSymlink "gnome-terminal" ''
+        [ x"$1" = x"--" ] || exit 1
+
+        shift
+
+        TITLE="$(basename "$1")"
+        if [ -n "$TITLE" ]; then
+          ${alacritty.out}/bin/alacritty -t "$TITLE" -e "$@"
+        else
+          ${alacritty.out}/bin/alacritty             -e "$@"
+        fi
+
+        exit 0
+      ''
+    )
   ];
   fonts.fonts = with pkgs; [
     nerdfonts
