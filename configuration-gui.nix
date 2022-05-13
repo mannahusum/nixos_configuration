@@ -114,7 +114,7 @@
     gnupg.agent = {
       enable = true;
       enableSSHSupport = true;
-      pinentryFlavor = "gnome3";
+      pinentryFlavor = "qt";
     };
     gpaste.enable = true;
     iotop.enable = true;
