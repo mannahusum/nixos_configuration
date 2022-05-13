@@ -71,6 +71,14 @@ in {
       "github.com" = {
         forwardX11 = false;
       };
+      "SSHProxy" = {
+        user = "calbertsen";
+        hostname = "54.169.217.33";
+      };
+      "S1221S" = {
+       user = "root";
+       proxyCommand = "${pkgs.openssh.out}/bin/ssh SSHProxy -W 127.0.0.1:6221";
+      };
     };
   };
   # home = {
