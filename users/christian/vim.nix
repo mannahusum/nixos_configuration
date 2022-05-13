@@ -20,7 +20,10 @@ in {
           oldAttrs: rec {
             buildInputs = oldAttrs.buildInputs ++ (
               with pythonPackages; [
+                black
                 jedi
+                simple-websocket-server
+                python-slugify
               ]
             );
           }
@@ -58,6 +61,7 @@ let g:cmakePath = "${pkgs.cmake-format.out}/bin/cmake-format"
 let g:github_user = trim(system("pass github-gist | grep user: | cut -b 6-"))
 let g:gist_token = trim(system("pass github-gist | head -n 1"))
 let g:gist_clip_command = "${pkgs.xclip.out}/bin/xclip -selection primary"
+let g:black_virtualenv = "${pkgs.black.out}/"
 '';};
     activation.checkoutVimConfig = lib.hm.dag.entryAfter ["installSSHprivateKey"] ''
       vim_changed=""

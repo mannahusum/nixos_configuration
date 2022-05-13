@@ -163,6 +163,14 @@ in {
       ueberzug
       urllib3
       virtualenv
+
+      # used by vim
+      black
+      simple-websocket-server
+      python-slugify
+
+      # needed by black, hope this helps
+      pathspec
     ];
 
     homePython38 = python38Full.withPackages homePythonPackages;
