@@ -2,6 +2,13 @@
 with lib;
 
 let
+  writeShellScriptBinAndSymlink = name: text: pkgs.symlinkJoin {
+    name = name;
+    paths = [
+      (pkgs.writeShellScriptBin name text)
+    ];
+  };
+
   get_password_command = account: "${pkgs.pass.out}/bin/pass \"${account.passpath}\"";
 in let
   contactHome = "${config.xdg.cacheHome}/contacts";
@@ -132,13 +139,19 @@ in let
       ${vdirsyncer_get_readonly account}
 
   '';
+
+   neomutt_in_window = writeShellScriptBinAndSymlink "neomutt_in_window" ''
+     command="${pkgs.neomutt.out}/bin/neomutt $@"
+     [ -t 1 ] || command="${pkgs.alacritty.out}/bin/alacritty -t NeoMutt -e ${pkgs.neomutt.out}/bin/neomutt $@"
+     eval "$command"
+    '';
 in
 {
 
   xdg.desktopEntries.neomutt = {
     categories = [ "Office" "Network" "Email" ];
     comment="Simple text-based Mail User Agent";
-    exec="neomutt";
+    exec="${neomutt_in_window.out}/bin/neomutt_in_window %u";
     genericName="Email";
     name="NeoMutt";
     mimeType=[
@@ -358,6 +371,7 @@ in
     )
   ];
   home.packages = with pkgs; [
+    neomutt_in_window
     khard
     emaillua
     mblaze
