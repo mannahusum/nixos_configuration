@@ -28,6 +28,8 @@ with lib;
     '')
     mplayer
     youtube-dl
+    dvdbackup
+    dvdplusrwtools
   ];
 
   home.file.".mplayer/config" = {

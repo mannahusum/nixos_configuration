@@ -8,6 +8,7 @@
     [
       ./computers/mannahusum/configuration.nix
       ./configuration-gui.nix
+      # ./netboot.nix
     ];
 
   nixpkgs.overlays = [

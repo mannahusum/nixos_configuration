@@ -16,6 +16,7 @@
     supportedFilesystems = [
       "ntfs"
       "zfs"
+      "exfat"
     ];
     zfs = {
       enableUnstable = true;
@@ -40,6 +41,13 @@
     kernelModules = [
       "coretemp"
     ];
+    kernelPatches = [ {
+      name = "enable-exfat";
+      patch = null;
+      extraConfig = ''
+        EXFAT_FS y
+      '';
+    } ];
   };
 
   networking = {
@@ -84,6 +92,7 @@
       enable = true;
       enableWifi = true;
     };
+    teamviewer.enable = true;
   };
 
   hardware.bluetooth.enable = true;

@@ -102,7 +102,7 @@ in
           family = "FiraCode Nerd Font Mono";
           style = "Regular";
         };
-        size = 5.0;
+        size = 8.0;
       };
       window = {
         decorations = "none";

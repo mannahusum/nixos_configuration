@@ -112,10 +112,13 @@ in {
         libvdpau-va-gl
       ];
     };
-    nvidia.prime = {
-      offload.enable = true;
-      nvidiaBusId = "PCI:1:0:0";
-      intelBusId = "PCI:0:2:0";
+    nvidia = {
+      prime = {
+        offload.enable = true;
+        nvidiaBusId = "PCI:1:0:0";
+        intelBusId = "PCI:0:2:0";
+      };
+      package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
     };
   };
 

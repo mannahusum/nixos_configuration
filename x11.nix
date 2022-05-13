@@ -15,6 +15,9 @@
     pulseaudio = {
       enable = true;
       support32Bit = true;
+      daemon.config = {
+        avoid-resampling = true;
+      };
     };
     opengl = {
       driSupport32Bit = true;

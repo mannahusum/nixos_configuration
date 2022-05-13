@@ -1,4 +1,4 @@
-{ users, ... }:
+{ users, boot, ... }:
 {
   imports =
     [ # ...
@@ -17,5 +17,9 @@
     sound = {
       enable = true;
     };
+
+    boot.extraModprobeConfig = ''
+    options snd_hda_intel model=lenovo-dock
+    '';
 }
 

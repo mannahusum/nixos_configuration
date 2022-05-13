@@ -208,6 +208,10 @@
       ];
       certificates = [
         (builtins.readFile ./79dachboden5.cer)
+        (builtins.readFile (builtins.fetchurl {
+          url = "https://raw.githubusercontent.com/awslabs/amazon-kinesis-producer/master/java/amazon-kinesis-producer/src/main/resources/cacerts/b204d74a.0";
+          sha256 = "1zy80166dv6wahqdqc2a21iac88kz0i4v21pj4r969kh37vzj0j9";
+        }))
       ];
     };
     sudo.wheelNeedsPassword = false;
@@ -216,8 +220,8 @@
 
   nix = {
     package = pkgs.nixUnstable;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
+    # extraOptions = ''
+    #   experimental-features = nix-command flakes
+    # '';
   };
 }

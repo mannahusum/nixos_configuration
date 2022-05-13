@@ -1,4 +1,4 @@
-{ virtualisation, users, nixpkgs, pkgs, environment, ... }:
+{ virtualisation, users, pkgs, environment, ... }:
 {
   virtualisation = {
     docker = {
@@ -21,21 +21,43 @@
         "virbr0"
         "fi0"
       ];
-      qemuOvmf = true;
+      qemu = {
+        swtpm = {
+          enable = true;
+        };
+        ovmf = {
+          enable = true;
+          package = pkgs.OVMFFull;
+        };
+        package = pkgs.qemu_kvm;
+      };
       enable = true;
       onBoot = "start";
       onShutdown = "suspend";
     };
+    # virtualbox.host = {
+    #   enable = true;
+    # };
     lxd = {
       enable = true;
       recommendedSysctlSettings = true;
       zfsSupport = true;
     };
+    lxc.lxcfs.enable = true;
   };
 
-  environment.variables = {
-    LIBVIRT_DEFAULT_URI = "qemu:///system";
+  environment = {
+    sessionVariables = {
+      LIBVIRT_DEFAULT_URI = "qemu:///system";
+      VAGRANT_DEFAULT_PROVIDER = "libvirt";
+    };
+    systemPackages = with pkgs; [
+      virt-manager
+      win-virtio
+      virt-viewer
+    ];
   };
+
   # systemd.services.lxd.path = with pkgs; [ (callPackage ./pkgs/nvidia-docker-new {}) ];
   users.extraUsers.root = {
     subUidRanges = [

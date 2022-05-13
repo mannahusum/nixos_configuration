@@ -1,4 +1,10 @@
 { pkgs, services, hardware, ... }:
+# let
+#   myutsushi = pkgs.utsushi.override {
+#     withNetworkScan = true;
+#     utsushi-networkscan = pkgs.utsushi-networkscan;
+#   };
+# in
 {
   programs.system-config-printer.enable = true;
   services = {
