@@ -273,6 +273,60 @@ in {
 
   programs = {
 
+    autorandr = {
+      enable = true;
+      hooks.postswitch = {
+        "notify-awesome" = "echo 'awesome.restart()' | ${pkgs.awesome.out}/bin/awesome-client";
+        "change-dpi" = ''
+          case "$AUTORANDR_CURRENT_PROFILE" in
+            default)
+              DPI=130;
+              ;;
+            docked)
+              DPI=163;
+              ;;
+            *)
+              echo "Unknown profile: $AUTORANDR_CURRENT_PROFILE"
+              exit 1
+              ;;
+          esac
+
+          echo "Xft.dpi: $DPI" | ${pkgs.xorg.xrdb}/bin/xrdb -merge
+        '';
+      };
+      profiles = {
+        "docked" = {
+          fingerprint = {
+            "DP-2-1" = "00ffffffffffff0010ac08a04c383830280f010380291f78ee6390a3574b9b25115054a54b008180a940714f01010101010101010101483f403062b0324040c013006f131100001e000000ff0043303838313539533038384c20000000fc0044454c4c203230303146500a20000000fd00384c1f5010000a2020202020200053";
+            "DP-2-2" = "00ffffffffffff001e6d0677e28f0300061d0103803c2278ea3e31ae5047ac270c50542108007140818081c0a9c0d1c081000101010104740030f2705a80b0588a0058542100001a04740030f2705a80b0588a0058542100001a000000fd00383d1e873c000a202020202020000000fc004c472048445220344b0a20202001e3020338714d9022201f1203040161605d5e5f230907076d030c001100b83c20006001020367d85dc401788003e30f0003e305c000e3060501023a801871382d40582c450058542100001e565e00a0a0a029503020350058542100001a000000ff003930364e54585236563434320a0000000000000000000000000000000000c5";
+            "eDP-1" = "00ffffffffffff0006afed3400000000001601049522137802d1159e59539b271e505400000001010101010101010101010101010101b03680b470381e403064310058c1100000180000000f0000000000000000000000000020000000fe0041554f0a202020202020202020000000fe004231353648544e30332e34200a00f6";
+          };
+          config = {
+            "eDP-1".enable = false;
+            "DP-2-1" = {
+              enable = true;
+              crtc = 0;
+              primary = true;
+              position = "0x0";
+              mode = "1600x1200";
+              rate = "60.00";
+              transform = [
+                [ 1.699997 0.000000 0.000000 ]
+                [ 0.000000 1.699997 0.000000 ]
+                [ 0.000000 0.000000 1.000000 ]
+              ];
+            };
+            "DP-2-2" = {
+              enable = true;
+              crtc = 2;
+              mode = "38640x2160";
+              position = "2720x0";
+              rate = "30.00";
+            };
+          };
+        };
+      };
+    };
     exa.enable = true;
     topgrade.enable = true;
     home-manager.enable = true;
