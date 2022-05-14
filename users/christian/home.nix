@@ -197,6 +197,7 @@ in {
     cadaver
     coreutils-full
     cyrus_sasl
+    discord
     dmidecode
     dpt-rp1
     duff
