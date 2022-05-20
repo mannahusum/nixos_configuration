@@ -2,7 +2,7 @@
 
 set -e # Exit after a non-zero exit status
 # set -u # Treat unset variables as an error when subtituting
-set +x # Do not print commands as they are executed
+#set +x # Do not print commands as they are executed
 
 declare hostname="marianne"
 declare become="sudo -n"
@@ -17,7 +17,6 @@ declare git_repository="https://${GITHUB_USERNAME}:${GITHUB_ACCESS_TOKEN}@github
 declare -r KEYS_DIR="/etc/keys"
 declare -r INSTALL_DIR="$(mktemp -p /dev/shm -d)"
 declare NIX_RESULTS_ROOT
-
 # declare -r NIX_VERSION="21.05"
 declare -r PASSPHRASE_FILE="${CONFIGURATION_DIRECTORY}/passphrase.txt"
 declare -r TRUE=$(which true)
@@ -258,9 +257,8 @@ ensure_nix_environment() {
 }
 
 ensure_installation_device() {
-
-  [ -z "${install_device+x}" ] && show_error "No install device given"
-
+  [ -z "${install_device}" ] && show_error "No install device given"
+  return 0
 }
 
 mirror_devices_given() {

@@ -1,3 +1,4 @@
+**/.direnv
 *.sw?
 passphrase.txt
 passwords.nix
