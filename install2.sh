@@ -12,9 +12,12 @@ declare -i swap_partition_size=64
 declare -i libvirt_partition_size=0
 declare -r CONFIGURATION_DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 declare -r GITHUB_USERNAME="mannahusum"
-declare git_repository="git@github.com:${GITHUB_USERNAME}/nixos_configuration.git"
+declare -r GITHUB_ACCESS_TOKEN="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"
+declare git_repository="https://${GITHUB_USERNAME}:${GITHUB_ACCESS_TOKEN}@github.com/${GITHUB_USERNAME}/nixos_configuration.git"
 declare -r KEYS_DIR="/etc/keys"
 declare -r INSTALL_DIR="$(mktemp -p /dev/shm -d)"
+declare NIX_RESULTS_ROOT
+
 # declare -r NIX_VERSION="21.05"
 declare -r PASSPHRASE_FILE="${CONFIGURATION_DIRECTORY}/passphrase.txt"
 declare -r TRUE=$(which true)
@@ -25,16 +28,43 @@ declare -rA KEYS=(
 )
 declare -a mirror_devices
 
+add_partition_number() {
+  device=$1; shift
+  number=$1; shift
+
+  long_path="${device}-part${number}"
+  short_path="${device}${number}"
+  if [ -b "${long_path}" ]; then
+    echo -n "${long_path}"
+  elif [ -b "${short_path}" ]; then
+    echo -n "${short_path}"
+  else
+    show_error "Unable to find device for partition ${number} on drive ${device}"
+  fi
+}
+
 get_efipartition() {
   device=$1; shift
 
-  echo -n "$(get_persistent_disk_path "${device}")-part2"
+  echo -n "$(add_partition_number $(get_persistent_disk_path "${device}") 2)"
 }
 
 get_bootpartition() {
   device=$1; shift
 
-  echo -n "$(get_persistent_disk_path "${device}")-part3"
+  echo -n "$(add_partition_number $(get_persistent_disk_path "${device}") 3)"
+}
+
+get_swappartition() {
+  device=$1; shift
+
+  echo -n "$(add_partition_number $(get_persistent_disk_path "${device}") 4)"
+}
+
+get_rootpartition() {
+  device=$1; shift
+
+  echo -n "$(add_partition_number $(get_persistent_disk_path "${device}") 5)"
 }
 
 remove_temporary_keyfiles() {
@@ -116,8 +146,6 @@ unmount_filesystems() {
 }
 
 cleanup() {
-  read -p "blubb: " blubb
-
   unmount_filesystems
   destroy_crypto_devices
   export_zpools
@@ -185,8 +213,8 @@ get_persistent_disk_path() {
     fi;
   done
 
-  [ -n ${DEBUG+x} ] \
-    && printf "No persistent path found for device '%s'" "${disk}" 1>&2
+  [ -n ${DEBUG} ] \
+    && printf "No persistent path found for device '%s'\n" "${disk}" 1>&2
   echo "${disk}"
 }
 
@@ -223,14 +251,16 @@ ensure_nix_environment() {
       show_error "Unable to find nix environment. Giving up"
     fi
   fi
+
+  # ensure that the gcroot exists
+  nix-env -i bash
+  NIX_RESULTS_ROOT="$(mktemp -p /nix/var/nix/gcroots/per-user/$USER/ -d)"
 }
 
 ensure_installation_device() {
 
   [ -z "${install_device+x}" ] && show_error "No install device given"
 
-  swapPartition="$(get_persistent_disk_path "${install_device}")-part4"
-  rootPartition="$(get_persistent_disk_path "${install_device}")-part5"
 }
 
 mirror_devices_given() {
@@ -288,7 +318,8 @@ ensure_command_nix() {
     return
   fi
 
-  echo $(nix-store -r $(nix-instantiate '<nixpkgs>' -A ${package}))/bin/${name}
+  nix_pkg_root=${NIX_RESULTS_ROOT}/${package}
+  echo $(nix-store --add-root ${nix_pkg_root} -r $(nix-instantiate '<nixpkgs>' --add-root ${nix_pkg_root} -A ${package} ) | head -n 1)/bin/${name}
 }
 
 ensure_lsblk() {
@@ -388,10 +419,10 @@ ensure_zpools_not_in_use() {
   fi
 }
 
-ensure_github_access() {
-  ssh -T git@github.com </dev/null \
-    || [[ $? -eq 1 ]]
-}
+# ensure_github_access() {
+#   ssh -T git@github.com </dev/null \
+#     || [[ $? -eq 1 ]]
+# }
 
 ensure_devices_unused() {
   local device rdevice kdevice usagestring found fstype
@@ -452,7 +483,6 @@ check_prequisits() {
   ensure_swapoff
   ensure_swapon
   ensure_nixos_install_program
-
 }
 
 check_config() {
@@ -466,7 +496,7 @@ check_config() {
   ensure_devices_unused
   ensure_cryptdevice_names_unused
 
-  ensure_github_access
+  # ensure_github_access
   ensure_is_efi
 }
 
@@ -521,8 +551,8 @@ partition_single_disk() {
   partcmd+="-n1:+:+2M -c 1:grub -t 1:ef02 -A 1:set:2 "
   partcmd+="-n2:+:+512M -c 2:efi -t 2:ef00 "
   partcmd+="-n3:+:+${boot_partition_size}G -c 3:boot -t 3:8300 "
+  partcmd+="-n4:+:+${swap_partition_size}G -c 4:swap -t 4:8300 "
   if [ -z "${system_size}" ]; then
-    partcmd+="-n4:+:+${swap_partition_size}G -c 4:swap -t 4:8300 "
     partcmd+="-n5:+:- -c 5:system -t 5:8300 "
   else
     partcmd+="-n5:+:+${system_size} -c 5:system -t 5:8300 "
@@ -530,6 +560,7 @@ partition_single_disk() {
   fi
   partcmd+="${disk}"
 
+  echo $partcmd 1>&2
   eval "$become $partcmd 2>&1 >/dev/null"
 }
 
@@ -539,7 +570,7 @@ partition_disks() {
   echo
 
   partition_single_disk "${install_device}"
-  sectors_in_system=$(${become} LANG=C sgdisk -i5 ${install_device} | grep -i size | cut -d' ' -f3)
+  sectors_in_system=$(${become} LANG=C blockdev --getsize ${install_device})
 
   for mirror in "${mirror_devices[@]}"; do
     partition_single_disk "${mirror}" "${sectors_in_system}"
@@ -660,6 +691,9 @@ format_boot_partitions() {
     ${become} ${my_mkfs_fat} -F 32 "${efiPartition}"
   fi
 
+  [ -f "${KEYS[Boot]}" ] || show_error "Boot key does not exist"
+  [ -r "${KEYS[Boot]}" ] || show_error "Unable to read boot key"
+
   ${become} ${my_cryptsetup} luksFormat \
     --batch-mode \
     --type luks1 \
@@ -677,6 +711,8 @@ format_boot_partitions() {
 }
 
 format_swap_partition() {
+  device=$1; shift
+
   # swap
   ${become} ${my_cryptsetup} luksFormat \
     --batch-mode \
@@ -684,15 +720,17 @@ format_swap_partition() {
     -c aes-xts-plain64 \
     -s 256 \
     --pbkdf pbkdf2 \
-    "${swapPartition}" "${KEYS[Swap]}"
+    "$(get_swappartition ${device})" "${KEYS[Swap]}"
 
 }
 
 create_crypto_swap_partition() {
+  device=$1; shift
+
   ${become} ${my_cryptsetup} open \
     --type luks \
     --key-file \
-    "${KEYS[Swap]}" "${swapPartition}" ${CRYPT_SWAP_DEV}
+    "${KEYS[Swap]}" "$(get_swappartition ${device})" ${CRYPT_SWAP_DEV}
 
   ${become} mkswap -L swap "/dev/mapper/${CRYPT_SWAP_DEV}"
 }
@@ -722,7 +760,7 @@ create_crypto_devices() {
       "${mirror_devices[$BACKUPBOOTCOUNT]}"
   done
 
-  create_crypto_swap_partition
+  create_crypto_swap_partition "${install_device}"
 }
 
 format_partitions() {
@@ -733,9 +771,13 @@ format_partitions() {
   echo
 
   if mirror_devices_given; then
-    system_zpool_devices="mirror ${rootPartition} ${mirror_devices[@]/%/-part5}"
+    system_zpool_devices="mirror $(get_rootpartition ${install_device})"
+    for mirror in "${mirror_devices[@]}"
+    do
+      system_zpool_devices+="$(get_rootpartition ${mirror})"
+    done
   else
-    system_zpool_devices="${rootPartition}"
+    system_zpool_devices="$(get_rootpartition ${install_device})"
   fi
 
   create_zpool "${SYSTEM_POOL_NAME}" "${system_zpool_devices}"
@@ -755,7 +797,7 @@ format_partitions() {
       "${mirror_devices[$BACKUPBOOTCOUNT]}"
   done
 
-  format_swap_partition
+  format_swap_partition "${install_device}"
 
   create_crypto_devices
 }
@@ -890,7 +932,7 @@ cat <<EOF
           enable = true;
           keyFile = "/$(get_keyfile_name Swap)";
           label = "${CRYPT_SWAP_DEV}";
-          blkDev = "/dev/disk/by-uuid/$(get_uuid ${swapPartition})";
+          blkDev = "/dev/disk/by-uuid/$(get_uuid $(get_swappartition ${install_device}))";
         };
       }
     ];
