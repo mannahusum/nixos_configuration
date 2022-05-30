@@ -22,6 +22,7 @@ target=github-gist
     userEmail= "christian@wudika.de";
     extraConfig = {
       credential.helper = "${pkgs.gitAndTools.pass-git-helper}/bin/pass-git-helper";
+      pull.rebase = false;
     };
   };
 
