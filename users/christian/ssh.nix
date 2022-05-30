@@ -279,7 +279,7 @@ let
     {
       name="vdms-s1221";
       machine="S1221";
-      address="1.tcp.ap.ngrok.io:21473";
+      address="1.tcp.au.ngrok.io:24529";
     }
   ];
   vdms_hosts_old = [
@@ -295,6 +295,8 @@ in let
         user = user;
         hostname = builtins.elemAt splitaddress 0;
         port = lib.toInt (builtins.elemAt splitaddress 2);
+        identitiesOnly = true;
+        identityFile = "~/.ssh/RED.pub";
       };
     }
   ) vdms_hosts ));
@@ -380,8 +382,21 @@ in {
             hostname = "54.169.217.33";
           };
           "S1221S" = {
-          user = "root";
-          proxyCommand = "${pkgs.openssh.out}/bin/ssh SSHProxy -W 127.0.0.1:6221";
+            user = "root";
+            proxyCommand = "${pkgs.openssh.out}/bin/ssh SSHProxy -W 127.0.0.1:6221";
+          };
+          "*.vmt-gmbh.info" = {
+            user = "vdmsadmin";
+            identitiesOnly = true;
+            identityFile = "~/.ssh/RED.pub";
+          };
+          "serial-console.ec2-instance-connect.*.aws" = {
+            identitiesOnly = true;
+            identityFile = "~/.ssh/RED.pub";
+            extraOptions = {
+              HostKeyAlgorithms = "+ssh-rsa";
+              ControlPath = "~/.ssh/controlmasters/ec2-console";
+            };
           };
         }
       )
