@@ -12,7 +12,7 @@ declare -i swap_partition_size=64
 declare -i libvirt_partition_size=0
 declare -r CONFIGURATION_DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 declare -r GITHUB_USERNAME="mannahusum"
-declare -r GITHUB_ACCESS_TOKEN="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"
+declare -r GITHUB_ACCESS_TOKEN="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"
 declare git_repository="https://${GITHUB_USERNAME}:${GITHUB_ACCESS_TOKEN}@github.com/${GITHUB_USERNAME}/nixos_configuration.git"
 declare -r KEYS_DIR="/etc/keys"
 declare -r INSTALL_DIR="$(mktemp -p /dev/shm -d)"
@@ -45,25 +45,25 @@ add_partition_number() {
 get_efipartition() {
   device=$1; shift
 
-  echo -n "$(add_partition_number $(get_persistent_disk_path "${device}") 2)"
+  echo -n "$(add_partition_number "${device}" 2)"
 }
 
 get_bootpartition() {
   device=$1; shift
 
-  echo -n "$(add_partition_number $(get_persistent_disk_path "${device}") 3)"
+  echo -n "$(add_partition_number "${device}" 3)"
 }
 
 get_swappartition() {
   device=$1; shift
 
-  echo -n "$(add_partition_number $(get_persistent_disk_path "${device}") 4)"
+  echo -n "$(add_partition_number "${device}" 4)"
 }
 
 get_rootpartition() {
   device=$1; shift
 
-  echo -n "$(add_partition_number $(get_persistent_disk_path "${device}") 5)"
+  echo -n "$(add_partition_number "${device}" 5)"
 }
 
 remove_temporary_keyfiles() {
@@ -145,10 +145,12 @@ unmount_filesystems() {
 }
 
 cleanup() {
+  read -p "blubb: " blubb || true
+
   unmount_filesystems
   destroy_crypto_devices
   export_zpools
-  remove_temporary_keyfiles
+  # remove_temporary_keyfiles
   remove_install_dir
 }
 
@@ -161,6 +163,38 @@ get_uuid() {
   ${become} ${my_blkid} --match-tag UUID --output value ${partition}
 }
 
+is_crypto_device() {
+  partition=$1; shift
+  [ "$(${become} ${my_blkid} --match-tag TYPE --output value ${partition})" = "crypto_LUKS" ]
+}
+
+find_crypto_mapper_device() {
+  partition=$1; shift
+  for mapper_device in $(${become} ${my_dmsetup} ls | cut -f1); do
+    [ -n ${DEBUG} ] && echo "Analysing device: ${mapper_device}" 1>&2
+    read identifier device blubb < <(${become} ${my_cryptsetup} status ${mapper_device} | grep device:)
+    [ -n ${DEBUG} ] && echo "Found device: ${device}" 1>&2
+    if [ "${device}" = "${partition}" ]; then
+      echo "${mapper_device}"
+      break
+    fi
+  done
+}
+
+get_mount_device_from_partition() {
+  partition=$1; shift
+  local canonical_device=$(get_canonical_disk_path ${partition})
+  local mount_device;
+
+  if is_crypto_device "${partition}"; then
+    mount_device="${partition}"
+  else
+    mount_device="$(find_crypto_mapper_device ${partition})"
+    [ -z "$mapper_device" ] && show_error "Cryptodevice ${partition} is not opened"
+  fi
+
+  echo ${mount_device}
+}
 
 # Flow control
 
@@ -320,6 +354,12 @@ ensure_command_nix() {
   echo $(nix-store --add-root ${nix_pkg_root} -r $(nix-instantiate '<nixpkgs>' --add-root ${nix_pkg_root} -A ${package} ) | head -n 1)/bin/${name}
 }
 
+ensure_dmsetup() {
+  my_dmsetup="$(ensure_command_nix dmsetup lvm2)"
+  "${my_dmsetup}" --help >/dev/null 2>&1
+  return $?
+}
+
 ensure_lsblk() {
   my_lsblk="$(ensure_command_nix lsblk util-linux)"
   "${my_lsblk}" --help >/dev/null 2>&1
@@ -471,6 +511,7 @@ check_prequisits() {
   ensure_git
   ensure_sudo
   ensure_sgdisk
+  ensure_dmsetup
   ensure_lsblk
   ensure_blkid
   ensure_mkfs_fat
@@ -558,7 +599,6 @@ partition_single_disk() {
   fi
   partcmd+="${disk}"
 
-  echo $partcmd 1>&2
   eval "$become $partcmd 2>&1 >/dev/null"
 }
 
@@ -682,6 +722,7 @@ format_boot_partitions() {
 
   bootPartition="$(get_bootpartition ${device})"
   efiPartition="$(get_efipartition ${device})"
+  echo "Formating boot/efi on ${device}"
 
   if is_efi_formated "${efiPartition}"; then
     :
@@ -739,6 +780,7 @@ create_crypto_boot_device() {
 
   bootPartition="$(get_bootpartition ${device})"
 
+  echo "  Creating ${cryptname}"
   ${become} ${my_cryptsetup} open \
     --type luks \
     --key-file \
@@ -748,6 +790,8 @@ create_crypto_boot_device() {
 }
 
 create_crypto_devices() {
+  echo "Creating crypto devices"
+
   create_crypto_boot_device \
     "$CRYPT_BOOT_DEV" \
     "${install_device}"
@@ -830,7 +874,7 @@ mount_partitions() {
 
   mount_boot_partition \
     /boot \
-    "$CRYPT_BOOT_DEV" \
+    "$(get_bootpartition ${install_device})" \
     "${install_device}"
 
   for ((backupbootcount=0; backupbootcount<${#mirror_devices[@]}; backupbootcount++)); do
@@ -839,6 +883,8 @@ mount_partitions() {
       "${CRYPT_BOOTBACKUP_DEV}${backupbootcount}" \
       "${mirror_devices[$BACKUPBOOTCOUNT]}"
   done
+
+  sleep 600
 }
 
 get_keyfile_name() {
@@ -959,6 +1005,39 @@ copy_crypto_keys() {
   done
 }
 
+format_and_mount_root() {
+  local system_zpool_devices
+
+  if mirror_devices_given; then
+    system_zpool_devices="mirror $(get_rootpartition ${install_device})"
+    for mirror in "${mirror_devices[@]}"
+    do
+      system_zpool_devices+="$(get_rootpartition ${mirror})"
+    done
+  else
+    system_zpool_devices="$(get_rootpartition ${install_device})"
+  fi
+
+  echo "  Formating zpools"
+
+  create_zpool "${SYSTEM_POOL_NAME}" "${system_zpool_devices}"
+  if mirror_devices_given; then
+    create_zpool "${STORAGE_POOL_NAME}" "mirror ${mirror_devices[@]/%/-part6}"
+    make_storage_mounts "${STORAGE_POOL_NAME}"
+  else
+    make_storage_mounts "${SYSTEM_POOL_NAME}"
+  fi
+  make_system_mounts
+
+}
+
+format_and_mount_partitions_new() {
+  echo
+  echo "Formatting.."
+
+  format_and_mount_root
+}
+
 install_nixos() {
   local build
   local found
@@ -966,6 +1045,7 @@ install_nixos() {
   copy_crypto_keys
   clone_configuration
   ${become} -- `which nixos-generate-config` --root "${INSTALL_DIR}"
+  sleep 600
   create_bootdevice_nix
   set_zfs_keyfile_locations
   if [ -f /etc/nixos/passwords.nix ]; then
@@ -1032,8 +1112,9 @@ main() {
   initialize_keys
   partition_disks
   sleep 3 # wait for partition tables to be reread
-  format_partitions
-  mount_partitions
+  # format_partitions
+  # mount_partitions
+  format_and_mount_partitions_new
   install_nixos
 }
 
