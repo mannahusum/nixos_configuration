@@ -15,14 +15,16 @@ fi
 
 [ -d httpd ] || mkdir httpd
 [ -f httpd/sshkey.pub ] || ssh-keygen -N '' -f httpd/sshkey -q
-[ -f httpd/sshkey ] && mv http/sshkey .
+[ -f httpd/sshkey ] && mv httpd/sshkey .
 [ -f OVMF_VARS.fd ] || cp /run/libvirt/nix-ovmf/OVMF_VARS.fd .
 chmod u+rw OVMF_VARS.fd
 
 CHECKSUM=$(curl -s -L ${ISO_URL}.sha256 | cut -d' '  -f1)
+PACKER_LOG=1 \
 PACKER_CACHE_DIR="${packer_cache}" packer build \
   -var "iso_url=${ISO_URL}" \
-  -var "iso_checksum=${CHECKSUM}" \
+  -var "iso_checksum=sha256:${CHECKSUM}" \
+  -var "packer_cache=${packer_cache}" \
   -on-error=ask \
   nixos-x86_64.pkr.hcl
 
