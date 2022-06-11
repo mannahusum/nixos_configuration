@@ -1,15 +1,15 @@
-{ pkgs, home, xdg, programs, ... }:
+{ pkgs, home, xdg, programs, config, ... }:
 
 let
-  get_password_command = account: "${pkgs.pass.out}/bin/pass \"${account}\" | head -n 1";
+  get_password_command = account: "${pkgs.pass.out}/bin/pass \"${account}\" | ${pkgs.coreutils}/bin/head -n 1";
   get_username_command = account: "${pkgs.pass.out}/bin/pass \"${account}\" | ${pkgs.gnugrep}/bin/grep ^user: | ${pkgs.coreutils}/bin/cut -d\\  -f2";
   spotify = "spotify.com";
 in let
   tomlFormat = pkgs.formats.toml { };
   spotifyConfig = tomlFormat.generate "spotifyd.conf" {
       global = {
-        username_cmd = get_username_command spotify;
-        password_cmd = get_password_command spotify;
+        username_cmd = get_username_command "spotify.com";
+        password_cmd = get_password_command "spotify.com";
         device_name = "mannahusum";
         backend = "pulseaudio";
         use_mpris = true;
@@ -60,12 +60,18 @@ in {
     Unit = {
       Description = "spotify daemon";
       Documentation = "https://github.com/Spotifyd/spotifyd";
+      BindsTo = [ (config.services.fluidsynth.soundService + ".service") ];
+      After = [ (config.services.fluidsynth.soundService + ".service") ];
     };
 
     Install.WantedBy = [ "default.target" ];
 
     Service = {
-      Environment="SPOTIFYD_CLIENT_ID=6ae373fc497545af9002cc6c988118b8";
+
+      Environment= [
+        "SPOTIFYD_CLIENT_ID=6ae373fc497545af9002cc6c988118b8"
+        "PASSWORD_STORE_DIR=${config.programs.password-store.settings.PASSWORD_STORE_DIR}"
+      ];
       ExecStart =
         "${pkgs.spotifyd}/bin/spotifyd --no-daemon --config-path ${spotifyConfig}";
       Restart = "always";
