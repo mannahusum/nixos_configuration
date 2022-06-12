@@ -33,6 +33,7 @@ in {
       })
       solargraph
       xdotool
+      shellcheck
     ];
 
     file.".secret_vimrc" = {
