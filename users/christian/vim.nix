@@ -1,7 +1,6 @@
 { lib, pkgs, home, ... }:
 
 let
-
     vimPythonPackages = python-packages: with python-packages; [
       pylint
       pynvim
