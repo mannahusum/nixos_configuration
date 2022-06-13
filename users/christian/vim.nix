@@ -4,6 +4,7 @@ let
     vimPythonPackages = python-packages: with python-packages; [
       pylint
       pynvim
+      pyyaml
     ];
 
     vimPython38 = pkgs.python38Full.withPackages vimPythonPackages;
