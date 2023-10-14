@@ -62,6 +62,7 @@
         ssh-keys.packages."x86_64-linux".ssh_public_keys.out
       ];
     };
+    security.sudo.wheelNeedsPassword = false;
     nix.settings.trusted-users = [ "root" "christian" ];
     users.mutableUsers = true;
     # users.users.marianne.isNormalUser = true;
