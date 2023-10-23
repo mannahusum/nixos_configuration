@@ -1,0 +1,10 @@
+keys:
+  - &admin_christian F1A1F1A33787F28359E60BFB1DBDE5EC541E1874
+  - &computer_hydra age13sypr3ave32sf4lvzckwlj65mkmerzaxh856v8sy7s240hkldfaqmn2agn
+creation_rules:
+  - path_regex: computers/[^/]+/secrets/secureboot/keys/[^/]+/[^/]+.key
+    key_groups:
+    - pgp:
+      - &admin_christian
+      age:
+      - &computer_hydra
