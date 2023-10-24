@@ -64,6 +64,29 @@
           disko.nixosModules.disko
           sops-nix.nixosModules.sops
           {
+            sops.defaultSopsFile = ./computers/hydra/secrets.yaml;
+            sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+            sops.secrets."secureboot/GUID" = {
+              path = "/etc/secureboot/GUID";
+            };
+            sops.secrets."secureboot/db/public" = {
+              path = "/etc/secureboot/db/db.pem";
+            };
+            sops.secrets."secureboot/db/private" = {
+              path = "/etc/secureboot/db/db.key";
+            };
+            sops.secrets."secureboot/KEK/public" = {
+              path = "/etc/secureboot/KEK/KEK.pem";
+            };
+            sops.secrets."secureboot/KEK/private" = {
+              path = "/etc/secureboot/KEK/KEK.key";
+            };
+            sops.secrets."secureboot/PK/public" = {
+              path = "/etc/secureboot/PK/PK.pem";
+            };
+            sops.secrets."secureboot/PK/private" = {
+              path = "/etc/secureboot/PK/PK.key";
+            };
             boot.loader.systemd-boot = {
               enable = true;
               configurationLimit = 10;
