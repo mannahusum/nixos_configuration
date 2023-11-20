@@ -33,9 +33,16 @@
       url = "github:akkesm/nixos-luks-yk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-anywhere = {
+      url = "github:nix-community/nixos-anywhere";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        disko.follows = "disko";
+      };
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, ssh-keys, lanzaboote, sops-nix, nixos-luks-yk, ...}@inputs: {
+  outputs = { self, nixpkgs, home-manager, disko, ssh-keys, lanzaboote, sops-nix, nixos-luks-yk, nixos-anywhere, ...}@inputs: {
     homeConfigurations = {
       christian_at_hydra = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -155,6 +162,7 @@
         openssl
         sops
         yubikey-personalization
+        nixos-anywhere.packages.x86_64-linux.nixos-anywhere
       ];
     };
   };
