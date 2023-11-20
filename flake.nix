@@ -29,13 +29,13 @@
     #   url = "github:nix-community/nixos-generators";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
-    nixos-yubikey-luks = {
-      url = "github:/sgillespie/nixos-yubikey-luks";
+    nixos-luks-yk = {
+      url = "github:akkesm/nixos-luks-yk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, ssh-keys, lanzaboote, sops-nix, nixos-yubikey-luks, ...}@inputs: {
+  outputs = { self, nixpkgs, home-manager, disko, ssh-keys, lanzaboote, sops-nix, nixos-luks-yk, ...}@inputs: {
     homeConfigurations = {
       christian_at_hydra = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -143,12 +143,12 @@
       };
     };
     devShells.x86_64-linux.default = let
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
-      luks_setup_scripts = import nixos-yubikey-luks;
+      pkgs = nixpkgs.legacyPackages.x86_64-linux.extend(nixos-luks-yk.overlay);
     in pkgs.mkShell {
-      nativeBuildInputs = with pkgs; 
-      [ 
-        luks_setup_scripts
+      nativeBuildInputs = with pkgs;
+      [
+        hextorb
+        rbtohex
         pbkdf2-sha512
         cryptsetup
         gcc
