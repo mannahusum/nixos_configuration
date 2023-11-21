@@ -56,6 +56,8 @@ in {
       pkgs.git
       pkgs.mokutil
       pkgs.sbctl
+      pkgs.tpm2-tss
+      pkgs.git-crypt
     ];
     system.stateVersion = "23.05";
   };
