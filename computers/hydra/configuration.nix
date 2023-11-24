@@ -4,6 +4,9 @@ let
 in {
   imports = [
     (modulesPath + "/profiles/base.nix")
+    ./x11.nix
+    ../../modules/sshd.nix
+    ../../modules/saned.nix
     ../../modules/system_administration/debug.nix
     ../../modules/users.nix
   ];
@@ -43,7 +46,8 @@ in {
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       ];
     };
-    services.openssh.enable = true;
+    casshd.enable = true;
+    casaned.enable = true;
 
     networking.hostId = "d22d38ba";
     networking.hostName = "hydra";

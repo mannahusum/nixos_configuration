@@ -1,7 +1,7 @@
 { disks ? [ "/dev/disk/by-id/nvme-eui.0025385811b168ce" "/dev/disk/by-id/wwn-0x5001b448bc1f7726" ], swapsize ? "72G", ... }: {
   disk = let
     disklayout = device: efimountpoint: counter: {
-      device = device;
+      inherit device;
       type = "disk";
       content = {
         type = "gpt";
@@ -26,7 +26,7 @@
             size = "100%";
             content = {
               type = "luks";
-              name = "rpool${counter}";
+              name = "rpool${builtins.toString counter}";
               initrdUnlock = true;
               passwordFile = "/tmp/secret.key";
               settings.allowDiscards = true;
@@ -40,8 +40,8 @@
       };
     };
   in {
-    vda = (disklayout (builtins.elemAt disks 0) "/boot" "0");
-    vdb = (disklayout (builtins.elemAt disks 1) "/efibackup" "1");
+    vda = disklayout (builtins.elemAt disks 0) "/boot" 0;
+    vdb = disklayout (builtins.elemAt disks 1) "/efibackup" 1;
   };
   mdadm = {
     swap = {

@@ -336,6 +336,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-utsushi": {
+      "locked": {
+        "lastModified": 1636841373,
+        "narHash": "sha256-cZPsKFxndGHaVrw9fORxDgVgO9HJsqsQN/86ZeLWy6Q=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b0249fdf998d782e1058b0cf3239091e59e393ef",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b0249fdf998d782e1058b0cf3239091e59e393ef",
+        "type": "github"
+      }
+    },
     "pre-commit-hooks-nix": {
       "inputs": {
         "flake-compat": [
@@ -375,6 +391,7 @@
         "nixos-anywhere": "nixos-anywhere",
         "nixos-luks-yk": "nixos-luks-yk",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-utsushi": "nixpkgs-utsushi",
         "sops-nix": "sops-nix",
         "ssh-keys": "ssh-keys"
       }

@@ -5,6 +5,9 @@
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-23.05";
     };
+    nixpkgs-utsushi = {
+      url = "github:NixOS/nixpkgs/b0249fdf998d782e1058b0cf3239091e59e393ef";
+    };
     home-manager = {
       url = "github:nix-community/home-manager/release-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -42,7 +45,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, ssh-keys, lanzaboote, sops-nix, nixos-luks-yk, nixos-anywhere, ...}@inputs: {
+  outputs = { self, nixpkgs, nixpkgs-utsushi, home-manager, disko, ssh-keys, lanzaboote, sops-nix, nixos-luks-yk, nixos-anywhere, ...}@inputs: {
     homeConfigurations = {
       christian_at_hydra = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -146,11 +149,11 @@
             };
           } // sops-config)
         ];
-        specialArgs = { inherit ssh-keys; };
+        specialArgs = { inherit ssh-keys nixpkgs-utsushi;};
       };
     };
     devShells.x86_64-linux.default = let
-      pkgs = nixpkgs.legacyPackages.x86_64-linux.extend(nixos-luks-yk.overlay);
+      pkgs = nixpkgs.legacyPackages.x86_64-linux.extend nixos-luks-yk.overlay;
     in pkgs.mkShell {
       nativeBuildInputs = with pkgs;
       [
