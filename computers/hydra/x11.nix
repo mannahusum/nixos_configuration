@@ -3,7 +3,8 @@ let
   cfg = config.x11;
 in
 {
-  imports = [];
+  imports = [
+  ];
 
   options.x11 = {
   };
@@ -24,10 +25,6 @@ in
         enable = true;
         package = pkgs.awesome;
       };
-      layout = "de,de,gr";
-      xkbModel = "pc105";
-      xkbVariant = "neo,,";
-      xkbOptions = ",,";
     };
     services.xserver = {
       enable = true;

@@ -149,7 +149,7 @@
             };
           } // sops-config)
         ];
-        specialArgs = { inherit ssh-keys nixpkgs-utsushi;};
+        specialArgs = { inherit ssh-keys nixpkgs-utsushi nixpkgs;};
       };
     };
     devShells.x86_64-linux.default = let

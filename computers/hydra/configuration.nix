@@ -4,7 +4,9 @@ let
 in {
   imports = [
     (modulesPath + "/profiles/base.nix")
-    ./x11.nix
+    # ./x11.nix
+    ../../modules/keyboard.nix
+    ../../modules/wayland.nix
     ../../modules/sshd.nix
     ../../modules/saned.nix
     ../../modules/system_administration/debug.nix
@@ -48,6 +50,11 @@ in {
     };
     casshd.enable = true;
     casaned.enable = true;
+    cawayland.enable = true;
+    cakeyboard.enable = true;
+    time.timeZone = "Europe/Berlin";
+    i18n.defaultLocale = "de_DE.UTF-8";
+
 
     networking.hostId = "d22d38ba";
     networking.hostName = "hydra";
