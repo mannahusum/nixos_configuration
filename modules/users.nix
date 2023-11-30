@@ -2,6 +2,9 @@
 let
   cfg = config.causers;
 in {
+  # imports = [
+  #   home-manager.nixosModules.home-manager
+  # ];
 
   options.causers = {
     adminUsers = lib.mkOption {
@@ -117,7 +120,11 @@ in {
       user:
       { name = user; value = {}; }
     ) (builtins.attrNames myusers));
-    # users.users.christian.extraGroups = cfg.regularUserGroups ++ cfg.adminUserGroups;
+
+    # home-manager.users.christian = import ../home-manager/caHomeConfig.nix {
+    #   inherit pkgs config;
+    # };
+
     # Option definitions.
     # Define what other settings, services and resources should be active.
     # Usually these are depend on whether a user of this module chose to "enable" it
