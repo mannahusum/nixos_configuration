@@ -24,97 +24,65 @@ in {
   };
 
   config = lib.mkIf cfg.enable (let
-    mycage = let
-      mygtkgreet = let
-        mywaydispconf = pkgs.writeText "cfg.yaml" ''
-          ARRANGE: ROW
-          ALIGN: MIDDLE
-          ORDER:
-            - 'DP-1'
-            - 'HDMI-A-1'
-          SCALING: true
-          AUTO_SCALE: true
-          crashes cage somehow
-          ''${pkgs.way-displays}/bin/way-displays -c ''${mywaydispconf} &
-        '';
-      in pkgs.writeShellScriptBin "mygtkgreet" ''
-          ${pkgs.greetd.gtkgreet}/bin/gtkgreet
-        '';
-    in pkgs.writeShellScriptBin "mycage" ''
-      ${cfg.keyboardSettings}
-      ${pkgs.cage}/bin/cage \
-        -m last \
-        -- ${mygtkgreet.out}/bin/mygtkgreet
+    mybackground = builtins.fetchurl {
+      url = "https://upload.wikimedia.org/wikipedia/commons/0/00/Husum-NordseeMuseum_Nissenhaus.jpg";
+      sha256 = "0b4qqmiz5lbqizhf2kfc2x22im59nvi0672cn3aanybmbm0vm3g7";
+    };
+    myregreetconfig = {
+      background = {
+        path = "${mybackground}";
+        fit = "Contain";
+      };
+      GTK = {
+        application_prefer_dark_theme = false;
+        cursor_theme_name = "SolArc";
+        font_name = "FiraCode Nerd Font 11";
+        icon_theme_name = "SolArc";
+        theme_name = "SolArc";
+      };
+    };
 
-    '';
+
+    myswayconfig = pkgs.writeText "greetd-sway-config" ''
+# `-l` activates layer-shell mode. Notice that `swaymsg exit` will run after gtkgreet.
+exec "${pkgs.greetd.regreet.out}/bin/regreet; swaymsg exit"
+
+output "DP-1" mode 3840x2160@30Hz pos 0 0
+output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
+
+bindsym Mod4+shift+e exec swaynag \
+-t warning \
+-m 'What do you want to do?' \
+-b 'Poweroff' 'systemctl poweroff' \
+-b 'Reboot' 'systemctl reboot'
+
+include /etc/sway/config.d/*
+'';
+  myswaycommand = pkgs.writeShellScriptBin "mysway" ''
+${cfg.keyboardSettings}
+${pkgs.sway.out}/bin/sway --config ${myswayconfig}
+  '';
   in {
-    nixpkgs.overlays = [
-      (
-        final: prev: {
-          cage = if (builtins.compareVersions prev.cage.version "0.1.5") == -1 then
-            (prev.cage.overrideAttrs (
-              previousAttrs: rec {
-                version = "0.1.5";
-                src = prev.fetchFromGitHub {
-                  owner = "Hjdskes";
-                  repo = "cage";
-                  rev = "v${version}";
-                  hash = "sha256-Suq14YRw/MReDRvO/TQqjpZvpzAEDnHUyVbQj0BPT4c=";
-                };
-                buildInputs = previousAttrs.buildInputs ++ [ prev.xorg.xcbutilwm ];
-                CFLAGS = null;
-              }
-            )).override( { wlroots = final.wlroots; }) else prev.cage;
-          wlroots = if (builtins.compareVersions prev.wlroots.version "0.16") == -1 then
-            (prev.wlroots.overrideAttrs (
-              previousAttrs: rec {
-                version = "0.16.2";
-                src = prev.fetchFromGitLab {
-                  domain = "gitlab.freedesktop.org";
-                  owner = "wlroots";
-                  repo = "wlroots";
-                  rev = version;
-                  hash = "sha256-JeDDYinio14BOl6CbzAPnJDOnrk4vgGNMN++rcy2ItQ=";
-                };
-                postPatch = ''
-                  substituteInPlace backend/drm/meson.build \
-                    --replace /usr/share/hwdata/ ${prev.hwdata}/share/hwdata/
-                '';
-                buildInputs = previousAttrs.buildInputs ++ [ prev.vulkan-loader prev.xorg.xcbutilwm ];
-                nativeBuildInputs = previousAttrs.nativeBuildInputs ++ [ prev.glslang ];
-              }
-            )) else prev.wlroots;
-          way-displays = if (builtins.compareVersions prev.way-displays.version "1.9.0") == -1 then
-            (prev.way-displays.overrideAttrs (
-              previousAttrs: rec {
-                version = "1.9.0";
-                src = prev.fetchFromGitHub {
-                  owner = "alex-courtis";
-                  repo = "way-displays";
-                  rev = version;
-
-                  sha256 = "sha256-X+/aM+/2pO1FbHGwEiC2w9AxPXHf1EVZkyr+CXtprLk=";
-                };
-              }
-            )) else prev.way-displays;
-        }
-      )
-    ];
     services.greetd = {
       enable = true;
       settings = {
-        default_session.command = "${mycage.out}/bin/mycage";
+        default_session.command = "${myswaycommand.out}/bin/mysway";
       };
     };
     environment.etc."greetd/environments".text = ''
       sway
     '';
-
-    environment.systemPackages = [
-      pkgs.cage
+    environment.systemPackages = with pkgs; [
+      solarc-gtk-theme
+      fira-code
     ];
+
     causers.regularUserGroups = [ "input" ];
     programs.sway.enable = true;
+    programs.regreet = {
+      enable = true;
+      settings = myregreetconfig;
+    };
 
     sound.enable = true;
     nixpkgs.config.pulseaudio = true;
