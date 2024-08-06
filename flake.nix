@@ -3,13 +3,13 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/nixos-23.05";
+      url = "github:nixos/nixpkgs/nixos-24.05";
     };
     nixpkgs-utsushi = {
       url = "github:NixOS/nixpkgs/b0249fdf998d782e1058b0cf3239091e59e393ef";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.05";
+      url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -28,6 +28,7 @@
       url = "github:mannahusum/sshkeys_from_gpg_keyserver";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
     # nixos-generators = {
     #   url = "github:nix-community/nixos-generators";
     #   inputs.nixpkgs.follows = "nixpkgs";
@@ -45,7 +46,20 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-utsushi, home-manager, disko, ssh-keys, lanzaboote, sops-nix, nixos-luks-yk, nixos-anywhere, ...}@inputs: {
+  outputs = {
+    self,
+    nixpkgs,
+    nixpkgs-utsushi,
+    home-manager,
+    disko,
+    ssh-keys,
+    lanzaboote,
+    sops-nix,
+    nixos-luks-yk,
+    nixos-anywhere,
+    nix-flake-tests,
+    ...
+  } @ inputs: {
     homeConfigurations = {
       christian_at_hydra = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -59,7 +73,7 @@
             home = {
               username = "christian";
               homeDirectory = "/home/christian";
-              stateVersion = "23.05";
+              stateVersion = "24.05";
             };
           }
         ];
@@ -69,104 +83,94 @@
         };
       };
     };
-    nixosConfigurations = let
-        sops-config = {
-            sops.defaultSopsFile = ./computers/hydra/secrets.yaml;
-            sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-            sops.secrets."secureboot/GUID" = {
-                path = "/etc/secureboot/GUID";
-            };
-            sops.secrets."secureboot/db/public" = {
-                path = "/etc/secureboot/keys/db/db.pem";
-            };
-            sops.secrets."secureboot/db/private" = {
-                path = "/etc/secureboot/keys/db/db.key";
-            };
-            sops.secrets."secureboot/KEK/public" = {
-                path = "/etc/secureboot/keys/KEK/KEK.pem";
-            };
-            sops.secrets."secureboot/KEK/private" = {
-                path = "/etc/secureboot/keys/KEK/KEK.key";
-            };
-            sops.secrets."secureboot/PK/public" = {
-                path = "/etc/secureboot/keys/PK/PK.pem";
-            };
-            sops.secrets."secureboot/PK/private" = {
-                path = "/etc/secureboot/keys/PK/PK.key";
-            };
-        };
-    in {
+    nixosConfigurations = {
       hydra_install = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./computers/hydra/configuration.nix
           ./computers/hydra/hardware-configuration.nix
+          ./computers/hydra/sops.nix
           disko.nixosModules.disko
-          sops-nix.nixosModules.sops
-          ({
+          {
             boot.loader.systemd-boot = {
               enable = true;
               configurationLimit = 10;
               graceful = true;
             };
-          } // sops-config)
+          }
         ];
-        specialArgs = { inherit ssh-keys; };
+        specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
       };
       hydra_prepare_secureboot = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./computers/hydra/configuration.nix
           ./computers/hydra/hardware-configuration.nix
+          ./computers/hydra/sops.nix
           disko.nixosModules.disko
-          sops-nix.nixosModules.sops
           lanzaboote.nixosModules.lanzaboote
-          ({
-            boot.bootspec.enable = true;
-            boot.loader.systemd-boot = {
-              enable = true;
-              configurationLimit = 10;
-              graceful = true;
+          {
+            boot = {
+              bootspec.enable = true;
+              loader.systemd-boot = {
+                enable = true;
+                configurationLimit = 10;
+                graceful = true;
+              };
             };
-          } // sops-config)
+          }
         ];
-        specialArgs = { inherit ssh-keys; };
+        specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
       };
       hydra = inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./computers/hydra/configuration.nix
           ./computers/hydra/hardware-configuration.nix
+          ./computers/hydra/sops.nix
           disko.nixosModules.disko
           lanzaboote.nixosModules.lanzaboote
-          sops-nix.nixosModules.sops
-          ({
-            boot.bootspec.enable = true;
-            boot.loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-            boot.lanzaboote = {
-              enable = true;
-              pkiBundle = "/etc/secureboot";
+          {
+            boot = {
+              bootspec.enable = true;
+              loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+              lanzaboote = {
+                enable = true;
+                pkiBundle = "/etc/secureboot";
+              };
             };
-          } // sops-config)
+          }
         ];
-        specialArgs = { inherit ssh-keys nixpkgs-utsushi nixpkgs;};
+        specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
       };
+    };
+    checks."x86_64-linux" = {
+      functions = let
+        system = "x86_64-linux";
+        pkgs = nixpkgs.legacyPackages."x86_64-linux";
+      in
+        nix-flake-tests.lib.check {
+          inherit pkgs;
+          tests = import ./functions/tests/ssh.nix {inherit pkgs;};
+        };
     };
     devShells.x86_64-linux.default = let
       pkgs = nixpkgs.legacyPackages.x86_64-linux.extend nixos-luks-yk.overlay;
-    in pkgs.mkShell {
-      nativeBuildInputs = with pkgs;
-      [
-        hextorb
-        rbtohex
-        pbkdf2-sha512
-        cryptsetup
-        gcc
-        openssl
-        sops
-        yubikey-personalization
-        nixos-anywhere.packages.x86_64-linux.nixos-anywhere
-      ];
-    };
+    in
+      pkgs.mkShell {
+        nativeBuildInputs = with pkgs; [
+          alejandra
+          statix
+          hextorb
+          rbtohex
+          pbkdf2-sha512
+          cryptsetup
+          gcc
+          openssl
+          sops
+          yubikey-personalization
+          nixos-anywhere.packages.x86_64-linux.nixos-anywhere
+        ];
+      };
   };
 }

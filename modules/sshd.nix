@@ -16,6 +16,10 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    programs.ssh = {
+      setXAuthLocation = true;
+    };
+
     services.openssh = {
       enable = true;
       openFirewall = true;

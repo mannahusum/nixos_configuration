@@ -1,16 +1,23 @@
-{ config, pkgs, lib, modulesPath, ssh-keys, ... }:
-let
+{
+  config,
+  pkgs,
+  lib,
+  modulesPath,
+  ssh-keys,
+  home-manager,
+  ...
+}: let
   cfg = config.causers;
 in {
-  # imports = [
-  #   home-manager.nixosModules.home-manager
-  # ];
+  imports = [
+    home-manager.nixosModules.home-manager
+  ];
 
   options.causers = {
     adminUsers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "christian" ];
-      example = [ "christian" "marianne" ];
+      default = ["christian"];
+      example = ["christian" "marianne"];
       description = ''
         Users with administrative rights on this
         computer, like modifying printers or
@@ -20,8 +27,8 @@ in {
 
     regularUsers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ ];
-      example = [ "marianne" ];
+      default = [];
+      example = ["marianne"];
       description = ''
         Users with access to resources to fully use
         this machine, e.g. acceleration of graphics
@@ -31,8 +38,8 @@ in {
 
     regularUserGroups = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "camera" "cdrom" "dialout" "disk" ];
-      example = [ "cdrom" ];
+      default = ["camera" "cdrom" "dialout" "disk" "tty"];
+      example = ["cdrom"];
       description = ''
         List of groups to be accessible by regular
         users of the system
@@ -58,13 +65,13 @@ in {
   };
 
   config = let
-    groupsToUsers =
-      users:
-      groups:
+    groupsToUsers = users: groups:
       builtins.listToAttrs (
         map (
-          user:
-          { name = user; value = { extraGroups = groups; }; }
+          user: {
+            name = user;
+            value = {extraGroups = groups;};
+          }
         )
         users
       );
@@ -100,30 +107,58 @@ in {
       };
     };
   in {
+    users = {
+      users = builtins.listToAttrs (
+        map (
+          user: {
+            name = user;
+            value =
+              (
+                if (builtins.hasAttr user myusers)
+                then (builtins.getAttr user myusers)
+                else {}
+              )
+              // {
+                extraGroups = [
+                  "cdrom"
+                  "docker"
+                  "kvm"
+                  "libvirtd"
+                  "lxd"
+                  "qemu-libvirtd"
+                  "render"
+                  "transmission"
+                  "video"
+                  "vboxusers"
+                  "wheel"
+                  "networkmanager"
+                ];
+                # (if ("extraGroups"?myusers."$user") then myusers."$user".extraGroups else [])
+                # ++ (if (builtins.elem user cfg.adminUsers) then cfg.adminUserGroups else [])
+                # ++ (if (builtins.elem user (cfg.adminUsers ++ cfg.regularUsers)) then cfg.regularUserGroups else []);
+              };
+          }
+        ) ((builtins.attrNames myusers) ++ cfg.adminUsers ++ cfg.regularUsers)
+      );
 
-    users.users = builtins.listToAttrs (map (
-      user:
-      {
-        name = user;
-        value =
-          (if (builtins.hasAttr user myusers) then (builtins.getAttr user myusers) else {}) //
-          {
-            extraGroups =
-              (if ("extraGroups"?myusers."$user") then myusers."$user".extraGroups else [])
-              ++ (if (builtins.elem user cfg.adminUsers) then cfg.adminUserGroups else [])
-              ++ (if (builtins.elem user (cfg.adminUsers ++ cfg.regularUsers)) then cfg.regularUserGroups else []);
-          };
-      }
-    ) ((builtins.attrNames myusers) ++ cfg.adminUsers ++ cfg.regularUsers));
+      groups = builtins.listToAttrs (map (
+        user: {
+          name = user;
+          value = {};
+        }
+      ) (builtins.attrNames myusers));
 
-    users.groups = builtins.listToAttrs (map (
-      user:
-      { name = user; value = {}; }
-    ) (builtins.attrNames myusers));
+      mutableUsers = true;
+    };
 
-    # home-manager.users.christian = import ../home-manager/caHomeConfig.nix {
-    #   inherit pkgs config;
-    # };
+    home-manager = {
+      users = {
+        christian = import ../home_manager/caHomeConfig.nix {
+          inherit pkgs config ssh-keys;
+          publickeys = ssh-keys.packages."x86_64-linux".ssh_public_keys.out;
+        };
+      };
+    };
 
     # Option definitions.
     # Define what other settings, services and resources should be active.
@@ -131,8 +166,7 @@ in {
     # using the "option" above.
     # You also set options here for modules that you imported in "imports".
     security.sudo.wheelNeedsPassword = false;
-    nix.settings.trusted-users = [ "root" "christian" ];
-    users.mutableUsers = true;
+    nix.settings.trusted-users = ["root" "christian"];
     # users.users.marianne.isNormalUser = true;
     programs.gnupg.agent.enable = true;
   };

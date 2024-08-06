@@ -1,14 +1,28 @@
-({ config, modulesPath, lib, ssh-keys, boot, pkgs, ... }:
-let
+({
+  config,
+  modulesPath,
+  lib,
+  boot,
+  pkgs,
+  home-manager,
+  sops-nix,
+  ...
+}: let
   cfg = config.hydra;
 in {
   imports = [
+    sops-nix.nixosModules.sops
+    ./sops.nix
     (modulesPath + "/profiles/base.nix")
     # ./x11.nix
     ../../modules/keyboard.nix
     ../../modules/wayland.nix
     ../../modules/sshd.nix
     ../../modules/saned.nix
+    ../../modules/nginx.nix
+    ../../modules/xandikos.nix
+    ../../modules/gitea.nix
+    ../../modules/yubikey.nix
     ../../modules/system_administration/debug.nix
     ../../modules/users.nix
   ];
@@ -20,47 +34,98 @@ in {
     disko.devices = import ./disko-config.nix {
       inherit lib;
     };
-    boot.supportedFilesystems = [ "zfs" ];
-    boot.loader.efi = {
-      # canTouchEfiVariables = true;
-      efiSysMountPoint = "/boot";
+    nixpkgs.config.allowUnfreePredicate = pkg:
+      builtins.elem (lib.getName pkg) [
+        "google-chrome"
+      ];
+    boot = {
+      supportedFilesystems = ["zfs"];
+      loader.efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
+      };
+      initrd = {
+        supportedFilesystems = ["zfs"];
+        systemd = {
+          enable = true;
+          emergencyAccess = true;
+        };
+      };
+      kernelParams = [
+        "console=ttyS0,115200"
+      ];
+      swraid = {
+        enable = true;
+        mdadmConf = ''
+          MAILADDR christian@wudika.de
+        '';
+      };
     };
-    boot.initrd.supportedFilesystems = [ "zfs" ];
-    boot.initrd.systemd = {
+    nix = {
+      extraOptions = ''
+        keep-outputs = true
+        keep-derivations = true
+        experimental-features = nix-command flakes
+      '';
+      settings = {
+        substituters = [
+          # "http://mannahusum.catbertsen.de:5000/"
+          "https://nix-community.cachix.org"
+        ];
+        trusted-public-keys = [
+          "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
+          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        ];
+      };
+    };
+
+    services.r53-ddns = {
+      zoneID = "Z04260616D6EKM0EH83P";
+      hostname = "hydra";
+      environmentFile = config.sops.templates."route53Credentials".path;
       enable = true;
-      emergencyAccess = true;
+      domain = "catbertsen.de";
     };
-    boot.kernelParams = [
-      "console=ttyS0,115200"
-    ];
-    nix.extraOptions = ''
-      keep-outputs = true
-      keep-derivations = true
-      experimental-features = nix-command flakes
-    '';
-    nix.settings = {
-      substituters = [
-        "http://mannahusum.catbertsen.de:5000/"
-        "https://nix-community.cachix.org"
-      ];
-      trusted-public-keys = [
-        "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
-    };
+
     casshd.enable = true;
     casaned.enable = true;
+    canginx.enable = true;
+    caacme = {
+      enable = true;
+      credentialsfile = config.sops.templates."route53Credentials".path;
+    };
+    caxandikos = {
+      enable = true;
+      domain = "calendar.catbertsen.de";
+      passwordfile = config.sops.templates."xandikosBasicAuth".path;
+    };
+    cagitea = {
+      enable = true;
+      domain = "gitea.catbertsen.de";
+    };
     cawayland.enable = true;
+    cayubikey.enable = true;
+    environment.etc."sway/config.d/monitors.conf".text = ''
+      output "DP-1" mode 3840x2160@30Hz pos 0 0
+      output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
+    '';
     cakeyboard.enable = true;
     time.timeZone = "Europe/Berlin";
-    i18n.defaultLocale = "de_DE.UTF-8";
-
-
-    networking.hostId = "d22d38ba";
-    networking.hostName = "hydra";
-    networking.hosts = {
-      "192.168.10.253" = [ "mannahusum.catbertsen.de" ];
-      "192.168.10.254" = [ "hydra.catbertsen.de" ];
+    i18n = {
+      defaultLocale = "de_DE.UTF-8";
+      extraLocaleSettings = {
+        LC_COLLATE = "de_DE.UTF-8";
+        LC_CTYPE = "de_DE.UTF-8";
+      };
+    };
+    networking = {
+      hostId = "d22d38ba";
+      hostName = "hydra";
+      tempAddresses = "disabled";
+      hosts = {
+        "192.168.10.253" = ["mannahusum.catbertsen.de"];
+        "192.168.10.254" = ["hydra.catbertsen.de" "calendar.catbertsen.de" "gitea.catbertsen.de"];
+      };
     };
 
     environment.systemPackages = [
@@ -69,7 +134,11 @@ in {
       pkgs.sbctl
       pkgs.tpm2-tss
       pkgs.git-crypt
+      pkgs.neovim
+      pkgs.ripgrep
+      pkgs.xterm
+      pkgs.file
     ];
-    system.stateVersion = "23.05";
+    system.stateVersion = "23.11";
   };
 })

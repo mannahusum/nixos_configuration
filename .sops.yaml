@@ -3,7 +3,7 @@ keys:
   - &computer_hydra age13sypr3ave32sf4lvzckwlj65mkmerzaxh856v8sy7s240hkldfaqmn2agn
 creation_rules:
   - path_regex: computers/[^/]+/secrets.yaml$
-    encrypted_regex: 'private$'
+    encrypted_regex: '(aws|xandikos|private|secret|password|hashed)$'
     key_groups:
     - pgp:
       - *admin_christian

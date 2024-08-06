@@ -18,11 +18,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    services.xserver = {
+    services.xserver.xkb = {
       layout = "de,de,gr";
-      xkbModel = "pc105";
-      xkbVariant = "neo,,";
-      xkbOptions = ",,";
+      model = "pc105";
+      variant = "neo,,";
+      options = ",,";
     };
     console.useXkbConfig = true;
     cawayland.keyboardSettings = ''

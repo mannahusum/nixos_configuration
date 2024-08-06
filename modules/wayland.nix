@@ -78,7 +78,10 @@ ${pkgs.sway.out}/bin/sway --config ${myswayconfig}
     ];
 
     causers.regularUserGroups = [ "input" ];
-    programs.sway.enable = true;
+    programs.sway = {
+      enable = true;
+      wrapperFeatures.gtk = true;
+    };
     programs.regreet = {
       enable = true;
       settings = myregreetconfig;

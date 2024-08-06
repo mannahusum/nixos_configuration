@@ -17,6 +17,7 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    services.udev.packages = [ nixpkgs-utsushi.legacyPackages.x86_64-linux.utsushi ];
     hardware.sane = {
       enable = true;
       extraBackends = [ nixpkgs-utsushi.legacyPackages.x86_64-linux.utsushi ];
