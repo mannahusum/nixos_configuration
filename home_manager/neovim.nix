@@ -38,6 +38,15 @@ in {
       enable = true;
       executable = false;
       text = ''
+        silent call system("echo 'test' | gpg --encrypt --recipient christian@wudika.de | gpg --decrypt -o /dev/null")
+        if v:shell_error != 0
+          echom "Can't decrypt passwords. Keys won't be available"
+        else
+          let g:SimplenoteUsername = "christian@wudika.de"
+          let g:SimplenotePassword = trim(system("${pkgs.pass.out}/bin/pass simplenote/christian@wudika.de | ${pkgs.coreutils.out}/bin/head -1"))
+          let g:github_user = trim(system("${pkgs.pass.out}/bin/pass github-gist | ${pkgs.gnugrep.out}/bin/grep user: | cut -b 6-"))
+          let g:gist_token = trim(system("${pkgs.pass.out}/bin/pass github-gist | ${pkgs.coreutils.out}/bin/head -n 1"))
+        endif
         let g:powerShellPath ="${pkgs.powershell.out}/bin/pwsh"
         let g:bashLSPPath = "${pkgs.nodePackages.bash-language-server.out}/bin/bash-language-server"
         let g:vimtex_viewer_zathura = "${pkgs.zathura.out}/bin/zathura"
@@ -55,6 +64,12 @@ in {
                 \}
         let g:cmakePath = "${pkgs.cmake-format.out}/bin/cmake-format"
         let g:gist_clip_command = "${pkgs.xclip.out}/bin/xclip -selection primary"
+        let g:nilPath = "${pkgs.nil.out}/bin/nil"
+        let g:openscadlspPath = "${pkgs.openscad-lsp.out}/bin/openscad-lsp"
+        let g:alejandraPath = "${pkgs.alejandra.out}/bin/alejandra"
+        let g:clangdPath = "${pkgs.clang-tools}/bin/clangd"
+        let g:pylintPath = "${pkgs.pylint.out}/bin/pylint"
+        let g:ctagsPath = "${pkgs.universal-ctags}/bin/ctags"
       '';
     };
 
