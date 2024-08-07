@@ -144,15 +144,13 @@
         specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
       };
     };
-    checks."x86_64-linux" = {
-      functions = let
-        system = "x86_64-linux";
-        pkgs = nixpkgs.legacyPackages."x86_64-linux";
-      in
-        nix-flake-tests.lib.check {
-          inherit pkgs;
-          tests = import ./functions/tests/ssh.nix {inherit pkgs;};
-        };
+    checks."x86_64-linux" = let
+      pkgs = nixpkgs.legacyPackages."x86_64-linux";
+    in {
+      ssh = nix-flake-tests.lib.check {
+        inherit pkgs;
+        tests = import ./functions/tests/ssh.nix {inherit pkgs;};
+      };
     };
     devShells.x86_64-linux.default = let
       pkgs = nixpkgs.legacyPackages.x86_64-linux.extend nixos-luks-yk.overlay;

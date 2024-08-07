@@ -2,10 +2,10 @@
   config,
   lib,
   pkgs,
-  ssh-publickeys,
   ...
 }:
 with lib; let
+  ssh_functions = import ../functions/ssh.nix {inherit lib;};
   itivHosts = {
     "bck" = {
       hostname = "bck.itiv.kit.edu";
@@ -305,16 +305,19 @@ with lib; let
     };
   };
   privateHosts = {
-    "wudika" = {
-      hostname = "ssl.wudika.de";
+    "hydra" = {
+      hostname = "hydra.catbertsen.de";
       hostkeys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOIJoES+tRruLrrhH9CcDJZJ652gBaMV7KcwOXBLReCs"
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDxwNYupZCFm6aaQM7G1/tSPvnni61EOdUHE91oVmsAwY4pl+s+ZdaBgD/8rFN/7/I/n5CdeoZZcGeXVw0WVfF4ZLReCqQoFO71H8nLdQmOExMco1NPnSlVC82lRbM4t00dLwVbfSzfZDZ4uBsNLJe5K5s4ZV2fuuqHPJtt/EH0kpBi98gJkjLhyP3GI6AC0/9m45at/4g0G9ZktsYcnsYjq88pnv64K/OoKVf8aeNYwUle0cKdZOVOuAUU3PqUt1gV7Yi40BW5CUJXH7zusCO5xlim96/YdXg4eu+r5Bj9NBOSjO68f6aH7J69QlDjPmGYyqS9hIeShvw8ArH+nu8z"
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBAOrA3zmMzoNbuX7H0o+7LC+YNN7q/Ise0OscQBVvEnTE63g4BrTc0DrwzShguPnxlKMPZqzPeK/GPdzJ8DNNBE="
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDKncv408h784fugQLZFOQPer0e7fRonltCugAaCA08ME+lgroTYNzURR8Of2ohlnfFmZdQT6b0WbdnKDndHiTdjs7lp3IP08dYXRPDsc0naCxmxp6fjqunqWFFN0HgxgOuDNnBWGeNxcnda+AEKNUVV4gwLMzBP3Ql3TqBEmRzCenrlo8E/+YwfDHRjyBK9nDrVqBYidltXK9YKNFGihBWCeVO1oQBRZD2Wgk8w9NErn+LSvCvZC1lGAqwPLEBFMUTRB89cIrxEz7nAtVgPSDFkNKQ2W3BBxyl39w+p1uyB2EgL3QeHbAhiocB3vb8zFnvyfoLQkn0quEcYQEy5xCch59sgqybmhewSPcCDHc0InZFCvmT6IgnwdCUt3+Zd4DooJA12rLZ4d17tmPwQKyR1+oMi7zCyJwfi9+zmu6NSUMz6QTyU/+wIuSRklPy8Lv/V3zY6E3ESbIwa4Pa4njrkvFvY5MCN1/IB/6zVEsqOGeLo3iet+9ZLBiQ4ujGQ/dXooJgZLVXgDEQ8LG7Qh72xci0ctvGQmAqMslZxUgVfZ+B/R065gxw5Kc9cJgpipDq5uz68emZSmGPHqa+G2BWO2mDbTM8mYI4wQ/Y1UY0H9ETim35MiI1y9Lym/5PN4QQ1FbX1Qve018t6AmAmi70kbTxcL/+tGh3Yqs7n8b3uQ=="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKAcdptqXxeaqYxl4D9nXfZ+TESsif5+v7EkEql8GJWR"
       ];
-      overrides = {
-        user = "manna";
-      };
+    };
+    "mannahusum" = {
+      hostname = "mannahusum.catbertsen.de";
+      hostkeys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJOPI+OGCetpSOAsUBT4U9obDBLzfApbH+4WMemD9xDq"
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0uA5pX6RzBwOhBXRImMVmz6Ul0uIQPTvmLIiF7O3RZHw2p+8IukERO8iSSBmmD7wjH+lac2UqmlYnBvyWECefmUSsSVe7nF59Ksd8XCv182M0kugzvt8gatKZxSpCKNSB7zo9RWhrD74RqiZwJPqInUo7Zp4PwVwrU4MaNq4aUNxMfwlJyNvCN0XFVU+Khq0c+VhIgptr2qTRXlTGDjvNoXclO3LJ1770ImaVdaxpS4a+KXhF8kUZlmzJe+gr8zDE2kEdYX7RJvmx9rCm4eldCKoi9S9gzGfq4+Boo1q+y5ExhsvB2eifyaxW/OZ0kbNpyX7hxVxSIDZLH6Oo0QOLbA6Z+dLx4ySi/hK+2teLPJjJ2kuc391jmbNRf/kIVb6sT2NgR1mlUFA7CPIVE2n5yKQsCCIa1wEhSTqaGBRYj9X+MDL5I3HePuE1W/M8IruiQWeYF5VZ5L6Sg6rIJc5UBnuclv2ZFyfeV8OnsqHBYc2Qe3oAWsDWr3llIiOAhI0ComRcRSC4Aw782PubLzYQY8xfFGp+CfNgs9AxHJN6xnazH+nXfTZsPa/YoZdO/xNs/0KMRAlIVg9hYnCKrTn2d5l7qFwKMJPHHc77J2sUyOl+auvKyXjmK8vpzYD+yMAxMn/tDi1DBw1V2iemWXuLp63iBOi4xyV3lAmrPlEpuw=="
+      ];
     };
   };
   cfg = config.ca.ssh;
@@ -332,50 +335,17 @@ with lib; let
   privateKnownHost = known_hosts_for "known_hosts_ca" privateHosts;
   itivKnownHosts = known_hosts_for "itiv_known_hosts" itivHosts;
 
-  identityFiles = publickeys:
-    map (builtins.toFile ".pub") (
-      filter (key: (builtins.substring 0 3 key) == "ssh") (
-        pkgs.lib.strings.splitString "\n" (builtins.readFile ''${publickeys}'')
-      )
-    );
-
-  host-config = defaults: host: publickeys: socket: value: (
-    {
-      inherit host;
-      inherit (value) hostname;
-      extraOptions =
-        {
-          identityFile = identityFiles publickeys;
-        }
-        // (
-          if (socket == null)
-          then {}
-          else {
-            RemoteForward = "/home/to6338/.forwarded-sockets/S.gpg-agent ${socket}";
-          }
-        );
-    }
-    // defaults
-    // (
-      if hasAttr "overrides" value
-      then value.overrides
-      else {}
-    )
-  );
-
-  standard-config = publickeys: {
+  standard-config = {
     identitiesOnly = true;
     forwardAgent = true;
     forwardX11 = true;
   };
-  # itiv-host = host-config (standard-config //{
-  #     user = "to6338";
-  # });
-  # private-host = host-config standard-config;
-  # configure-hosts = hostconfig: publickeys: socket: mapAttrs (
-  #     name: value:
-  #     hostconfig name publickeys socket value
-  # );
+
+  itiv-config =
+    standard-config
+    // {
+      user = "to6338";
+    };
 in {
   imports = [
   ];
@@ -398,7 +368,7 @@ in {
         '';
       };
       publicKeys = mkOption {
-        type = types.nixxOr types.path;
+        type = types.either (types.listOf types.path) (types.nullOr types.path);
         default = null;
         description = ''
           List of publicKeys whose private keys are store on a gpg card and used for authentication
@@ -411,12 +381,11 @@ in {
     programs.ssh = {
       controlMaster = "yes";
       controlPath = "~/.ssh/master-%C";
+      userKnownHostsFile = "~/.ssh/known_hosts ${privateKnownHost} ${itivKnownHosts}";
       enable = true;
-      # userKnownHostsFile = "~/.ssh/known_hosts ${privateKnownHost} ${itivKnownHosts}";
-      # matchBlocks = let
-      #     toGpgSocket = (if (cfg.forwardGpgSocket && (cfg.localGpgSocket != null)) then cfg.localGpgSocket else null);
-      # in (configure-hosts private-host cfg.publicKeys toGpgSocket privateHosts);
-      # in (configure-hosts itiv-host cfg.publicKeys toGpgSocket itivHosts) // (configure-hosts private-host cfg.publicKeys toGpgSocket privateHosts);
+      matchBlocks =
+        (ssh_functions.host-config standard-config cfg.publicKeys privateHosts)
+        // (ssh_functions.host-config itiv-config cfg.publicKeys itivHosts);
     };
   };
 }

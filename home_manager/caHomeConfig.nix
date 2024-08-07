@@ -1,12 +1,12 @@
 {
   config,
   pkgs,
-  publickeys,
+  ssh-keys,
   ...
 }: {
   imports = [
-    #  ./bashprofile.nix
-    #  ./cassh.nix
+    ./bashprofile.nix
+    ./cassh.nix
     #  ./cagpg.nix
     ./neovim.nix
     ./passwordstore.nix
@@ -17,9 +17,8 @@
     bash.enable = true;
     ssh = {
       enable = true;
-      publicKeys = publickeys;
+      publicKeys = "${ssh-keys.packages."x86_64-linux".ssh_public_keys.out}";
     };
-    # ca.ssh.publicKeys = pkgs.lib.strings.splitString "\n" (builtins.readFile ''${publickeys}'');
     # ca.gpg.enable = true;
     # ca.gpg.withExtraSocket = true;
     # ca.gpg.forwardTo = "";
@@ -28,7 +27,7 @@
   };
 
   home = {
-    file.ssh-keys.source = publickeys;
+    file.ssh-keys.source = ssh-keys.packages."x86_64-linux".ssh_public_keys.out;
     packages = with pkgs; [
       home-manager
       ripgrep

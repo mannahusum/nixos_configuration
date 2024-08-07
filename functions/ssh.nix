@@ -15,7 +15,10 @@ in {
     presets
     // {
        inherit (value) hostname;
-    } 
+    }
+    // (if keyfiles == null then {} else {
+        identityFile = keyfiles;
+    })
     // (if hasAttr "overrides" value then value.overrides else {})
   ) hosts;
 }

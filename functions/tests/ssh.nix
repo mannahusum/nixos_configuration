@@ -1,156 +1,169 @@
 {pkgs ? import <nixpkgs> {}}: let
   inherit (pkgs) lib;
-  inherit (lib) runTests;
-  ssh = import ../ssh.nix {inherit lib;};
-
+  ssh = import ../ssh.nix {inherit (pkgs) lib;};
   standard-config = {
     identitiesOnly = true;
     forwardAgent = true;
     forwardX11 = true;
   };
-  itiv-config =
-    standard-config
-    // {
-      user = "to6338";
-    };
-  privateHosts = {
-    "wudika" = {
-      hostname = "ssl.wudika.de";
-      hostkeys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOIJoES+tRruLrrhH9CcDJZJ652gBaMV7KcwOXBLReCs"
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDxwNYupZCFm6aaQM7G1/tSPvnni61EOdUHE91oVmsAwY4pl+s+ZdaBgD/8rFN/7/I/n5CdeoZZcGeXVw0WVfF4ZLReCqQoFO71H8nLdQmOExMco1NPnSlVC82lRbM4t00dLwVbfSzfZDZ4uBsNLJe5K5s4ZV2fuuqHPJtt/EH0kpBi98gJkjLhyP3GI6AC0/9m45at/4g0G9ZktsYcnsYjq88pnv64K/OoKVf8aeNYwUle0cKdZOVOuAUU3PqUt1gV7Yi40BW5CUJXH7zusCO5xlim96/YdXg4eu+r5Bj9NBOSjO68f6aH7J69QlDjPmGYyqS9hIeShvw8ArH+nu8z"
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBAOrA3zmMzoNbuX7H0o+7LC+YNN7q/Ise0OscQBVvEnTE63g4BrTc0DrwzShguPnxlKMPZqzPeK/GPdzJ8DNNBE="
-      ];
-      overrides = {
-        user = "manna";
-      };
-    };
+  vagrant_sec_key_rsa = ''
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEogIBAAKCAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzI
+    w+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoP
+    kcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2
+    hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NO
+    Td0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcW
+    yLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQIBIwKCAQEA4iqWPJXtzZA68mKd
+    ELs4jJsdyky+ewdZeNds5tjcnHU5zUYE25K+ffJED9qUWICcLZDc81TGWjHyAqD1
+    Bw7XpgUwFgeUJwUlzQurAv+/ySnxiwuaGJfhFM1CaQHzfXphgVml+fZUvnJUTvzf
+    TK2Lg6EdbUE9TarUlBf/xPfuEhMSlIE5keb/Zz3/LUlRg8yDqz5w+QWVJ4utnKnK
+    iqwZN0mwpwU7YSyJhlT4YV1F3n4YjLswM5wJs2oqm0jssQu/BT0tyEXNDYBLEF4A
+    sClaWuSJ2kjq7KhrrYXzagqhnSei9ODYFShJu8UWVec3Ihb5ZXlzO6vdNQ1J9Xsf
+    4m+2ywKBgQD6qFxx/Rv9CNN96l/4rb14HKirC2o/orApiHmHDsURs5rUKDx0f9iP
+    cXN7S1uePXuJRK/5hsubaOCx3Owd2u9gD6Oq0CsMkE4CUSiJcYrMANtx54cGH7Rk
+    EjFZxK8xAv1ldELEyxrFqkbE4BKd8QOt414qjvTGyAK+OLD3M2QdCQKBgQDtx8pN
+    CAxR7yhHbIWT1AH66+XWN8bXq7l3RO/ukeaci98JfkbkxURZhtxV/HHuvUhnPLdX
+    3TwygPBYZFNo4pzVEhzWoTtnEtrFueKxyc3+LjZpuo+mBlQ6ORtfgkr9gBVphXZG
+    YEzkCD3lVdl8L4cw9BVpKrJCs1c5taGjDgdInQKBgHm/fVvv96bJxc9x1tffXAcj
+    3OVdUN0UgXNCSaf/3A/phbeBQe9xS+3mpc4r6qvx+iy69mNBeNZ0xOitIjpjBo2+
+    dBEjSBwLk5q5tJqHmy/jKMJL4n9ROlx93XS+njxgibTvU6Fp9w+NOFD/HvxB3Tcz
+    6+jJF85D5BNAG3DBMKBjAoGBAOAxZvgsKN+JuENXsST7F89Tck2iTcQIT8g5rwWC
+    P9Vt74yboe2kDT531w8+egz7nAmRBKNM751U/95P9t88EDacDI/Z2OwnuFQHCPDF
+    llYOUI+SpLJ6/vURRbHSnnn8a/XG+nzedGH5JGqEJNQsz+xT2axM0/W/CRknmGaJ
+    kda/AoGANWrLCz708y7VYgAtW2Uf1DPOIYMdvo6fxIB5i9ZfISgcJ/bbCUkFrhoH
+    +vq/5CIWxCPp0f85R4qxxQ5ihxJ0YDQT9Jpx4TMss4PSavPaBH3RXow5Ohe+bYoQ
+    NE5OgEXk2wVfZczCZpigBKbKZHNYcelXtTt/nP3rsCuGcM4h53s=
+    -----END RSA PRIVATE KEY-----
+  '';
+  vagrant_sec_key_ed25519 = ''
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+    QyNTUxOQAAACDdWHcQaTZc8Q6nycsP0CqMNRfsLxvYVxqKosrHyTp+WAAAAJj2TBMT9kwT
+    EwAAAAtzc2gtZWQyNTUxOQAAACDdWHcQaTZc8Q6nycsP0CqMNRfsLxvYVxqKosrHyTp+WA
+    AAAEAveRHRHSCjIxbNKHDRzezD0U3R3UEEmS7R33fzvPQAD91YdxBpNlzxDqfJyw/QKow1
+    F+wvG9hXGoqiysfJOn5YAAAAEHNwb3hAdmFncmFudC1kZXYBAgMEBQ==
+    -----END OPENSSH PRIVATE KEY-----
+  '';
+  vagrant_pub_key_rsa = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key";
+  vagrant_pub_key_ed25519 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN1YdxBpNlzxDqfJyw/QKow1F+wvG9hXGoqiysfJOn5Y vagrant insecure public key";
+  vagrant_pub_keys = lib.strings.concatStringsSep "\n" [
+    vagrant_pub_key_rsa
+    vagrant_pub_key_ed25519
+  ];
+  vagrant_pub_rsa_key_file = pkgs.writeText "vagrant.rsa.pub" vagrant_pub_key_rsa;
+  vagrant_pub_key_file = pkgs.writeTextFile {
+    name = "vagrant.pub";
+    text = vagrant_pub_keys;
   };
-  itivHosts = {
-    "itiv-infopi1" = {
-      hostname = "itiv-infopi1.itiv.kit.edu";
-      hostkeys = [
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDO3XOvQEr/yztNACcygXv7VUdkY1OrfJBgEJ2nGphlcHiDJDgGSJDkklkfQOQwmVkBgcEAjTOr6YjzGmWo28DrpQP71Rh3mKJddHcrQHdQX97OfN4ClJfWEpE44X8oEXpZNKJoSZ/r9pteB+eB25B+VgZMcesxJg21+KIrvuE0q4UiPnqeZkcVVawKqbLPrDcwvosew76BV3ASJehhhjMqUkhzd35asxMJxC8FNDQzjvEvN1B68aB/oajNKWATA2mLK1PwLICsukhA1IVl958gW+GZXX3Gvpfg4aJcqXzoMspPvZzfku7IQqa4anmcGHUeG0djvOh9L7F2sL48POXT"
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBM3Kh1CoX8Q0cbbS5sifv1C9y9UNm69MHSAqz/PyMKObcOZ844dtLyTNoBcs9uVFHJYnRPMzMOk4AzWln6Nnt20="
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILdkYRsbztp2zo6n30cPU2VZAto864nxccfyCimk89z9"
-      ];
-      overrides = {
-        user = "pi";
-        proxyJump = "nixos-substitute";
-      };
-    };
-    "nixos-substitute" = {
-      hostname = "nixos-substitute.itiv.kit.edu";
-      hostkeys = [
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDOksupsvA7m6OJ7z0gK1Bit3tlE4drw9z0XtXOt1IaHH8zuW+Hy6RSTHLv1RA97Z8VCNF2m5erNd03PQ0eLgIF9DVrfaI4G1UzQB54dhL9GISG4VBDlPG1L+pRBckpgWCXHo94nWpdgYQA1D4LtwwSkAsjNuSlxm6O46zlS/XjiPArms0KoVMOGUUnaBBWKF3kF4F0R4E3859Kyo30Yohulii8T3Bo/gGpZyffV9iIHWZtv6Pi9+2JOh3TOsyJ5tf3GYX49yB/J4RmDqDov0yGxgiJiNnH5LYacWhfNfeHTOmNf2sGzgQanP1tGkyiMbfZefHbB/GOpqdtBcfKq9KBborQguGNQnzVlp4HnKCRu2v6ezATOLEG5SRHjHtVYklI7FFL2f+jzHnY67z4ZlYXtdwnuue2yH43UhUIOOOnXnl4l6EI46mmstid/DAAQ47PaZMb/nnGtks90EKwTeVbv9YNTAvFzK11ks1uXRUJKzHvhDw58Sc4ya7tzYUTMJChGm6RC0Dq1VIzfWpD4X+U2fvnghhZX8c0aShUOalkgONlf46S7lm1RwbMKsQcVAHmpMvyu5wfLcfkdKWcBvvJJ+HLdOpZl3De71Xxt1/tL8mShpT11Vn68ZltxU7YX30ZbKbPAPclcemxMc7KLgZzTuSwgDfUVcnSu0d/Hw/uwQ=="
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWKUNueuWanuJjxsOsbAc3JpzGTR3FuVDXSkEuymQFt"
-      ];
-    };
-  };
-  testkeys = {
-    first = {
-      private = ''
-        -----BEGIN OPENSSH PRIVATE KEY-----
-        b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-        QyNTUxOQAAACAYEc5fKup+7DJPuk2vmu1YlRQdGw3wo1cTKAqhQmfsugAAAJhf+a4zX/mu
-        MwAAAAtzc2gtZWQyNTUxOQAAACAYEc5fKup+7DJPuk2vmu1YlRQdGw3wo1cTKAqhQmfsug
-        AAAEDxzUZAiHH+QLSV5JgK+2Y6Esmv6wSl1aqHyk3xxzNJeBgRzl8q6n7sMk+6Ta+a7ViV
-        FB0bDfCjVxMoCqFCZ+y6AAAAFGtpdFx0bzYzMzhAaXRpdi00MDE5AQ==
-        -----END OPENSSH PRIVATE KEY-----
-      '';
-      public = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBgRzl8q6n7sMk+6Ta+a7ViVFB0bDfCjVxMoCqFCZ+y6 kit\to6338@itiv-4019";
-    };
-    second = {
-      private = ''
-        -----BEGIN OPENSSH PRIVATE KEY-----
-        b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
-        NhAAAAAwEAAQAAAYEA2MHT7VmNnJkMyU3dXszGuJO5rLhGTl3Z4TPKxN45Cf61f5i3NOUc
-        58v9lmaoSW5+gnmVELjfjcceTIefOQdXIK8K9hzw8xovUWuN/urDfJuNEZMnYN95L0Ak6V
-        Efvk62/sMSbIbDhok6Cl6OPtmCvhdCZgVIQiUpFoXOBM/4x++rEeAmE72rSE4cjueHl0O+
-        BxjF4NmCNw+hDlQjBg4LK6g4scqE53VHDhuqCUDSEuRMojXZkN7V2odL+AVoigsAXATM8U
-        rQEnz5qmrT/wZnnZvI6l3aHcxlgeBjIp51/Gs40P4u6IwwgnkF0vPhfRHYjy6eTpYgjkzX
-        kIjGiFPRz3sAvQrWzkpzVY1ZC4ugrZcVk0UeVv46hAA56DRwquYUdLE/JE6cTP1/X+mOtb
-        OySJx5H2NSQLBQ6nNQdu6wa4GbqodaZf0RhoypcSGGRgv6dIYa2ivsg/DooZBtSORb3eh4
-        72maoQG+OYOFz2iR/N1KX7Vh2U8IQZ8knS/bM9LnAAAFkGI2cSpiNnEqAAAAB3NzaC1yc2
-        EAAAGBANjB0+1ZjZyZDMlN3V7MxriTuay4Rk5d2eEzysTeOQn+tX+YtzTlHOfL/ZZmqElu
-        foJ5lRC4343HHkyHnzkHVyCvCvYc8PMaL1Frjf7qw3ybjRGTJ2DfeS9AJOlRH75Otv7DEm
-        yGw4aJOgpejj7Zgr4XQmYFSEIlKRaFzgTP+MfvqxHgJhO9q0hOHI7nh5dDvgcYxeDZgjcP
-        oQ5UIwYOCyuoOLHKhOd1Rw4bqglA0hLkTKI12ZDe1dqHS/gFaIoLAFwEzPFK0BJ8+apq0/
-        8GZ52byOpd2h3MZYHgYyKedfxrOND+LuiMMIJ5BdLz4X0R2I8unk6WII5M15CIxohT0c97
-        AL0K1s5Kc1WNWQuLoK2XFZNFHlb+OoQAOeg0cKrmFHSxPyROnEz9f1/pjrWzskiceR9jUk
-        CwUOpzUHbusGuBm6qHWmX9EYaMqXEhhkYL+nSGGtor7IPw6KGQbUjkW93oeO9pmqEBvjmD
-        hc9okfzdSl+1YdlPCEGfJJ0v2zPS5wAAAAMBAAEAAAGALDCv9Rap0UA+pBe0xuv2o5CybO
-        0QoE9v6QK3FxW7CTedZwsKZsVC9FrZMz1wl6/oKM+CvWsDYJM0sSOBKY4+jBJDqNNTqCwx
-        c2b7BvpzqkbIJsoaYByPRzvLiqmYUCMaGaxJaEi9OgNmCtEmLNgJWJnDVqtDBQEwdEAJNV
-        /090X8WWOaP7IOZmpOVjALq6IK7sV1KhcN/g24pwQuM8DPNDJShKSmHc4CE3U+YC6P5XwX
-        x4Y0+d0EOk4VBdaMboA5TU1MbRgMXo2pUxyTpWFkARBtJmc97oupJqNSHt4nrYDoJJ4RN5
-        10fw01VPGw5F7IkFUE78nO4aOlJ6VnMzhc0GpyYv4QVpBlRdWXOX/iybCtPhJcHOwDwB8r
-        LS3bds2TSRiBunH30GqaqiU8vFjf9138TrW1pdxfHcd/+M7NgliV8fSaXqJ9DSub5Gex02
-        bH9bWQewEZaBgOtKX1Eqgp9ECwoEWEkN7l1DIFxETJ2T2noQHqexSpt3t36EOh7FWpAAAA
-        wG/1IZVtMYgUtEG/I36zqeoQpR8ElVgM/yw5wLe3JiohOS1SbYT3Qy+qUFhy3OHlkcc6s/
-        FB80zfgh/vm0LkjJqDYQj5xEaS3dz2bc8vhT6CtjtUNZ/PykIbm4KxpZxwGvqd94Rs1y5V
-        C5+MUX5Bm1obChM/PclouD2qNXAYBEYhs5pxrM5bx8yJ4N9G63aIbYjq3nPtcc9RcWlgfI
-        QU6ihIpSOg9tt9ZXd9iB+Qw/KnC+wAImzYxUT5OWBpnPqlbQAAAMEA+qGJAAUV+zgJCOdQ
-        pxH9CUyhUOFRFID4//p1a8KxR4LbYwtBxnMZUVesLySWaP3U06XErYgXEgPuzZIBQexmbA
-        jdcUoyGiow53Wkrk93vt57nU5Lg/ldKWx18Vm+wGslccauIsgXxbQDtZkbQilQExCB9gTl
-        VLPxO0njc3g1zFX03qN5aW1E7FhWMf72HRoHLlUD4ess13zrOezENG/aUVRbgW2mY3kST2
-        V9cJrg4Yv4SeHUrrZFGNq/Sk8wFxPbAAAAwQDdZochQnrepnLi941YlhosmxA/GZ+rKwyC
-        Rbcant3e4GasgMq6PJK/Iero8IBJBi6hT+t9eqms+uSFhoho/yEvYem2Aa+h0F1JzkMgHJ
-        jzj0sQUS4AoxiiC+T9aAwDj2oLrS4tqEXnygcPk/lU9+Dfde/7etBo97zH7JjJ7c2LYExe
-        b7Q+K0plWQj2S7IcLDqUR2N8HywPNxo6PGlIn7hILu6aTJB3LZvRcRfTulGN1Cseqv++pS
-        mzu5zpqItiMOUAAAAUa2l0XHRvNjMzOEBpdGl2LTQwMTkBAgMEBQYH
-        -----END OPENSSH PRIVATE KEY-----
-      '';
-      public = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDYwdPtWY2cmQzJTd1ezMa4k7msuEZOXdnhM8rE3jkJ/rV/mLc05Rzny/2WZqhJbn6CeZUQuN+Nxx5Mh585B1cgrwr2HPDzGi9Ra43+6sN8m40Rkydg33kvQCTpUR++Trb+wxJshsOGiToKXo4+2YK+F0JmBUhCJSkWhc4Ez/jH76sR4CYTvatIThyO54eXQ74HGMXg2YI3D6EOVCMGDgsrqDixyoTndUcOG6oJQNIS5EyiNdmQ3tXah0v4BWiKCwBcBMzxStASfPmqatP/Bmedm8jqXdodzGWB4GMinnX8azjQ/i7ojDCCeQXS8+F9EdiPLp5OliCOTNeQiMaIU9HPewC9CtbOSnNVjVkLi6CtlxWTRR5W/jqEADnoNHCq5hR0sT8kTpxM/X9f6Y61s7JInHkfY1JAsFDqc1B27rBrgZuqh1pl/RGGjKlxIYZGC/p0hhraK+yD8OihkG1I5Fvd6HjvaZqhAb45g4XPaJH83UpftWHZTwhBnySdL9sz0uc= kit\to6338@itiv-4019";
-    };
-  };
-  testkeyfiles =
-    lib.mapAttrs (
-      name: value: {
-        public = builtins.toFile ".pub" value.public;
-        private = builtins.toFile ".key" value.private;
-      }
-    )
-    testkeys;
-  publickeys = lib.mapAttrsToList (name: lib.attrByPath ["public"]) testkeys;
-  publickeyfiles = lib.mapAttrsToList (name: lib.attrByPath ["public"]) testkeyfiles;
 in {
   testSSHBasicSettingsEmpty = {
-    expr = ssh.host-config standard-config {};
+    expr = ssh.host-config standard-config null {};
     expected = {};
   };
-  testSSHBasicSettingsPrivate = {
-    expr = ssh.host-config standard-config "blubb" privateHosts; #testkeys.first.public ];
+  testSSHBasicSettingsNoSettings = {
+    expr = ssh.host-config standard-config null {
+      emptytesthost = {
+        hostname = "emptytesthost";
+      };
+    };
     expected = {
-      "wudika" = {
-        hostname = "ssl.wudika.de";
-        #identityFile = [ testkeyfiles.first.public ];
+      emptytesthost = {
         identitiesOnly = true;
         forwardAgent = true;
         forwardX11 = true;
-        user = "manna";
+        hostname = "emptytesthost";
       };
     };
   };
-  testSSHBasicSettingsItiv = {
-    expr = ssh.host-config itiv-config "blubb" itivHosts; #publickeys;
-    expected = {
-      "nixos-substitute" = {
-        hostname = "nixos-substitute.itiv.kit.edu";
-        #identityFile = ;
-        identitiesOnly = true;
-        forwardAgent = true;
-        forwardX11 = true;
-        user = "to6338";
+  testSSHBasicSettingsTwoHosts = {
+    expr = ssh.host-config standard-config null {
+      emptytesthost = {
+        hostname = "emptytesthost";
       };
-      "itiv-infopi1" = {
-        hostname = "itiv-infopi1.itiv.kit.edu";
-        #identityFile = lib.mapAttrsToList (name: lib.attrByPath [ "public" ] ) testkeyfiles;
+      othertesthost = {
+        hostname = "thevoid";
+      };
+    };
+    expected = {
+      emptytesthost = {
         identitiesOnly = true;
         forwardAgent = true;
         forwardX11 = true;
-        user = "pi";
-        proxyJump = "nixos-substitute";
+        hostname = "emptytesthost";
+      };
+      othertesthost = {
+        identitiesOnly = true;
+        forwardAgent = true;
+        forwardX11 = true;
+        hostname = "thevoid";
+      };
+    };
+  };
+  testSSHBasicSettingsIdentitiesAsString = {
+    expr = ssh.host-config standard-config " " {
+      emptytesthost = {
+        hostname = "emptytesthost";
+      };
+    };
+    expected = {
+      emptytesthost = {
+        identitiesOnly = true;
+        forwardAgent = true;
+        forwardX11 = true;
+        hostname = "emptytesthost";
+        identityFile = " ";
+      };
+    };
+  };
+  testSSHBasicSettingsIdentitiesAsOut = {
+    expr = ssh.host-config standard-config vagrant_pub_key_file.out {
+      emptytesthost = {
+        hostname = "emptytesthost";
+      };
+    };
+    expected = {
+      emptytesthost = {
+        identitiesOnly = true;
+        forwardAgent = true;
+        forwardX11 = true;
+        hostname = "emptytesthost";
+        identityFile = vagrant_pub_key_file.out;
+      };
+    };
+  };
+  testSSHBasicSettingsIdentitiesAsArray = {
+    expr = ssh.host-config standard-config vagrant_pub_key_file.out {
+      emptytesthost = {
+        hostname = "emptytesthost";
+      };
+    };
+    expected = {
+      emptytesthost = {
+        identitiesOnly = true;
+        forwardAgent = true;
+        forwardX11 = true;
+        hostname = "emptytesthost";
+        identityFile = vagrant_pub_key_file.out;
+      };
+    };
+  };
+  testSSHOverrideForwardX11IdentityFile = {
+    expr = ssh.host-config standard-config vagrant_pub_key_file.out {
+      emptytesthost = {
+        hostname = "emptytesthost";
+        overrides = {
+          forwardX11 = false;
+          identityFile = vagrant_pub_rsa_key_file.out;
+        };
+      };
+    };
+    expected = {
+      emptytesthost = {
+        identitiesOnly = true;
+        forwardAgent = true;
+        forwardX11 = false;
+        hostname = "emptytesthost";
+        identityFile = vagrant_pub_rsa_key_file.out;
       };
     };
   };

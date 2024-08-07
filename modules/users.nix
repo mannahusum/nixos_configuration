@@ -155,7 +155,6 @@ in {
       users = {
         christian = import ../home_manager/caHomeConfig.nix {
           inherit pkgs config ssh-keys;
-          publickeys = ssh-keys.packages."x86_64-linux".ssh_public_keys.out;
         };
       };
     };
