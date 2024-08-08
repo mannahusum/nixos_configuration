@@ -38,7 +38,7 @@ in {
       enable = true;
       executable = false;
       text = ''
-        silent call system("echo 'test' | gpg --encrypt --recipient christian@wudika.de | gpg --decrypt -o /dev/null")
+        silent call system("echo 'test' | ${pkgs.gnupg}/bin/gpg2 --encrypt --recipient christian@wudika.de | ${pkgs.gnupg}/bin/gpg2 --decrypt -o /dev/null")
         if v:shell_error != 0
           echom "Can't decrypt passwords. Keys won't be available"
         else
@@ -77,8 +77,8 @@ in {
     ca.bash.extraProfile.downloadVimConfiguration = hm.dag.entryAfter ["gpgForwardedSockets"] ''
       if [ ! -e $HOME/.config/nvim ]; then
           mkdir -p $HOME/.config
-          if (ssh-add -L | grep ssh >/dev/null); then
-              git clone git@github.com:mannahusum/vimrc_stuff.git $HOME/.config/nvim
+          if (${pkgs.openssh.out}/bin/ssh-add -L | ${pkgs.gnugrep.out}/bin/grep ssh >/dev/null); then
+              ${pkgs.git.out}/bin/git clone git@github.com:mannahusum/vimrc_stuff.git $HOME/.config/nvim
               ${config.programs.neovim.finalPackage}/bin/nvim +"call dein#install()" +qall
           fi
       fi
