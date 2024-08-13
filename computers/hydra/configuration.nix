@@ -2,14 +2,10 @@
   config,
   modulesPath,
   lib,
-  boot,
   pkgs,
-  home-manager,
   sops-nix,
   ...
-}: let
-  cfg = config.hydra;
-in {
+}: {
   imports = [
     sops-nix.nixosModules.sops
     ./sops.nix
@@ -123,8 +119,14 @@ in {
       hostName = "hydra";
       tempAddresses = "disabled";
       hosts = {
-        "192.168.10.253" = ["mannahusum.catbertsen.de"];
-        "192.168.10.254" = ["hydra.catbertsen.de" "calendar.catbertsen.de" "gitea.catbertsen.de"];
+        "192.168.10.253" = [
+          "mannahusum.catbertsen.de"
+        ];
+        "192.168.10.254" = [
+          "hydra.catbertsen.de"
+          "calendar.catbertsen.de"
+          "gitea.catbertsen.de"
+        ];
       };
     };
 

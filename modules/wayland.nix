@@ -1,5 +1,9 @@
-{ config, modulesPath, lib, pkgs, nixpkgs, time, i28n, sound, hardware, ... }:
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   cfg = config.cawayland;
 in {
   imports = [
@@ -42,26 +46,25 @@ in {
       };
     };
 
-
     myswayconfig = pkgs.writeText "greetd-sway-config" ''
-# `-l` activates layer-shell mode. Notice that `swaymsg exit` will run after gtkgreet.
-exec "${pkgs.greetd.regreet.out}/bin/regreet; swaymsg exit"
+      # `-l` activates layer-shell mode. Notice that `swaymsg exit` will run after gtkgreet.
+      exec "${pkgs.greetd.regreet.out}/bin/regreet; swaymsg exit"
 
-output "DP-1" mode 3840x2160@30Hz pos 0 0
-output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
+      output "DP-1" mode 3840x2160@30Hz pos 0 0
+      output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
 
-bindsym Mod4+shift+e exec swaynag \
--t warning \
--m 'What do you want to do?' \
--b 'Poweroff' 'systemctl poweroff' \
--b 'Reboot' 'systemctl reboot'
+      bindsym Mod4+shift+e exec swaynag \
+      -t warning \
+      -m 'What do you want to do?' \
+      -b 'Poweroff' 'systemctl poweroff' \
+      -b 'Reboot' 'systemctl reboot'
 
-include /etc/sway/config.d/*
-'';
-  myswaycommand = pkgs.writeShellScriptBin "mysway" ''
-${cfg.keyboardSettings}
-${pkgs.sway.out}/bin/sway --config ${myswayconfig}
-  '';
+      include /etc/sway/config.d/*
+    '';
+    myswaycommand = pkgs.writeShellScriptBin "mysway" ''
+      ${cfg.keyboardSettings}
+      ${pkgs.sway.out}/bin/sway --config ${myswayconfig}
+    '';
   in {
     services.greetd = {
       enable = true;
@@ -77,7 +80,7 @@ ${pkgs.sway.out}/bin/sway --config ${myswayconfig}
       fira-code
     ];
 
-    causers.regularUserGroups = [ "input" ];
+    causers.regularUserGroups = ["input"];
     programs.sway = {
       enable = true;
       wrapperFeatures.gtk = true;
@@ -92,4 +95,3 @@ ${pkgs.sway.out}/bin/sway --config ${myswayconfig}
     hardware.pulseaudio.enable = true;
   });
 }
-

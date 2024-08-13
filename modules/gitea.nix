@@ -1,5 +1,9 @@
-{ config, lib, options, ... }:
-let
+{
+  config,
+  lib,
+  options,
+  ...
+}: let
   cfg = config.cagitea;
 in {
   imports = [
@@ -17,7 +21,7 @@ in {
       '';
     };
     domain = lib.mkOption {
-      type = lib.types.str ;
+      type = lib.types.str;
       default = "gitea.catbertsen.de";
       description = ''
         Domain under which gitea should be reachable
@@ -32,7 +36,7 @@ in {
 
     # In order to access sockets of other processes give
     # nginx the right to traverse
-    users.groups.gitea.members = [ "nginx" ];
+    users.groups.gitea.members = ["nginx"];
     systemd.services.nginx.serviceConfig.ProtectHome = false;
 
     services = {
@@ -69,11 +73,13 @@ in {
       };
     };
     services.postgresql = {
-      ensureUsers = [{
-        name = "gitea";
-        ensureDBOwnership = true;
-        ensureClauses.login = true;
-      }];
+      ensureUsers = [
+        {
+          name = "gitea";
+          ensureDBOwnership = true;
+          ensureClauses.login = true;
+        }
+      ];
       ensureDatabases = [
         "gitea"
       ];
@@ -83,4 +89,3 @@ in {
     ];
   };
 }
-

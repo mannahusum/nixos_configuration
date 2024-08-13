@@ -1,5 +1,8 @@
-({ lib, ssh-keys, ... }: {
-
+({
+  lib,
+  ssh-keys,
+  ...
+}: {
   boot.initrd.systemd.emergencyAccess = true;
   services.getty.autologinUser = lib.mkForce "root";
   users.users.root.openssh.authorizedKeys.keyFiles = [

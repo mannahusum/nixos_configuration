@@ -1,4 +1,8 @@
-{ disks ? [ "/dev/disk/by-id/nvme-eui.0025385811b168ce" "/dev/disk/by-id/wwn-0x5001b448bc1f7726" ], swapsize ? "72G", ... }: {
+{
+  disks ? ["/dev/disk/by-id/nvme-eui.0025385811b168ce" "/dev/disk/by-id/wwn-0x5001b448bc1f7726"],
+  swapsize ? "72G",
+  ...
+}: {
   disk = let
     disklayout = device: efimountpoint: counter: {
       inherit device;

@@ -1,5 +1,9 @@
-{ config, home-manager, pkgs, ... }:
 {
+  config,
+  home-manager,
+  pkgs,
+  ...
+}: {
   home.packages = with pkgs; let
     qrcode = python310.pkgs.buildPythonApplication rec {
       pname = "qrcode";
@@ -7,7 +11,7 @@
 
       src = python310.pkgs.fetchPypi {
         inherit pname version;
-        sha256= "0sa3n298b9jpz6zn0birnjii3mg9sihjq28n9nzjlzv09y2m6ljh";
+        sha256 = "0sa3n298b9jpz6zn0birnjii3mg9sihjq28n9nzjlzv09y2m6ljh";
       };
 
       checkInputs = with python310Packages; [
@@ -24,32 +28,32 @@
       ];
     };
 
-    homePythonPackages = python-packages: with python-packages; [
-      cookiecutter
-      httpsig
-      # ipython
-      jedi
-      pip
-      pyaudio
-      pylint
-      pyserial
-      requests
-      setuptools
-      urllib3
-      virtualenv
+    homePythonPackages = python-packages:
+      with python-packages; [
+        cookiecutter
+        httpsig
+        # ipython
+        jedi
+        pip
+        pyaudio
+        pylint
+        pyserial
+        requests
+        setuptools
+        urllib3
+        virtualenv
 
-      # used by vim
-      #  black
-      # simple-websocket-server
-      python-slugify
+        # used by vim
+        #  black
+        # simple-websocket-server
+        python-slugify
 
-      # needed by black, hope this helps
-      pathspec
-    ];
+        # needed by black, hope this helps
+        pathspec
+      ];
 
     homePython310 = python310Full.withPackages homePythonPackages;
-  in
-  [
+  in [
     arandr
     bashInteractive
     bat # cat clone
@@ -94,7 +98,7 @@
     exa.enable = true;
     bash = {
       enable = true;
-      historyControl = [ "ignorespace" ];
+      historyControl = ["ignorespace"];
       initExtra = ''
         GPG_TTY=$(tty)
       '';
@@ -125,11 +129,11 @@
       mutableKeys = true;
       mutableTrust = true;
       publicKeys = [
-         {
+        {
           source = builtins.fetchurl {
             url = "https://keys.openpgp.org/vks/v1/by-fingerprint/F1A1F1A33787F28359E60BFB1DBDE5EC541E1874";
             sha256 = "1r5g5bg01fvkb2flyw75hin4gvifn8za93przr6jf2bd2vx5qic5";
-            };
+          };
           trust = "ultimate";
         }
       ];
@@ -170,7 +174,6 @@
 
     find_sockets_to_forward
   '';
-
 
   home.stateVersion = "23.05";
 }

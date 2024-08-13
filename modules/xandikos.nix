@@ -1,5 +1,9 @@
-{ config, lib, options, ... }:
-let
+{
+  config,
+  lib,
+  options,
+  ...
+}: let
   cfg = config.caxandikos;
 in {
   imports = [
@@ -43,7 +47,7 @@ in {
         basicAuthFile = cfg.passwordfile;
       };
     };
-    caacme.domains = [ "${cfg.domain}" ];
+    caacme.domains = ["${cfg.domain}"];
     services.xandikos = {
       enable = true;
       port = 8088;
@@ -55,4 +59,3 @@ in {
     };
   };
 }
-

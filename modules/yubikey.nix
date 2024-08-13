@@ -1,5 +1,10 @@
-{ config, lib, options, pkgs, ... }:
-let
+{
+  config,
+  lib,
+  options,
+  pkgs,
+  ...
+}: let
   cfg = config.cayubikey;
 in {
   imports = [
@@ -16,7 +21,7 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    services.udev.packages = [ pkgs.yubikey-personalization ];
+    services.udev.packages = [pkgs.yubikey-personalization];
 
     programs.gnupg.agent = {
       enableExtraSocket = true;

@@ -1,5 +1,9 @@
-{ config, lib, options, ... }:
-let
+{
+  config,
+  lib,
+  options,
+  ...
+}: let
   cfg = config.caacme;
 in {
   imports = [
@@ -42,14 +46,15 @@ in {
     security.acme = {
       acceptTerms = true;
       defaults.email = "${cfg.email}";
-      certs = builtins.listToAttrs ( map (domain: {
-        name = "${domain}";
-        value = {
-          dnsProvider = "route53";
-          credentialsFile = "${cfg.credentialsfile}";
-          webroot = null;
-        };
-      }) cfg.domains);
+      certs = builtins.listToAttrs (map (domain: {
+          name = "${domain}";
+          value = {
+            dnsProvider = "route53";
+            credentialsFile = "${cfg.credentialsfile}";
+            webroot = null;
+          };
+        })
+        cfg.domains);
     };
   };
 }

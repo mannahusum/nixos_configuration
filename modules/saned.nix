@@ -1,5 +1,9 @@
-{ config, modulesPath, lib, pkgs, nixpkgs-utsushi, hardware, ... }:
-let
+{
+  config,
+  lib,
+  nixpkgs-utsushi,
+  ...
+}: let
   cfg = config.casaned;
 in {
   imports = [
@@ -17,13 +21,13 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    services.udev.packages = [ nixpkgs-utsushi.legacyPackages.x86_64-linux.utsushi ];
+    services.udev.packages = [nixpkgs-utsushi.legacyPackages.x86_64-linux.utsushi];
     hardware.sane = {
       enable = true;
-      extraBackends = [ nixpkgs-utsushi.legacyPackages.x86_64-linux.utsushi ];
+      extraBackends = [nixpkgs-utsushi.legacyPackages.x86_64-linux.utsushi];
       openFirewall = true;
     };
     services.saned.enable = true;
-    causers.regularUserGroups = [ "lp" "scanner" ];
+    causers.regularUserGroups = ["lp" "scanner"];
   };
 }

@@ -1,5 +1,9 @@
-{ config, lib, options, ... }:
-let
+{
+  config,
+  lib,
+  options,
+  ...
+}: let
   cfg = config.capostgres;
 in {
   imports = [
@@ -28,4 +32,3 @@ in {
     };
   };
 }
-

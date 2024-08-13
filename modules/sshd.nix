@@ -1,5 +1,8 @@
-{ config, modulesPath, lib, pkgs, nixpkgs-utsushi, hardware, ... }:
-let
+{
+  config,
+  lib,
+  ...
+}: let
   cfg = config.casshd;
 in {
   imports = [
@@ -33,4 +36,3 @@ in {
     };
   };
 }
-

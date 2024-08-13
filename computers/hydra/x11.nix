@@ -1,8 +1,11 @@
-{ config, lib, pkgs, ... }:
-let
-  cfg = config.x11;
-in
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.x11;
+in {
   imports = [
   ];
 
@@ -28,7 +31,7 @@ in
     };
     services.xserver = {
       enable = true;
-      videoDrivers = [ "amdgpu" ];
+      videoDrivers = ["amdgpu"];
     };
     hardware.opengl = {
       driSupport = true;

@@ -1,8 +1,10 @@
-{ config, lib, pkgs, ... }:
-let
-  cfg = config.cakeyboard;
-in
 {
+  config,
+  lib,
+  ...
+}: let
+  cfg = config.cakeyboard;
+in {
   imports = [
     ./wayland.nix
   ];
@@ -34,4 +36,3 @@ in
     '';
   };
 }
-

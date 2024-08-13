@@ -1,5 +1,8 @@
-{ config, modulesPath, lib, pkgs, ... }:
-let
+{
+  config,
+  lib,
+  ...
+}: let
   cfg = config.canginx;
 in {
   options.canginx = {
