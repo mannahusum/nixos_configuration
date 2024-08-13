@@ -138,7 +138,7 @@
       pkgs.git-crypt
       pkgs.neovim
       pkgs.ripgrep
-      pkgs.xterm
+      pkgs.xterm # for resize command
       pkgs.file
     ];
     system.stateVersion = "23.11";
