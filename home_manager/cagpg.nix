@@ -61,6 +61,9 @@ in {
       enableSshSupport = true;
       grabKeyboardAndMouse = true;
     };
+    home.file."${config.programs.gpg.homedir}/scdaemon.conf".text = ''
+      disable-ccid
+    '';
 
     ca = {
       ssh.localGpgSocket =

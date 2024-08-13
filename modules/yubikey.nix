@@ -21,7 +21,10 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    services.udev.packages = [pkgs.yubikey-personalization];
+    services = {
+      udev.packages = [pkgs.yubikey-personalization];
+      pcscd.enable = true;
+    };
 
     programs.gnupg.agent = {
       enableExtraSocket = true;

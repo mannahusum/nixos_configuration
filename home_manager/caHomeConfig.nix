@@ -7,7 +7,7 @@
   imports = [
     ./bashprofile.nix
     ./cassh.nix
-    #  ./cagpg.nix
+    ./cagpg.nix
     ./neovim.nix
     ./passwordstore.nix
     ./sway.nix
@@ -19,9 +19,9 @@
       enable = true;
       publicKeys = "${ssh-keys.packages."x86_64-linux".ssh_public_keys.out}";
     };
-    # ca.gpg.enable = true;
-    # ca.gpg.withExtraSocket = true;
-    # ca.gpg.forwardTo = "";
+    gpg.enable = true;
+    # gpg.withExtraSocket = true;
+    # gpg.forwardTo = "";
     neovim.enable = true;
     pass.enable = true;
   };
