@@ -3,13 +3,13 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/nixos-24.05";
+      url = "github:nixos/nixpkgs/nixos-24.11";
     };
     nixpkgs-utsushi = {
       url = "github:NixOS/nixpkgs/b0249fdf998d782e1058b0cf3239091e59e393ef";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -143,6 +143,45 @@
         ];
         specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
       };
+      alexandria_install = inputs.nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./computers/alexandria/configuration.nix
+          ./computers/alexandria/hardware-configuration.nix
+          ./computers/alexandria/sops.nix
+          disko.nixosModules.disko
+          lanzaboote.nixosModules.lanzaboote
+          {
+            boot.loader.systemd-boot = {
+              enable = true;
+              configurationLimit = 10;
+              graceful = true;
+            };
+          }
+        ];
+        specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
+      };
+      alexandria = inputs.nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./computers/alexandria/configuration.nix
+          ./computers/alexandria/hardware-configuration.nix
+          ./computers/alexandria/sops.nix
+          disko.nixosModules.disko
+          lanzaboote.nixosModules.lanzaboote
+          {
+            boot = {
+              bootspec.enable = true;
+              loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+              lanzaboote = {
+                enable = true;
+                pkiBundle = "/etc/secureboot";
+              };
+            };
+          }
+        ];
+        specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
+      };
     };
     checks."x86_64-linux" = let
       pkgs = nixpkgs.legacyPackages."x86_64-linux";
@@ -154,6 +193,22 @@
     };
     devShells.x86_64-linux.default = let
       pkgs = nixpkgs.legacyPackages.x86_64-linux.extend nixos-luks-yk.overlay;
+      install_remote =  pkgs.writeShellApplication {
+        name = "install-remote";
+        runtimeInputs = [
+          nixos-anywhere.packages.x86_64-linux.nixos-anywhere
+          pkgs.git
+          pkgs.sudo
+        ];
+        text = ''
+          hostname="$1"; shift
+
+          cd "$(git rev-parse --show-toplevel)"
+          echo -n Disk Encryption Password:
+          read -rs USER_PASSWORD
+          nixos-anywhere -f ".#''${hostname}_install" --disk-encryption-keys /tmp/secret.key <(echo -n "''${USER_PASSWORD}") --extra-files "computers/''${hostname}/extra-files" "root@''${hostname}.fritz.box"
+        '';
+      };
     in
       pkgs.mkShell {
         nativeBuildInputs = with pkgs; [
@@ -165,9 +220,11 @@
           cryptsetup
           gcc
           openssl
+          ssh-to-age
           sops
           yubikey-personalization
           nixos-anywhere.packages.x86_64-linux.nixos-anywhere
+          install_remote
         ];
       };
   };

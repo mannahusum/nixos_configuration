@@ -39,19 +39,16 @@ in {
       };
       GTK = {
         application_prefer_dark_theme = false;
-        cursor_theme_name = "SolArc";
-        font_name = "FiraCode Nerd Font 11";
-        icon_theme_name = "SolArc";
-        theme_name = "SolArc";
+        cursor_theme_name = lib.mkForce "SolArc";
+        font_name = lib.mkForce "FiraCode Nerd Font 11";
+        icon_theme_name = lib.mkForce "SolArc";
+        theme_name = lib.mkForce "SolArc";
       };
     };
 
     myswayconfig = pkgs.writeText "greetd-sway-config" ''
       # `-l` activates layer-shell mode. Notice that `swaymsg exit` will run after gtkgreet.
       exec "${pkgs.greetd.regreet.out}/bin/regreet; swaymsg exit"
-
-      output "DP-1" mode 3840x2160@30Hz pos 0 0
-      output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
 
       bindsym Mod4+shift+e exec swaynag \
       -t warning \
@@ -90,8 +87,6 @@ in {
       settings = myregreetconfig;
     };
 
-    sound.enable = true;
     nixpkgs.config.pulseaudio = true;
-    hardware.pulseaudio.enable = true;
   });
 }

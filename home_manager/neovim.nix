@@ -23,6 +23,7 @@ in {
       enable = true;
       withPython3 = true;
       withNodeJs = true;
+      defaultEditor = true;
 
       extraPython3Packages = ps:
         with ps; [

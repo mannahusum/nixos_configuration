@@ -16,14 +16,11 @@
     ../../modules/sshd.nix
     ../../modules/saned.nix
     ../../modules/nginx.nix
-    ../../modules/xandikos.nix
-    ../../modules/gitea.nix
     ../../modules/yubikey.nix
+    ../../modules/system_administration/debug.nix
     ../../modules/users.nix
+    ./active-directory.nix
   ];
-
-  options.hydra = {
-  };
 
   config = {
     disko.devices = import ./disko-config.nix {
@@ -64,6 +61,7 @@
       '';
       settings = {
         substituters = [
+          # "https://hydra.catbertsen.de:5000/"
           # "http://mannahusum.catbertsen.de:5000/"
           "https://nix-community.cachix.org"
         ];
@@ -74,49 +72,9 @@
       };
     };
 
-    services = {
-      # r53-ddns = {
-      #   zoneID = "Z04260616D6EKM0EH83P";
-      #   hostname = "hydra";
-      #   environmentFile = config.sops.templates."route53Credentials".path;
-      #   enable = true;
-      #   domain = "catbertsen.de";
-      # };
-      avahi = {
-        enable = true;
-        nssmdns4 = true;
-        nssmdns6 = true;
-        publish = {
-          enable = true;
-          userServices = true;
-          hinfo = true;
-        };
-        ipv6 = true;
-      };
-    };
-
     casshd.enable = true;
-    casaned.enable = true;
-    canginx.enable = true;
-    caacme = {
-      enable = true;
-      credentialsfile = config.sops.templates."route53Credentials".path;
-    };
-    caxandikos = {
-      enable = true;
-      domain = "calendar.catbertsen.de";
-      passwordfile = config.sops.templates."xandikosBasicAuth".path;
-    };
-    cagitea = {
-      enable = true;
-      domain = "gitea.catbertsen.de";
-    };
     cawayland.enable = true;
     cayubikey.enable = true;
-    # environment.etc."sway/config.d/monitors.conf".text = ''
-    #   output "DP-1" mode 3840x2160@30Hz pos 0 0
-    #   output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
-    # '';
     cakeyboard.enable = true;
     time.timeZone = "Europe/Berlin";
     i18n = {
@@ -128,9 +86,14 @@
     };
     networking = {
       hostId = "d22d38ba";
-      hostName = "hydra";
+      hostName = "alexandria";
       tempAddresses = "disabled";
       hosts = {
+        "192.168.10.252" = [
+          "alexandria.catbertsen.de"
+          "alexandria.windows.catbertsen.de"
+          "alexandria"
+        ];
         "192.168.10.253" = [
           "mannahusum.catbertsen.de"
         ];

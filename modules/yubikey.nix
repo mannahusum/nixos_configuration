@@ -31,5 +31,7 @@ in {
       enableSSHSupport = true;
       enable = true;
     };
+
+    services.openssh.extraConfig = "StreamLocalBindUnlink = yes\n";
   };
 }

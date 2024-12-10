@@ -21,6 +21,7 @@ in {
   config = lib.mkIf cfg.enable {
     programs.ssh = {
       setXAuthLocation = true;
+      enableAskPassword = true;
     };
 
     services.openssh = {
