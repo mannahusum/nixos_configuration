@@ -6,6 +6,7 @@ let
   samba = cfg.package;
   nssModulesPath = config.system.nssModules.path;
   adDomain = "windows.catbertsen.de";
+  dcName = "alexandria.catbertsen.de";
   adWorkgroup = "CATA";
   adNetbiosName = "ALEXANDRIA";
   staticIp = "192.168.10.252";
@@ -20,7 +21,6 @@ let
   };
 in {
   # Disable resolveconf, we're using Samba internal DNS backend
-  systemd.services.resolvconf.enable = false;
   environment.etc = {
     "resolv.conf" = {
       text = ''
@@ -41,10 +41,24 @@ in {
 
   security.krb5 = {
     enable = true;
+    package = pkgs.krb5;
     settings = {
       libdefaults = {
         udp_preference_limit = 0;
         default_realm = adDomain;
+      };
+      realms."${adDomain}" = {
+        kdc = dcName;
+        admin_server = dcName;
+      };
+    };
+  };
+
+  services.kerberos_server = {
+    enable = true;
+    settings = {
+      realms."${adDomain}" = {
+        acl = [{ principal = "adminuser"; access= ["add" "cpw"]; }];
       };
     };
   };
@@ -63,22 +77,25 @@ in {
   })];
 
   # Disable default Samba `smbd` service, we will be using the `samba` server binary
-  systemd.services.samba-smbd.enable = false;
-  systemd.services.samba = {
-    description = "Samba Service Daemon";
+  systemd.services = {
+    resolvconf.enable = false;
+    samba-smbd.enable = false;
+    samba = {
+      description = "Samba Service Daemon";
 
-    requiredBy = [ "samba.target" ];
-    partOf = [ "samba.target" ];
+      requiredBy = [ "samba.target" ];
+      partOf = [ "samba.target" ];
 
-    serviceConfig = {
-      ExecStart = "${samba}/sbin/samba --foreground --no-process-group";
-      ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
-      LimitNOFILE = 16384;
-      PIDFile = "/run/samba/samba.pid";
-      Type = "notify";
-      NotifyAccess = "all"; #may not do anything...
+      serviceConfig = {
+	ExecStart = "${samba}/sbin/samba --foreground --no-process-group";
+	ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
+	LimitNOFILE = 16384;
+	PIDFile = "/run/samba/samba.pid";
+	Type = "notify";
+	NotifyAccess = "all"; #may not do anything...
+      };
+      unitConfig.RequiresMountsFor = "/var/lib/samba";
     };
-    unitConfig.RequiresMountsFor = "/var/lib/samba";
   };
   services.samba = {
     openFirewall = true;

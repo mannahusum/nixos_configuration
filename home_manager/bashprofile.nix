@@ -55,9 +55,7 @@ in {
         sortedProfileExtras = hm.dag.topoSort cfg.extraProfile;
         sortedProfileExtrasStr = builtins.toJSON sortedProfileExtras;
         profileExtras =
-          if sortedProfileExtras ? result
-          then sortedProfileExtras.result
-          else abort "Dependency cycle in bash profile: ${sortedProfileExtrasStr}";
+          sortedProfileExtras.result or (abort "Dependency cycle in bash profile: ${sortedProfileExtrasStr}");
       in
         concatStringsSep "\n\n" (map (entry: dagEntryToShell entry.name entry.data) profileExtras);
     };
