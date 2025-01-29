@@ -213,18 +213,19 @@
       pkgs.mkShell {
         nativeBuildInputs = with pkgs; [
           alejandra
-          statix
-          hextorb
-          rbtohex
-          pbkdf2-sha512
           cryptsetup
           gcc
-          openssl
-          ssh-to-age
-          sops
-          yubikey-personalization
-          nixos-anywhere.packages.x86_64-linux.nixos-anywhere
+          hextorb
           install_remote
+          nixos-anywhere.packages.x86_64-linux.nixos-anywhere
+          nix-prefetch-git
+          openssl
+          pbkdf2-sha512
+          rbtohex
+          sops
+          ssh-to-age
+          statix
+          yubikey-personalization
         ];
       };
   };

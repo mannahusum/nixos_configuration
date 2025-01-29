@@ -20,6 +20,7 @@
     ../../modules/gitea.nix
     ../../modules/yubikey.nix
     ../../modules/users.nix
+    ../../modules/usermount.nix
   ];
 
   options.hydra = {
@@ -141,6 +142,7 @@
         ];
       };
     };
+    causermount.enable = true;
 
     environment.systemPackages = [
       pkgs.git

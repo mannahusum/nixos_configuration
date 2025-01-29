@@ -29,11 +29,21 @@
   home = {
     file.ssh-keys.source = ssh-keys.packages."x86_64-linux".ssh_public_keys.out;
     packages = with pkgs; [
+      file
+      fzf
+      qrcode
       home-manager
+      pandoc
+      pdftk
+      psmisc
+      ranger
       ripgrep
+      tldr
+      units
+      wipe
       yubikey-manager
     ];
   };
 
-  home.stateVersion = "24.05";
+  home.stateVersion = "24.11";
 }

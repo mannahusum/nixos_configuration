@@ -121,6 +121,7 @@ in {
               // {
                 extraGroups = [
                   "cdrom"
+                  "dialout"
                   "docker"
                   "kvm"
                   "libvirtd"

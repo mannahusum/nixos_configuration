@@ -33,6 +33,7 @@ in {
         # PermitRootLogin = lib.mkDefault false;
         KbdInteractiveAuthentication = false;
         GatewayPorts = "yes";
+        StreamLocalBindUnlink = "yes";
       };
     };
   };

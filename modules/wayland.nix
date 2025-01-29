@@ -73,6 +73,7 @@ in {
       sway
     '';
     environment.systemPackages = with pkgs; [
+      wdisplays
       solarc-gtk-theme
       fira-code
     ];

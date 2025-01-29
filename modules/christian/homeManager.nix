@@ -5,51 +5,22 @@
   ...
 }: {
   home.packages = with pkgs; let
-    qrcode = python310.pkgs.buildPythonApplication rec {
-      pname = "qrcode";
-      version = "6.1";
-
-      src = python310.pkgs.fetchPypi {
-        inherit pname version;
-        sha256 = "0sa3n298b9jpz6zn0birnjii3mg9sihjq28n9nzjlzv09y2m6ljh";
-      };
-
-      checkInputs = with python310Packages; [
-        pytest
-        pytestcov
-      ];
-
-      propagatedBuildInputs = with python310Packages; [
-        six
-        setuptools
-        pymaging
-        pymaging_png
-        pillow
-      ];
-    };
-
     homePythonPackages = python-packages:
       with python-packages; [
         cookiecutter
         httpsig
-        # ipython
         jedi
         pip
         pyaudio
         pylint
         pyserial
+        python-slugify
+        qrcode
         requests
         setuptools
         urllib3
-        virtualenv
-
         # used by vim
-        #  black
-        # simple-websocket-server
-        python-slugify
-
-        # needed by black, hope this helps
-        pathspec
+        virtualenv
       ];
 
     homePython310 = python310Full.withPackages homePythonPackages;
