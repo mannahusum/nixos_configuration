@@ -379,8 +379,8 @@ in {
 
   config = mkIf cfg.enable {
     programs.ssh = {
-      controlMaster = "yes";
-      controlPath = "~/.ssh/master-%C";
+      # controlMaster = "yes";
+      # controlPath = "~/.ssh/master-%C";
       userKnownHostsFile = "~/.ssh/known_hosts ${privateKnownHost} ${itivKnownHosts}";
       enable = true;
       matchBlocks =
