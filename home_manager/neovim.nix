@@ -102,22 +102,27 @@ in {
   options = {
     ca.neovim = {
       enable = mkEnableOption "Generate Neovim configuration";
+      backgroundservice = mkEnableOption "Run a nvim listening in the background";
     };
   };
 
   config = mkIf cfg.enable {
     systemd.user.services = {
-      nvim = {
+      nvim = mkIf cfg.backgroundservice {
         Unit = {
           Description = "An nvim running in background for remote forwarding and profit";
           Documentation = ["https://neovim.io/doc/user" "man:nvim(1)"];
+        };
+
+        Install = {
+          WantedBy = [ "default.target" ];
         };
 
         Service = {
           Type = "exec";
           ExitType = "main";
 
-          ExecStart = "+${config.programs.neovim.finalPackage}/bin/nvim --headless --listen /run/user/1005/nvim/hydra";
+          ExecStart = "+${config.programs.neovim.finalPackage}/bin/nvim --headless --listen %t/nvim-local";
           Restart = "always";
         };
       };

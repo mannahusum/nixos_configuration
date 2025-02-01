@@ -22,7 +22,10 @@
     gpg.enable = true;
     # gpg.withExtraSocket = true;
     # gpg.forwardTo = "";
-    neovim.enable = true;
+    neovim = {
+      enable = true;
+      backgroundservice = true;
+    };
     pass.enable = true;
   };
 
