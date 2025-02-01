@@ -105,6 +105,11 @@
       };
     };
 
+    services.zfs.autoSnapshot = {
+      enable = true;
+      flags = "-k -p -u";
+    };
+
     environment.systemPackages = [
       pkgs.git
       pkgs.mokutil
