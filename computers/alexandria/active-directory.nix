@@ -52,7 +52,7 @@ in {
     settings = {
       libdefaults = {
         udp_preference_limit = 0;
-        default_realm = (lib.strings.toUpper adDomain);
+        default_realm = lib.strings.toUpper adDomain;
       };
       realms."${lib.strings.toUpper adDomain}" = {
         kdc = dcName;

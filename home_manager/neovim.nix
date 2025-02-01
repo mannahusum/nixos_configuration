@@ -68,28 +68,31 @@ with lib; let
     };
   };
 
-  spell_attrs_to_cp = configHome: builtins.foldl' (y: x: x + y) "" (
-    map (lang:
-      builtins.foldl' (x: y: x + y) "" (
-        map (encoding:
-          (
-            if (builtins.hasAttr "dictionary" spell."${lang}"."${encoding}") then let
-              path=spell."${lang}"."${encoding}".dictionary;
-            in
-              "cp ${path} ${configHome}/nvim/spell/${lang}.${encoding}.spl\n"
-            else ""
-          ) + (
-            if (builtins.hasAttr "suggestions" spell."${lang}"."${encoding}") then let
-              path=spell."${lang}"."${encoding}".dictionary;
-            in
-              "cp ${path} ${configHome}/nvim/spell/${lang}.${encoding}.sug\n"
-            else ""
+  spell_attrs_to_cp = configHome:
+    builtins.foldl' (y: x: x + y) "" (
+      map (
+        lang:
+          builtins.foldl' (x: y: x + y) "" (
+            map (
+              encoding:
+                (
+                  if (builtins.hasAttr "dictionary" spell."${lang}"."${encoding}")
+                  then let
+                    path = spell."${lang}"."${encoding}".dictionary;
+                  in "cp ${path} ${configHome}/nvim/spell/${lang}.${encoding}.spl\n"
+                  else ""
+                )
+                + (
+                  if (builtins.hasAttr "suggestions" spell."${lang}"."${encoding}")
+                  then let
+                    path = spell."${lang}"."${encoding}".dictionary;
+                  in "cp ${path} ${configHome}/nvim/spell/${lang}.${encoding}.sug\n"
+                  else ""
+                )
+            ) (builtins.attrNames spell."${lang}")
           )
-        ) (builtins.attrNames spell."${lang}")
-      )
-    ) (builtins.attrNames spell)
-  );
-
+      ) (builtins.attrNames spell)
+    );
 in {
   imports = [
     ./bashprofile.nix
@@ -107,7 +110,7 @@ in {
       nvim = {
         Unit = {
           Description = "An nvim running in background for remote forwarding and profit";
-          Documentation = [ "https://neovim.io/doc/user" "man:nvim(1)" ];
+          Documentation = ["https://neovim.io/doc/user" "man:nvim(1)"];
         };
 
         Service = {
@@ -115,7 +118,7 @@ in {
           ExitType = "main";
 
           ExecStart = "+${config.programs.neovim.finalPackage}/bin/nvim --headless --listen /run/user/1005/nvim/hydra";
-          Restart="always";
+          Restart = "always";
         };
       };
     };

@@ -22,7 +22,6 @@ in {
 
   config = lib.mkIf cfg.enable {
     services.udisks2.enable = true;
-    environment.defaultPackages = with pkgs; [ udisks bashmount usermount ];
+    environment.defaultPackages = with pkgs; [udisks bashmount usermount];
   };
 }
-
