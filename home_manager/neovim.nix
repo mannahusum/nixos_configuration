@@ -142,6 +142,21 @@ in {
         ];
     };
 
+    xdg.configFile."neovide/config.toml" = {
+      enable = true;
+      executable = false;
+      text = ''
+        fork = false
+        neovim-bin = "${config.programs.neovim.finalPackage}/bin/nvim"
+        tabs = false
+        title-hidden = true
+        wsl = false
+
+        [font]
+        size = 8.0
+      '';
+    };
+
     home.file.".secret_vimrc" = {
       enable = true;
       executable = false;
