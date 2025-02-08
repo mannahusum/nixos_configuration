@@ -4,6 +4,7 @@
   pkgs,
   networking,
   environment,
+  security,
   ...
 }:
 with lib; let
@@ -11,9 +12,9 @@ with lib; let
   samba = cfg.package;
   nssModulesPath = config.system.nssModules.path;
   adDomain = "windows.catbertsen.de";
-  dcName = "alexandria.catbertsen.de";
+  dcName = "alexandria.windows.catbertsen.de";
   adWorkgroup = "CATA";
-  adNetbiosName = "ALEXANDRIA";
+  adNetbiosName = "alexandria";
   staticIp = "192.168.10.252";
   dnsForwarder = "192.168.10.1";
   smbShare = path: {
@@ -123,65 +124,130 @@ in {
       unitConfig.RequiresMountsFor = "/var/lib/samba";
     };
   };
-  services.samba = {
-    openFirewall = true;
-    enable = true;
-    nmbd.enable = false;
-    winbindd.enable = false;
-    settings = {
-      global = {
-        "dns forwarder" = dnsForwarder;
-        "netbios name" = adNetbiosName;
-        "realm" = "${toUpper adDomain}";
-        "server role" = "active directory domain controller";
-        "workgroup" = adWorkgroup;
-        "idmap_ldb:use rf2307" = "yes";
-        "fruit:aapl" = "yes";
+
+  security.acme = {
+    acceptTerms = true;
+    useRoot = true;
+    defaults.email = "christian@wudika.de";
+    certs = {
+      "alexandria.windows.catbertsen.de" = {
+        dnsResolver = "205.251.193.108:53";
+        dnsProvider = "route53";
+        # credentialsFile = "/run/windows.catbertsen.de.env";
+        credentialsFile = config.sops.templates."route53WindowsCatbertsenCredentials".path;
+        webroot = null;
+        postRun = ''
+          ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
+        '';
       };
-      homes = {
-        "read only" = "no";
-        "comment" = "Home directories";
-        "valid users" = "%S";
-        "vfs objects" = "fruit acl_xattr";
-        "fruit:resource" = "xattr";
+      "alexandria.catbertsen.de" = {
+        dnsResolver = "205.251.194.49:53";
+        dnsProvider = "route53";
+        credentialsFile = config.sops.templates."route53CatbertsenCredentials".path;
+        webroot = null;
+        postRun = ''
+          ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
+        '';
       };
-      sysvol = {
-        path = "/var/lib/samba/sysvol";
-        "read only" = "No";
+    };
+  };
+
+  services = {
+    samba = {
+      openFirewall = true;
+      enable = true;
+      nmbd.enable = false;
+      winbindd.enable = false;
+      settings = {
+        global = {
+          "dns forwarder" = dnsForwarder;
+          "netbios name" = adNetbiosName;
+          "realm" = "${toUpper adDomain}";
+          "server role" = "active directory domain controller";
+          "workgroup" = adWorkgroup;
+          "idmap_ldb:use rf2307" = "yes";
+          "fruit:aapl" = "yes";
+          "tls cafile" = "/etc/ssl/certs/ca-certificates.crt";
+          "tls certfile" = "/var/lib/acme/${toLower dcName}/cert.pem";
+          "tls enabled" = "yes";
+          "tls keyfile" = "/var/lib/acme/${toLower dcName}/key4root.pem";
+          "tls verify peer" = "ca_and_name_if_available";
+        };
+        homes = {
+          "read only" = "no";
+          "comment" = "Home directories";
+          "valid users" = "%S";
+          "vfs objects" = "fruit acl_xattr";
+          "fruit:resource" = "xattr";
+        };
+        sysvol = {
+          path = "/var/lib/samba/sysvol";
+          "read only" = "No";
+        };
+        netlogon = {
+          path = "/var/lib/samba/sysvol/${adDomain}/scripts";
+          "read only" = "No";
+        };
+        audio = smbShare "/media/audio";
+        wii = smbShare "/media/games/wii";
+        video = smbShare "/media/video";
+        ultrastar = smbShare "/media/ultrastar";
+        onqm = {
+          path = "/media/onqm";
+          "public" = "no";
+          "valid users" = "christian";
+          "read only" = "no";
+          "map acl inherit" = "yes";
+          "inherit acls" = "yes";
+          "vfs objects" = "fruit acl_xattr";
+          "acl_xattr:default acl style" = "posix";
+          "access based share enum" = "yes";
+          # "hide unreadable" = "yes";
+          "smb3 unix extensions" = "yes";
+        };
+        "tm_share" = {
+          "path" = "/media/tm_share";
+          "valid users" = "christian";
+          "public" = "no";
+          "writeable" = "yes";
+          "force user" = "christian";
+          "fruit:aapl" = "yes";
+          "fruit:time machine" = "yes";
+          "fruit:resource" = "xattr";
+          "vfs objects" = "catia fruit streams_xattr acl_xattr";
+          "acl_xattr:default acl style" = "posix";
+          "smb3 unix extensions" = "yes";
+        };
       };
-      netlogon = {
-        path = "/var/lib/samba/sysvol/${adDomain}/scripts";
-        "read only" = "No";
+    };
+    avahi = {
+      enable = true;
+      nssmdns4 = mkDefault true;
+      extraServiceFiles = {
+        smb = ''
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+ <name replace-wildcards="yes">%h</name>
+ <service>
+   <type>_smb._tcp</type>
+   <port>445</port>
+ </service>
+ <service>
+   <type>_device-info._tcp</type>
+   <port>0</port>
+   <txt-record>model=RackMac</txt-record>
+ </service>
+</service-group>
+'';
+        ssh = "${pkgs.avahi}/etc/avahi/services/ssh.service";
       };
-      audio = smbShare "/media/audio";
-      wii = smbShare "/media/games/wii";
-      video = smbShare "/media/video";
-      ultrastar = smbShare "/media/ultrastar";
-      onqm = {
-        path = "/media/onqm";
-        "public" = "no";
-        "valid users" = "christian";
-        "read only" = "no";
-        "map acl inherit" = "yes";
-        "inherit acls" = "yes";
-        "vfs objects" = "fruit acl_xattr";
-        "acl_xattr:default acl style" = "posix";
-        "access based share enum" = "yes";
-        # "hide unreadable" = "yes";
-        "smb3 unix extensions" = "yes";
-      };
-      "tm_share" = {
-        "path" = "/media/tm_share";
-        "valid users" = "christian";
-        "public" = "no";
-        "writeable" = "yes";
-        "force user" = "christian";
-        "fruit:aapl" = "yes";
-        "fruit:time machine" = "yes";
-        "fruit:resource" = "xattr";
-        "vfs objects" = "catia fruit streams_xattr acl_xattr";
-        "acl_xattr:default acl style" = "posix";
-        "smb3 unix extensions" = "yes";
+
+
+      publish = {
+        enable = true;
+        domain = true;
+        addresses = true;
       };
     };
   };

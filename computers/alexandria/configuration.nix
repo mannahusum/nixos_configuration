@@ -11,6 +11,7 @@
     ./sops.nix
     (modulesPath + "/profiles/base.nix")
     # ./x11.nix
+    ../../modules/acme.nix
     ../../modules/keyboard.nix
     ../../modules/wayland.nix
     ../../modules/sshd.nix

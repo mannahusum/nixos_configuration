@@ -19,7 +19,7 @@ in {
     };
     domains = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = ["calendar.catbertsen.de"];
+      default = [];
       description = ''
         Domains for which to request certificates
       '';

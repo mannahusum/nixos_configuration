@@ -24,6 +24,28 @@
       "secureboot/PK/private" = {
         path = "/etc/secureboot/keys/PK/PK.key";
       };
+      "aws/key" = {};
+      "aws/secret" = {};
+      "aws/hosted_zone/catbertsen.de" = {};
+      "aws/hosted_zone/windows.catbertsen.de" = {};
+    };
+    templates = {
+      "route53CatbertsenCredentials" = {
+        content = ''
+          AWS_ACCESS_KEY_ID="${config.sops.placeholder."aws/key"}"
+          AWS_SECRET_ACCESS_KEY="${config.sops.placeholder."aws/secret"}"
+          AWS_REGION=us-east-1
+          AWS_HOSTED_ZONE_ID="${config.sops.placeholder."aws/hosted_zone/catbertsen.de"}"
+        '';
+      };
+      "route53WindowsCatbertsenCredentials" = {
+        content = ''
+          AWS_ACCESS_KEY_ID="${config.sops.placeholder."aws/key"}"
+          AWS_SECRET_ACCESS_KEY="${config.sops.placeholder."aws/secret"}"
+          AWS_REGION=us-east-1
+          AWS_HOSTED_ZONE_ID="${config.sops.placeholder."aws/hosted_zone/windows.catbertsen.de"}"
+        '';
+      };
     };
   };
 })
