@@ -1,10 +1,7 @@
-{ pkgs ? import <nixpkgs> {} }:
-
-
+{pkgs ? import <nixpkgs> {}}:
 with pkgs;
-
-mkShell {
-  nativeBuildInputs = [
-    packer
-  ];
-}
+  mkShell {
+    nativeBuildInputs = [
+      packer
+    ];
+  }

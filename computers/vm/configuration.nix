@@ -1,5 +1,8 @@
-{ config, pkgs, ... }:
 {
+  config,
+  pkgs,
+  ...
+}: {
   networking = {
     hostName = "mannavm"; # Define your hostname.
   };

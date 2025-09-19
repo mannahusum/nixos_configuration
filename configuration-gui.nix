@@ -1,29 +1,30 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ config, pkgs, ... }:
 {
-  imports =
-    [
-      ./fonts.nix
-      ./x11.nix
-      ./xscreensaver.nix
-      ./guiusers.nix
-      ./dropbox.nix
-      ./virtualization.nix
-      ./printing.nix
-      ./passwords.nix
-      ./raspberry-pi-zero-buildtools.nix
-    ];
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    ./fonts.nix
+    ./x11.nix
+    ./xscreensaver.nix
+    ./guiusers.nix
+    ./dropbox.nix
+    ./virtualization.nix
+    ./printing.nix
+    ./passwords.nix
+    ./raspberry-pi-zero-buildtools.nix
+  ];
 
   networking = {
-  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-  # Per-interface useDHCP will be mandatory in the future, so this generated config
-  # replicates the default behaviour.
+    # The global useDHCP flag is deprecated, therefore explicitly set to false here.
+    # Per-interface useDHCP will be mandatory in the future, so this generated config
+    # replicates the default behaviour.
     networkmanager = {
-      dhcp = "dhclient";
-      dns = "unbound";
+      # dhcp = "dhcpcd";
+      # dns = "unbound";
       enable = true;
     };
     timeServers = [
@@ -80,6 +81,7 @@
     lesspipe
     lm_sensors
     mlocate
+    nixos-option
     vim
     wget
     xsaneGimp
@@ -88,7 +90,6 @@
   environment.etc."mdadm.conf".text = ''
     MAILADDR christian@wudika.de
   '';
-
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -145,7 +146,7 @@
       };
       openFirewall = true;
     };
-    locate ={
+    locate = {
       enable = true;
       locate = pkgs.mlocate;
       localuser = null;
@@ -160,19 +161,19 @@
         "/home/christian/pron"
       ];
     };
-    openssh.enable = true;
-    unbound = {
-      settings.server.access-control = [
-        "127.0.0.0/24 allow"
-        "::1/128 allow"
-      ];
-      enable = true;
-    };
+    # unbound = {
+    #   settings.server.access-control = [
+    #     "127.0.0.0/24 allow"
+    #     "::1/128 allow"
+    #   ];
+    #   enable = true;
+    # };
     blueman = {
       enable = true;
     };
     openssh = {
-      forwardX11 = true;
+      enable = true;
+      settings.X11Forwarding = true;
     };
     transmission = {
       enable = true;
@@ -193,8 +194,10 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
 
   nixpkgs.config = {
-    packageOverrides = super: let self = super.pkgs; in {
-      xsaneGimp = super.pkgs.xsane.override { gimpSupport = true; };
+    packageOverrides = super: let
+      self = super.pkgs;
+    in {
+      xsaneGimp = super.pkgs.xsane.override {gimpSupport = true;};
     };
 
     allowUnfree = true;

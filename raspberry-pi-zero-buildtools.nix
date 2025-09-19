@@ -1,5 +1,4 @@
-{ boot, ... }:
-{
+{boot, ...}: {
   boot.binfmt.emulatedSystems = [
     "armv6l-linux"
     "aarch64-linux"

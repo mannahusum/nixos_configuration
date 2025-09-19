@@ -1,13 +1,16 @@
-{ pkgs, config, lib, nixpkgs, ... }:
-with lib;
-
-let
+{
+  pkgs,
+  config,
+  lib,
+  nixpkgs,
+  ...
+}:
+with lib; let
   emojiCompose = pkgs.fetchurl {
     url = "https://gist.github.com/m93a/9b2056cb867f08a3fddce0004200841a/raw/e910e19fdbaf8d4e8553f052472f880a561f7f46/.XCompose";
     sha256 = "0wpcbga7aqb92p5qnvfwrybvwik3mnq1g7yca4g8hf04aycdl49g";
   };
 in {
-
   # inherit nixpkgs;
 
   home.keyboard = null;
@@ -36,10 +39,11 @@ in {
   ];
 
   nixpkgs.overlays = [
-    (self: super: {
+    (
+      self: super: {
         uqm = super.uqm.overrideAttrs (
           oldAttrs: {
-            buildInputs = oldAttrs.buildInputs ++ [ pkgs.libpng ];
+            buildInputs = oldAttrs.buildInputs ++ [pkgs.libpng];
           }
         );
         pythonPackages = super.python38Packages;
@@ -48,13 +52,13 @@ in {
   ];
 
   home.packages = with pkgs; let
-
-    writeShellScriptBinAndSymlink = name: text: symlinkJoin {
-      name = name;
-      paths = [
-        (writeShellScriptBin name text)
-      ];
-    };
+    writeShellScriptBinAndSymlink = name: text:
+      symlinkJoin {
+        name = name;
+        paths = [
+          (writeShellScriptBin name text)
+        ];
+      };
 
     myrpiimager = stdenv.mkDerivation rec {
       pname = "rpi-imager";
@@ -67,7 +71,7 @@ in {
         sha256 = "sha256-Yt+RWox+0VOw8SH7Ry/o4NHOg3IGcebVeE9OWGP17do=";
       };
 
-      nativeBuildInputs = [ cmake util-linux libsForQt5.qt5.wrapQtAppsHook ];
+      nativeBuildInputs = [cmake util-linux libsForQt5.qt5.wrapQtAppsHook];
 
       buildInputs = with libsForQt5.qt5; [
         curl
@@ -80,17 +84,19 @@ in {
         qtgraphicaleffects
       ];
 
-      /* By default, the builder checks for JSON support in lsblk by running "lsblk --json",
-        but that throws an error, as /sys/dev doesn't exist in the sandbox.
-        This patch removes the check. */
-      patches = [ ./lsblkCheckFix.patch ];
+      /*
+       By default, the builder checks for JSON support in lsblk by running "lsblk --json",
+      but that throws an error, as /sys/dev doesn't exist in the sandbox.
+      This patch removes the check.
+      */
+      patches = [./lsblkCheckFix.patch];
 
       meta = with lib; {
         description = "Raspberry Pi Imaging Utility";
         homepage = "https://www.raspberrypi.org/software/";
         downloadPage = "https://github.com/raspberrypi/rpi-imager/";
         license = licenses.asl20;
-        maintainers = with maintainers; [ ymarkus ];
+        maintainers = with maintainers; [ymarkus];
         platforms = platforms.all;
         # does not build on darwin
         broken = stdenv.isDarwin;
@@ -103,7 +109,7 @@ in {
 
       src = python38.pkgs.fetchPypi {
         inherit pname version;
-        sha256= "0sa3n298b9jpz6zn0birnjii3mg9sihjq28n9nzjlzv09y2m6ljh";
+        sha256 = "0sa3n298b9jpz6zn0birnjii3mg9sihjq28n9nzjlzv09y2m6ljh";
       };
 
       checkInputs = with python38Packages; [
@@ -149,33 +155,54 @@ in {
       ];
     };
 
-    homePythonPackages = python-packages: with python-packages; [
-      cookiecutter
-      httpsig
-      # ipython
-      jedi
-      pip
-      pyaudio
-      pylint
-      pyserial
-      requests
-      setuptools
-      ueberzug
-      urllib3
-      virtualenv
+    wii-py = python38.pkgs.buildPythonPackage rec {
+      pname = "Wii.py";
+      version = "0.0.1";
 
-      # used by vim
-      black
-      simple-websocket-server
-      python-slugify
+      src = fetchFromGitHub {
+        owner = "DorkmasterFlek";
+        repo = pname;
+        rev = "98431caefa245a8f136c5b90541169fbeef69bc7";
+        sha256 = "0a1zk39snn002gbwzpl8dhy1nl9k63fmjh0542z3mas3jlad9pd1";
+      };
 
-      # needed by black, hope this helps
-      pathspec
-    ];
+      doCheck = false;
+
+      propagatedBuildInputs = with python38Packages; [
+        cryptography
+        pillow
+        wxpython
+      ];
+    };
+
+    homePythonPackages = python-packages:
+      with python-packages; [
+        cookiecutter
+        httpsig
+        # ipython
+        jedi
+        pip
+        pyaudio
+        pylint
+        pyserial
+        requests
+        setuptools
+        ueberzug
+        urllib3
+        virtualenv
+        wii-py
+
+        # used by vim
+        black
+        simple-websocket-server
+        python-slugify
+
+        # needed by black, hope this helps
+        pathspec
+      ];
 
     homePython38 = python38Full.withPackages homePythonPackages;
-  in
-  [
+  in [
     (
       writeShellScriptBinAndSymlink "nvidia-offload" ''
         export __NV_PRIME_RENDER_OFFLOAD=1
@@ -186,12 +213,7 @@ in {
       ''
     )
     arandr
-    (
-      avahi.override {
-        qt4Support = true;
-        qt4 = qt4;
-      }
-    )
+    avahi
     bashInteractive
     bat # cat clone
     cadaver
@@ -221,7 +243,7 @@ in {
     libsecret
     lsof
     lsscsi
-    manpages
+    man-pages
     # lutris
     mkpasswd
     mlterm
@@ -271,17 +293,16 @@ in {
     xournalpp
     yarn
     yubikey-personalization
-    yubioath-desktop
+    yubioath-flutter
     inotify-tools
   ];
 
   home.file.".XCompose".text = ''
-  include "${emojiCompose.out}"
-  include "%L"
+    include "${emojiCompose.out}"
+    include "%L"
   '';
 
   programs = {
-
     autorandr = {
       enable = true;
       hooks.postswitch = {
@@ -305,28 +326,28 @@ in {
       };
       profiles = let
         docked_config = {
-            "eDP-1".enable = false;
-            "DP-2-1" = {
-              enable = true;
-              crtc = 0;
-              primary = true;
-              position = "0x0";
-              mode = "1600x1200";
-              rate = "60.00";
-              transform = [
-                [ 1.699997 0.000000 0.000000 ]
-                [ 0.000000 1.699997 0.000000 ]
-                [ 0.000000 0.000000 1.000000 ]
-              ];
-            };
-            "DP-2-2" = {
-              enable = true;
-              crtc = 2;
-              mode = "3840x2160";
-              position = "2720x0";
-              rate = "30.00";
-            };
+          "eDP-1".enable = false;
+          "DP-2-1" = {
+            enable = true;
+            crtc = 0;
+            primary = true;
+            position = "0x0";
+            mode = "1600x1200";
+            rate = "60.00";
+            transform = [
+              [1.699997 0.000000 0.000000]
+              [0.000000 1.699997 0.000000]
+              [0.000000 0.000000 1.000000]
+            ];
           };
+          "DP-2-2" = {
+            enable = true;
+            crtc = 2;
+            mode = "3840x2160";
+            position = "2720x0";
+            rate = "30.00";
+          };
+        };
       in {
         "docked_open" = {
           fingerprint = {
@@ -351,8 +372,8 @@ in {
 
     bash = {
       enable = true;
-      historyControl = [ "ignorespace" ];
-      historyIgnore = [ "mplayer" ];
+      historyControl = ["ignorespace"];
+      historyIgnore = ["mplayer"];
       initExtra = ''
         GPG_TTY=$(tty)
       '';
@@ -386,7 +407,7 @@ in {
     enable = true;
     mimeApps = {
       defaultApplications = {
-        "x-scheme-handler/ftp" = [ "gftp.desktop" ];
+        "x-scheme-handler/ftp" = ["gftp.desktop"];
       };
     };
   };
@@ -395,4 +416,7 @@ in {
     enable = true;
   };
 
+  home.stateVersion = "23.05";
+  home.username = "christian";
+  home.homeDirectory = /home/christian;
 }

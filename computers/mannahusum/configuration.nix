@@ -1,15 +1,17 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ nixpkgs, config, pkgs, ... }:
 {
-  imports =
-    [
-      ./music.nix
-      ./bootdevice.nix
-      ./hardware-configuration.nix
-    ];
+  nixpkgs,
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    ./music.nix
+    ./bootdevice.nix
+    ./hardware-configuration.nix
+  ];
 
   # Use the GRUB 2 boot loader.
   boot = {
@@ -28,7 +30,6 @@
     loader = {
       grub = {
         enable = true;
-        version = 2;
         efiSupport = true;
         enableCryptodisk = true;
         efiInstallAsRemovable = true;
@@ -41,13 +42,15 @@
     kernelModules = [
       "coretemp"
     ];
-    kernelPatches = [ {
-      name = "enable-exfat";
-      patch = null;
-      extraConfig = ''
-        EXFAT_FS y
-      '';
-    } ];
+    kernelPatches = [
+      {
+        name = "enable-exfat";
+        patch = null;
+        extraConfig = ''
+          EXFAT_FS y
+        '';
+      }
+    ];
   };
 
   networking = {
@@ -55,13 +58,10 @@
     hostName = "mannahusum"; # Define your hostname.
 
     useDHCP = false;
-    interfaces = {
-      enp0s25.useDHCP = true;
-      wlan0.useDHCP = true;
-    };
+    dhcpcd.enable = false;
   };
 
-  boot.blacklistedKernelModules = [ "i926" ];
+  boot.blacklistedKernelModules = ["i926"];
 
   services = {
     thinkfan = {
@@ -72,7 +72,6 @@
           type = "tpacpi";
           query = "/proc/acpi/ibm/thermal";
         }
-
       ];
       fans = [
         {
@@ -100,4 +99,6 @@
   environment.systemPackages = with pkgs; [
     pciutils
   ];
+
+  system.stateVersion = "22.11";
 }

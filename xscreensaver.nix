@@ -1,18 +1,22 @@
-{ config, lib, pkgs, programs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  programs,
+  ...
+}: {
   environment.systemPackages = with pkgs; [
     xscreensaver
   ];
 
   networking.firewall = {
-    allowedTCPPorts = [ 17500 ];
-    allowedUDPPorts = [ 17500 ];
+    allowedTCPPorts = [17500];
+    allowedUDPPorts = [17500];
   };
 
   systemd.user.services.xscreensaver = {
     description = "XScreensaver";
-    wantedBy = [ "graphical-session.target" ];
+    wantedBy = ["graphical-session.target"];
     serviceConfig = {
       ExecStartPre = "${pkgs.xscreensaver.out}/bin/xscreensaver-command -exit";
       ExecStart = "${pkgs.xscreensaver.out}/bin/xscreensaver -no-splash";

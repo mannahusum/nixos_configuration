@@ -1,7 +1,12 @@
-{ pkgs, users, nix, services, security, programs, ... }:
-
-let
-
+{
+  pkgs,
+  users,
+  nix,
+  services,
+  security,
+  programs,
+  ...
+}: let
   nixpkgs = {
     url = "https://github.com/NixOS/nixpkgs/";
     ref = "nixos-20.09";
@@ -13,9 +18,7 @@ let
     rev = "209566c752c4428c7692c134731971193f06b37c";
     ref = "release-20.09";
   };
-
 in {
-
   # imports = [
   #     (import "${home-manager}/nixos")
   # ];

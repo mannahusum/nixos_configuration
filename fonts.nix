@@ -1,5 +1,8 @@
-{ pkgs, fonts, ... }:
 {
+  pkgs,
+  fonts,
+  ...
+}: {
   fonts = {
     enableDefaultFonts = true;
     fontDir.enable = true;
@@ -19,13 +22,12 @@
       inconsolata
       liberation_ttf
       lmodern
-      mplus-outline-fonts
       noto-fonts
       noto-fonts-cjk
       noto-fonts-emoji
       proggyfonts
       source-code-pro
-      symbola
+      # symbola
       ubuntu_font_family
     ];
   };

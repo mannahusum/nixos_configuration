@@ -1,4 +1,9 @@
-{ pkgs, services, hardware, ... }:
+{
+  pkgs,
+  services,
+  hardware,
+  ...
+}:
 # let
 #   myutsushi = pkgs.utsushi.override {
 #     withNetworkScan = true;
@@ -21,6 +26,12 @@
     };
     system-config-printer.enable = true;
   };
+
+  systemd.services.cups-browsed = {
+    enable = false;
+    unitConfig.Mask = true;
+  };
+
   hardware = {
     printers = {
       ensureDefaultPrinter = "kyocera5012cdw";
@@ -37,7 +48,10 @@
     };
     sane = {
       enable = true;
-      extraBackends = [ pkgs.hplipWithPlugin pkgs.utsushi ];
+      extraBackends = [
+        pkgs.hplipWithPlugin
+        # pkgs.utsushi
+      ];
     };
   };
 }

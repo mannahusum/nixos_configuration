@@ -1,10 +1,16 @@
-{ pkgs, users, nix, services, security, programs, ... }:
 {
-  imports =
-    [
-      ./users.nix
-      ./users/christian/gui.nix
-    ];
+  pkgs,
+  users,
+  nix,
+  services,
+  security,
+  programs,
+  ...
+}: {
+  imports = [
+    ./users.nix
+    ./users/christian/gui.nix
+  ];
 
   networking.firewall = {
     # 8512 Mnemosyne Sync

@@ -1,5 +1,12 @@
-{ pkgs, environment, hardware, services, security, programs, ... }:
 {
+  pkgs,
+  environment,
+  hardware,
+  services,
+  security,
+  programs,
+  ...
+}: {
   environment.systemPackages = with pkgs; [
     xorg.xf86inputevdev
     xorg.xf86inputlibinput
@@ -59,10 +66,8 @@
             enable = true;
           };
         };
-
       };
     };
-
   };
 
   security.pam.services.lightdm.enableGnomeKeyring = true;

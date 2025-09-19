@@ -1,25 +1,24 @@
-{ users, boot, ... }:
 {
-  imports =
-    [ # ...
-      <musnix>
-    ];
+  users,
+  boot,
+  ...
+}: {
+  imports = [
+    # ...
+    <musnix>
+  ];
 
-    musnix = {
-      enable = true;
-      alsaSeq.enable = true;
-      soundcardPciId = "00:1b.0";
-      kernel = {
-        optimize = false;
-      };
-    };
+  musnix = {
+    enable = true;
+    alsaSeq.enable = true;
+    soundcardPciId = "00:1b.0";
+  };
 
-    sound = {
-      enable = true;
-    };
+  sound = {
+    enable = true;
+  };
 
-    boot.extraModprobeConfig = ''
+  boot.extraModprobeConfig = ''
     options snd_hda_intel model=lenovo-dock
-    '';
+  '';
 }
-

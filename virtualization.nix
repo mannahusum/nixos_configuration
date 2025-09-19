@@ -1,5 +1,10 @@
-{ virtualisation, users, pkgs, environment, ... }:
 {
+  virtualisation,
+  users,
+  pkgs,
+  environment,
+  ...
+}: {
   virtualisation = {
     docker = {
       autoPrune = {
@@ -27,7 +32,7 @@
         };
         ovmf = {
           enable = true;
-          package = pkgs.OVMFFull;
+          packages = [pkgs.OVMFFull];
         };
         package = pkgs.qemu_kvm;
       };
@@ -177,4 +182,3 @@
   #   "d /var/spool/samba 1777 root root -"
   # ];
 }
-

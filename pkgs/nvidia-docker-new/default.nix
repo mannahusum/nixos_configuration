@@ -1,9 +1,15 @@
-{ stdenv, lib, fetchFromGitHub, callPackage, makeWrapper
-, buildGoPackage, runc, glibc }:
-
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  callPackage,
+  makeWrapper,
+  buildGoPackage,
+  runc,
+  glibc,
+}:
 with lib; let
-
-  libnvidia-container = callPackage ./libnvc.nix { };
+  libnvidia-container = callPackage ./libnvc.nix {};
 
   nvidia-container-runtime = fetchFromGitHub {
     owner = "NVIDIA";
@@ -30,43 +36,43 @@ with lib; let
       rev = "v${version}";
       sha256 = "1jwacb8xnmx5fr86gximhbl9dlbdwj3rpf27hav9q1si86w5pb1j";
     };
-    patches = [ "${nvidia-container-runtime}/runtime/runc/3f2f8b84a77f73d38244dd690525642a72156c64/0001-Add-prestart-hook-nvidia-container-runtime-hook-to-t.patch" ];
+    patches = ["${nvidia-container-runtime}/runtime/runc/3f2f8b84a77f73d38244dd690525642a72156c64/0001-Add-prestart-hook-nvidia-container-runtime-hook-to-t.patch"];
   });
+in
+  stdenv.mkDerivation rec {
+    pname = "nvidia-docker";
+    version = "2.0.3";
 
-in stdenv.mkDerivation rec {
-  pname = "nvidia-docker";
-  version = "2.0.3";
+    src = fetchFromGitHub {
+      owner = "NVIDIA";
+      repo = "nvidia-docker";
+      rev = "v${version}";
+      sha256 = "1vx5m591mnvcb9vy0196x5lh3r8swjsk0fnlv5h62m7m4m07v6wx";
+    };
 
-  src = fetchFromGitHub {
-    owner = "NVIDIA";
-    repo = "nvidia-docker";
-    rev = "v${version}";
-    sha256 = "1vx5m591mnvcb9vy0196x5lh3r8swjsk0fnlv5h62m7m4m07v6wx";
-  };
+    nativeBuildInputs = [makeWrapper];
 
-  nativeBuildInputs = [ makeWrapper ];
+    buildPhase = ''
+      mkdir bin
+      cp nvidia-docker bin
+      cp ${libnvidia-container}/bin/nvidia-container-cli bin
+      cp ${nvidia-container-runtime-hook}/bin/nvidia-container-runtime-hook bin
+      cp ${nvidia-runc}/bin/runc bin/nvidia-container-runtime
+    '';
 
-  buildPhase = ''
-    mkdir bin
-    cp nvidia-docker bin
-    cp ${libnvidia-container}/bin/nvidia-container-cli bin
-    cp ${nvidia-container-runtime-hook}/bin/nvidia-container-runtime-hook bin
-    cp ${nvidia-runc}/bin/runc bin/nvidia-container-runtime
-  '';
+    installPhase = ''
+      mkdir -p $out/{bin,etc}
+      cp -r bin $out
+      wrapProgram $out/bin/nvidia-container-cli \
+        --prefix LD_LIBRARY_PATH : /run/opengl-driver/lib:/run/opengl-driver-32/lib
+      cp ${./config.toml} $out/etc/config.toml
+      substituteInPlace $out/etc/config.toml --subst-var-by glibcbin ${lib.getBin glibc}
+    '';
 
-  installPhase = ''
-    mkdir -p $out/{bin,etc}
-    cp -r bin $out
-    wrapProgram $out/bin/nvidia-container-cli \
-      --prefix LD_LIBRARY_PATH : /run/opengl-driver/lib:/run/opengl-driver-32/lib
-    cp ${./config.toml} $out/etc/config.toml
-    substituteInPlace $out/etc/config.toml --subst-var-by glibcbin ${lib.getBin glibc}
-  '';
-
-  meta = {
-    homepage = "https://github.com/NVIDIA/nvidia-docker";
-    description = "NVIDIA container runtime for Docker";
-    license = licenses.bsd3;
-    platforms = platforms.linux;
-  };
-}
+    meta = {
+      homepage = "https://github.com/NVIDIA/nvidia-docker";
+      description = "NVIDIA container runtime for Docker";
+      license = licenses.bsd3;
+      platforms = platforms.linux;
+    };
+  }
