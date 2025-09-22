@@ -138,13 +138,22 @@
           nativeBuildInputs = with pkgs;
             [
               alejandra
-              statix
+              ansible-lint
+              deadnix
               gcc
-              openssl
-              ssh-to-age
-              sops
-              yubikey-personalization
+              git
+              git-crypt
+              jq
               nixos-anywhere.packages."${system}".nixos-anywhere
+              openssl
+              powershell
+              sops
+              ssh-to-age
+              statix
+              yamlfmt
+              yamllint
+              yj
+              yubikey-personalization
             ]
             ++ (
               if pkgs.lib.strings.hasPrefix "linux-" system
