@@ -26,12 +26,12 @@ in {
       pcscd.enable = true;
     };
 
-    programs.gnupg.agent = {
-      enableExtraSocket = true;
-      enableSSHSupport = true;
-      enable = true;
-    };
-
+    # programs.gnupg.agent = {
+    #   enableExtraSocket = true;
+    #   enableSSHSupport = true;
+    #   enable = true;
+    # };
+    #
     services.openssh.extraConfig = "StreamLocalBindUnlink = yes\n";
   };
 }
