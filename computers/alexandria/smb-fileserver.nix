@@ -2,20 +2,17 @@
   config,
   lib,
   pkgs,
-  networking,
-  environment,
-  security,
   ...
 }:
 with lib; let
   cfg = config.services.samba;
   samba = cfg.package;
-  nssModulesPath = config.system.nssModules.path;
+  # nssModulesPath = config.system.nssModules.path;
   adDomain = "windows.catbertsen.de";
   dcName = "archon.windows.catbertsen.de";
   adWorkgroup = "CATA";
   adNetbiosName = "alexandria";
-  staticIp = "192.168.10.252";
+  # staticIp = "192.168.10.252";
   # dnsForwarder = "192.168.10.251";
   dnsForwarder = "192.168.10.1";
   smbShare = path: {
