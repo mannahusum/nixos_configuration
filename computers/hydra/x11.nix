@@ -1,11 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}: let
-  cfg = config.x11;
-in {
+{pkgs, ...}: {
   imports = [
   ];
 

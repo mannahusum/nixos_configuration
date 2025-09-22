@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  modulesPath,
   ssh-keys,
   home-manager,
   nixpkgs,
@@ -67,16 +66,6 @@ in {
   };
 
   config = let
-    groupsToUsers = users: groups:
-      builtins.listToAttrs (
-        map (
-          user: {
-            name = user;
-            value = {extraGroups = groups;};
-          }
-        )
-        users
-      );
     myusers = {
       christian = {
         initialHashedPassword = "$y$j9T$jug3Q9mus229sFQGQbkC6/$w/pJzFFXGRvpjW6/sck2P8DPo.PJvE4rVbobNaf2yWC";
@@ -136,9 +125,6 @@ in {
                   "wheel"
                   "networkmanager"
                 ];
-                # (if ("extraGroups"?myusers."$user") then myusers."$user".extraGroups else [])
-                # ++ (if (builtins.elem user cfg.adminUsers) then cfg.adminUserGroups else [])
-                # ++ (if (builtins.elem user (cfg.adminUsers ++ cfg.regularUsers)) then cfg.regularUserGroups else []);
               };
           }
         ) ((builtins.attrNames myusers) ++ cfg.adminUsers ++ cfg.regularUsers)
@@ -162,14 +148,7 @@ in {
       };
     };
 
-    # Option definitions.
-    # Define what other settings, services and resources should be active.
-    # Usually these are depend on whether a user of this module chose to "enable" it
-    # using the "option" above.
-    # You also set options here for modules that you imported in "imports".
     security.sudo.wheelNeedsPassword = false;
     nix.settings.trusted-users = ["root" "christian"];
-    # users.users.marianne.isNormalUser = true;
-    # programs.gnupg.agent.enable = true;
   };
 }

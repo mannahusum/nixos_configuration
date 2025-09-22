@@ -136,10 +136,12 @@
 
     networking = {
       interfaces.br0 = {
-        ipv4.addresses = [{
-          address = "192.168.10.252";
-          prefixLength = 24;
-        }];
+        ipv4.addresses = [
+          {
+            address = "192.168.10.252";
+            prefixLength = 24;
+          }
+        ];
       };
       bridges.br0.interfaces = [
         "eth0"
@@ -181,9 +183,10 @@
     environment.systemPackages = let
       mkvpkgs = import nixpkgs-makemkv {
         inherit system;
-        config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-          "makemkv"
-        ];
+        config.allowUnfreePredicate = pkg:
+          builtins.elem (lib.getName pkg) [
+            "makemkv"
+          ];
       };
     in [
       pkgs.git

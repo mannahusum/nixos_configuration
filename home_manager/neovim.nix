@@ -115,7 +115,7 @@ in {
         };
 
         Install = {
-          WantedBy = [ "default.target" ];
+          WantedBy = ["default.target"];
         };
 
         Service = {

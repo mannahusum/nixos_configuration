@@ -1,11 +1,7 @@
 ({
-  config,
   modulesPath,
   lib,
   pkgs,
-  sops-nix,
-  nixpkgs,
-  system,
   ...
 }: {
   imports = [

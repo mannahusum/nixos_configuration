@@ -1,9 +1,4 @@
-{
-  config,
-  home-manager,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   home.packages = with pkgs; let
     homePythonPackages = python-packages:
       with python-packages; [

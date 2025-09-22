@@ -68,23 +68,23 @@
     nixos-anywhere,
     nix-flake-tests,
     ...
-  } @ inputs:
-  let 
-    mypkgs = system: import inputs.nixpkgs {
-      inherit system;
-      overlays = [
-        (import ./packages/ssh/overlay.nix)
-      ];
-      config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-        "google-chrome"
-      ];
-    };
+  } @ inputs: let
+    mypkgs = system:
+      import inputs.nixpkgs {
+        inherit system;
+        overlays = [
+          (import ./packages/ssh/overlay.nix)
+        ];
+        config.allowUnfreePredicate = pkg:
+          builtins.elem (nixpkgs.lib.getName pkg) [
+            "google-chrome"
+          ];
+      };
   in
-  flake-utils.lib.eachDefaultSystem (system:
-  {
+    flake-utils.lib.eachDefaultSystem (system: {
       homeConfigurations = {
         christian_at_hydra = home-manager.lib.homeManagerConfiguration {
-          pkgs = (mypkgs system);
+          pkgs = mypkgs system;
           modules = [
             ./modules/christian/homeManager.nix
             {
@@ -107,7 +107,7 @@
       };
 
       checks = let
-        pkgs = (mypkgs system);
+        pkgs = mypkgs system;
       in {
         ssh = nix-flake-tests.lib.check {
           inherit pkgs;
@@ -171,8 +171,9 @@
     // {
       nixosConfigurations = {
         hydra = let
-            system = "x86_64-linux";
-          in inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+        in
+          inputs.nixpkgs.lib.nixosSystem {
             inherit system;
             modules = [
               ./computers/hydra/configuration.nix
@@ -200,35 +201,36 @@
               # }
             ];
             specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix system;};
-        };
+          };
         alexandria = let
           system = "x86_64-linux";
-        in inputs.nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [
-            ./computers/alexandria/configuration.nix
-            ./computers/alexandria/hardware-configuration.nix
-            ./computers/alexandria/sops.nix
-            disko.nixosModules.disko
-            lanzaboote.nixosModules.lanzaboote
-            {
-              boot = {
-                bootspec.enable = true;
-                loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                lanzaboote = {
-                  enable = true;
-                  pkiBundle = "/etc/secureboot";
+        in
+          inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ./computers/alexandria/configuration.nix
+              ./computers/alexandria/hardware-configuration.nix
+              ./computers/alexandria/sops.nix
+              disko.nixosModules.disko
+              lanzaboote.nixosModules.lanzaboote
+              {
+                boot = {
+                  bootspec.enable = true;
+                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+                  lanzaboote = {
+                    enable = true;
+                    pkiBundle = "/etc/secureboot";
+                  };
                 };
-              };
-            }
-          ];
-          specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs-makemkv nixpkgs home-manager sops-nix system;};
-        };
+              }
+            ];
+            specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs-makemkv nixpkgs home-manager sops-nix system;};
+          };
       };
 
       darwinConfigurations."simple" = nix-darwin.lib.darwinSystem {
         modules = let
-          pkgs = (mypkgs "aarch64-darwin");
+          pkgs = mypkgs "aarch64-darwin";
         in [
           {
             # List packages installed in system profile. To search by name, run:

@@ -7,9 +7,10 @@
 }: let
   mypkgs = import nixpkgs {
     inherit system;
-    config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-      "google-chrome"
-    ];
+    config.allowUnfreePredicate = pkg:
+      builtins.elem (nixpkgs.lib.getName pkg) [
+        "google-chrome"
+      ];
     check = false;
   };
 in {
@@ -24,10 +25,11 @@ in {
   ];
 
   nixpkgs = {
-   inherit system;
-   config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-     "google-chrome"
-   ];
+    inherit system;
+    config.allowUnfreePredicate = pkg:
+      builtins.elem (nixpkgs.lib.getName pkg) [
+        "google-chrome"
+      ];
   };
   ca = {
     bash.enable = true;

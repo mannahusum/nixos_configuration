@@ -2,7 +2,6 @@
   config,
   lib,
   nixpkgs-utsushi,
-  system,
   ...
 }: let
   cfg = config.casaned;

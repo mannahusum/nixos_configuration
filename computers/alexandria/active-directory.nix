@@ -2,15 +2,11 @@
   config,
   lib,
   pkgs,
-  networking,
-  environment,
-  security,
   ...
 }:
 with lib; let
   cfg = config.services.samba;
   samba = cfg.package;
-  nssModulesPath = config.system.nssModules.path;
   adDomain = "windows.catbertsen.de";
   dcName = "alexandria.windows.catbertsen.de";
   adWorkgroup = "CATA";
@@ -88,7 +84,7 @@ in {
 
   # Rebuild Samba with LDAP, MDNS and Domain Controller support
   nixpkgs.overlays = [
-    (self: super: {
+    (_self: super: {
       samba =
         (super.samba.override {
           enableLDAP = true;
@@ -97,7 +93,7 @@ in {
           enableProfiling = true; # Optional for logging
           # Set pythonpath manually (bellow with overrideAttrs) as it is not set on 22.11 due to bug
         })
-        .overrideAttrs (finalAttrs: previousAttrs: {
+        .overrideAttrs (_finalAttrs: _previousAttrs: {
           pythonPath = with super; [python3Packages.dnspython python3Packages.markdown tdb ldb talloc];
         });
     })
@@ -225,24 +221,23 @@ in {
       nssmdns4 = mkDefault true;
       extraServiceFiles = {
         smb = ''
-<?xml version="1.0" standalone='no'?>
-<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
-<service-group>
- <name replace-wildcards="yes">%h</name>
- <service>
-   <type>_smb._tcp</type>
-   <port>445</port>
- </service>
- <service>
-   <type>_device-info._tcp</type>
-   <port>0</port>
-   <txt-record>model=RackMac</txt-record>
- </service>
-</service-group>
-'';
+          <?xml version="1.0" standalone='no'?>
+          <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+          <service-group>
+           <name replace-wildcards="yes">%h</name>
+           <service>
+             <type>_smb._tcp</type>
+             <port>445</port>
+           </service>
+           <service>
+             <type>_device-info._tcp</type>
+             <port>0</port>
+             <txt-record>model=RackMac</txt-record>
+           </service>
+          </service-group>
+        '';
         ssh = "${pkgs.avahi}/etc/avahi/services/ssh.service";
       };
-
 
       publish = {
         enable = true;

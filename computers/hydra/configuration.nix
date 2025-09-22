@@ -100,8 +100,8 @@
       resolved = {
         enable = true;
         dnssec = "true";
-        domains = [ "~." ];
-        fallbackDns = [ "1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one" ];
+        domains = ["~."];
+        fallbackDns = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
         dnsovertls = "true";
       };
     };
@@ -139,16 +139,18 @@
     };
     networking = {
       firewall.enable = false;
-      nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       enableIPv6 = true;
       hostId = "d22d38ba";
       hostName = "hydra";
       tempAddresses = "disabled";
       interfaces.enp2s0 = {
-        ipv4.addresses = [{
-          address = "192.168.10.254";
-          prefixLength = 24;
-        }];
+        ipv4.addresses = [
+          {
+            address = "192.168.10.254";
+            prefixLength = 24;
+          }
+        ];
       };
       defaultGateway = {
         address = "192.168.10.1";

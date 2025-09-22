@@ -1,11 +1,8 @@
 {
-  config,
   lib,
   pkgs,
   ...
-}: let
-  cfg = config.ca.sway;
-in {
+}: {
   imports = [
   ];
 
@@ -20,9 +17,6 @@ in {
     };
     modifier = "Mod4";
     shotman = "${pkgs.shotman.out}/bin/shotman";
-    swaylockcfg =
-      pkgs.writeText "swaylock.cfg" ''
-      '';
   in {
     home.sessionVariables = {
       XKB_DEFAULT_LAYOUT = "de,de,gr";
