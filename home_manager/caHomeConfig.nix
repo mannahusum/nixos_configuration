@@ -15,11 +15,11 @@
 in {
   imports = [
     ./bashprofile.nix
-    ./cassh.nix
     ./cagpg.nix
+    ./cassh.nix
+    ./chrome.nix
     ./neovim.nix
     ./passwordstore.nix
-    ./chrome.nix
     ./sway.nix
   ];
 
@@ -34,7 +34,6 @@ in {
     chrome.enable = true;
     ssh = {
       enable = true;
-      publicKeys = "${ssh-keys.packages."${system}".ssh_public_keys.out}";
     };
     gpg.enable = true;
     # gpg.withExtraSocket = true;
@@ -51,11 +50,11 @@ in {
     packages = with mypkgs; [
       file
       fzf
-      qrcode
       home-manager
       pandoc
       pdftk
       psmisc
+      qrcode
       ranger
       ripgrep
       tldr

@@ -7,10 +7,7 @@
 with lib; let
   cfg = config.ca.gpg;
 
-  mykey = builtins.fetchurl {
-    url = "https://keys.openpgp.org/vks/v1/by-fingerprint/F1A1F1A33787F28359E60BFB1DBDE5EC541E1874";
-    sha256 = "1r5g5bg01fvkb2flyw75hin4gvifn8za93przr6jf2bd2vx5qic5";
-  };
+  mypkgs = pkgs.extend (import ../packages/ssh/overlay.nix);
 in {
   imports = [
     ./bashprofile.nix
@@ -46,6 +43,9 @@ in {
   };
 
   config = mkIf cfg.enable {
+    home.packages = with pkgs; [
+      git-crypt
+    ];
     programs = {
       gpg = {
         enable = true;
@@ -72,29 +72,6 @@ in {
         else "${cfg.forwardTo}/S.gpg-agent";
       bash = {
         enable = true;
-        extraProfile.importGpgKey = ''
-
-          gpgKeyId() {
-              ${pkgs.gnupg}/bin/gpg --quiet --show-key --with-colons "$1" \
-                  | grep ^pub: \
-                  | cut -d: -f5
-          }
-
-          importTrust() {
-              local keyIds trust
-              IFS='\n' read -ra keyIds <<< "$(gpgKeyId "$1")"
-              trust="$2"
-              for id in "''${keyIds[@]}" ; do
-                  { echo trust; echo "$trust"; (( trust == 5 )) && echo y; echo quit; } \
-                  | ${pkgs.gnupg}/bin/gpg --quiet --no-tty --command-fd 0 --edit-key "$id" 2>/dev/null
-              done
-          }
-
-          ${pkgs.gnupg}/bin/gpg --quiet --import "${mykey}"
-          importTrust "${mykey}" 5
-
-          unset importTrust
-        '';
         extraProfile.gpgForwardedSockets =
           if (cfg.forwardTo == null)
           then ""
@@ -156,10 +133,28 @@ in {
                 done
             }
 
+            gpgKeyId() {
+                ${pkgs.gnupg}/bin/gpg --quiet --show-key --with-colons "$1" \
+                    | grep ^pub: \
+                    | cut -d: -f5
+            }
+
+            importTrust() {
+                local keyIds trust
+                IFS='\n' read -ra keyIds <<< "$(gpgKeyId "$1")"
+                trust="$2"
+                for id in "''${keyIds[@]}" ; do
+                    { echo trust; echo "$trust"; (( trust == 5 )) && echo y; echo quit; } \
+                    | ${pkgs.gnupg}/bin/gpg --quiet --no-tty --command-fd 0 --edit-key "$id" 2>/dev/null
+                done
+            }
+
 
             check_sockets
 
-            unset GNUPGHOME
+            ${pkgs.gnupg}/bin/gpg --quiet --import "${mypkgs.al_pgp_key}"
+            importTrust "${mypkgs.al_pgp_key}" 5
+            unset GNUPGHOME keyId importTrust
 
             [ -S "$(${pkgs.gnupg}/bin/gpgconf --list-dirs agent-socket)" ] \
                 && ${pkgs.gnupg}/bin/gpgconf --kill gpg-agent 2>&1

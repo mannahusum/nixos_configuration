@@ -39,10 +39,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
-    # nixos-generators = {
-    #   url = "github:nix-community/nixos-generators";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
     nixos-luks-yk = {
       url = "github:akkesm/nixos-luks-yk";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -76,6 +72,9 @@
   let 
     mypkgs = system: import inputs.nixpkgs {
       inherit system;
+      overlays = [
+        (import ./packages/ssh/overlay.nix)
+      ];
       config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
         "google-chrome"
       ];

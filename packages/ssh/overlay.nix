@@ -1,5 +1,5 @@
 final: prev: let
-  version = "20231016";
+  version = "20250922";
   keys_to_file = name: keys:
     builtins.toFile name (
       builtins.concatStringsSep "\n" keys
@@ -7,7 +7,7 @@ final: prev: let
 
   al_pgp_key = final.fetchurl {
     url = "https://keys.openpgp.org/vks/v1/by-email/christian@wudika.de";
-    sha256 = "sha256-2PVmc7QA6n2iwxYmrUkhPj4At2vB5BM/FqPQNjc3AI8=";
+    hash = "sha256-2PVmc7QA6n2iwxYmrUkhPj4At2vB5BM/FqPQNjc3AI8=";
   };
 
   al_public_keys_file = with final;
@@ -83,7 +83,6 @@ final: prev: let
     };
 
   al_public_keys = builtins.filter (string: string != "") (final.lib.splitString "\n" (builtins.readFile al_public_keys_file.out));
-  lk_ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDHAS+m8ojPtnggyvE/AY1BEExT896jJrxSq1LO2bfOYbFe9f3CsRWXHMuLJyLTBVAdQLDjs5+xL1MZPtH6cPKWyyYfTr1WJZjp7bn1oj6tYHtnFNZzn4KPupAp9zWw1TXNISqGP9PSPyyNt2qT9g566JpC/7UijsrFL/QVQxCTfATEvVYGDqDqn8G4EsNdy3X2GN+Y60os1gcBGRmiaTLL+lQea7peGomrlW6o2NR5NJMRarZ+/m5UEfb1tWspxHyUquZnkUyC32nWJ3hxyhAvjCd0xIA/JUusLu1a3iB8+Q8isQe+AzZnhd71Jz05ItpyRKKQG4mVbDnkfbRH6Av/ lesniak@itiv";
   gitlab_ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPLbfzdFD93S+Hme28WQKS67btUan8GNCR/FQAfg86is vm-templates@gitlab";
 
   testing_ssh_keys = with final;
@@ -106,7 +105,7 @@ final: prev: let
       '';
     };
 
-  admin_ssh_public_keys = al_public_keys ++ [lk_ssh_public_key];
+  admin_ssh_public_keys = al_public_keys;
 
   testing_ssh_public_key = builtins.readFile (testing_ssh_keys.out + "/ssh-key.pub");
 

@@ -135,18 +135,34 @@ in {
       defaultEditor = true;
 
       extraPackages = with pkgs; [
-        git
         bash
+        clang
         direnv
+        git
+        jq
+        nixpkgs-fmt
         ripgrep
+        texliveFull
+        xdotool
+        zathura
       ];
+
+      extraLuaPackages = ps:
+        with ps; [
+          lua-curl
+          mimetypes
+          nvim-nio
+          xml2lua
+        ];
+
       extraPython3Packages = ps:
         with ps; [
-          pynvim
-          msgpack
           black
-          simple-websocket-server
+          msgpack
+          pynvim
           python-slugify
+          rope
+          simple-websocket-server
         ];
     };
 
@@ -173,20 +189,20 @@ in {
         if v:shell_error != 0
             echom "Can't decrypt passwords. Keys won't be available"
         else
-            let g:SimplenoteUsername = "christian@wudika.de"
-            let g:SimplenotePassword = trim(system("${pkgs.pass.out}/bin/pass simplenote/christian@wudika.de | ${pkgs.coreutils.out}/bin/head -n 1"))
+            let g:SimplenoteUsername = trim(system("${pkgs.pass.out}/bin/pass simplenote.com 2>/dev/null | ${pkgs.gnugrep.out}/bin/grep user: | cut -b 6-"))
+            let g:SimplenotePassword = trim(system("${pkgs.pass.out}/bin/pass simplenote.com 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
 
-            let g:github_user = trim(system("${pkgs.pass.out}/bin/pass github-gist | ${pkgs.gnugrep.out}/bin/grep user: | cut -b 6-"))
-            let g:gist_token = trim(system("${pkgs.pass.out}/bin/pass github-gist | ${pkgs.coreutils.out}/bin/head -n 1"))
+            let g:github_user = trim(system("${pkgs.pass.out}/bin/pass github/gist 2>/dev/null | ${pkgs.gnugrep.out}/bin/grep user: | cut -b 6-"))
+            let g:gist_token = trim(system("${pkgs.pass.out}/bin/pass github/gist 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
             let g:gitlab_api_keys = {
-            \ 'gitlab.itiv.kit.edu': trim(system("${pkgs.pass.out}/bin/pass gitlab.itivk.it.edu/vimcanixos | ${pkgs.coreutils.out}/bin/head -n 1"))
-            \ }
+            \ 'gitlab.itiv.kit.edu': trim(system("${pkgs.pass.out}/bin/pass kit.edu/gitlab.itiv.kit.edu/vimcanixos 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
+            \}
+            let $TODOIST_API_KEY = trim(system("${pkgs.pass.out}/bin/pass todoist.com/ApiToken 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
         endif
         let g:powerShellPath ="${pkgs.powershell.out}/bin/pwsh"
         let g:bashLSPPath = "${pkgs.nodePackages.bash-language-server.out}/bin/bash-language-server"
-        let g:vimtex_viewer_zathura = "${pkgs.zathura.out}/bin/zathura"
+        let g:vimtex_view_method = "zathura"
         let g:vimtex_view_automatic = 1
-        let g:vimtex_compiler_method = "latexmk"
         let g:vimtex_compiler_latexmk_engines = {
                 \ '_'                : "",
                 \ 'pdflatex'         : '-pdf',
@@ -205,6 +221,14 @@ in {
         let g:pylintPath = "${pkgs.pylint.out}/bin/pylint"
         let g:ctagsPath = "${pkgs.universal-ctags.out}/bin/ctags"
         let g:coc_node_path = "${pkgs.nodejs.out}/bin/node"
+        let g:gitlabCiLs = "${pkgs.gitlab-ci-ls.out}/bin/gitlab-ci-ls"
+        let g:vimtex_compiler_latexmk = {
+            \ 'callback' : 1,
+            \ 'continuous' : 1,
+            \ 'executable' : "${pkgs.texliveFull.out}/bin/latexmk",
+            \}
+        let g:fugitive_gitlab_domains = ['https://gitlab.itiv.kit.edu/', 'https://gitlab.kit.edu/']
+        let g:fugitive_gitea_domains = ['https://gitea.catbertsen.de']
       '';
     };
 
