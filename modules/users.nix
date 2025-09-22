@@ -5,6 +5,8 @@
   modulesPath,
   ssh-keys,
   home-manager,
+  nixpkgs,
+  system,
   ...
 }: let
   cfg = config.causers;
@@ -102,7 +104,7 @@ in {
         ];
         openssh.authorizedKeys.keyFiles = [
           # The keys are the same for any system type
-          ssh-keys.packages."x86_64-linux".ssh_public_keys.out
+          ssh-keys.packages."${system}".ssh_public_keys.out
         ];
       };
     };
@@ -155,7 +157,7 @@ in {
     home-manager = {
       users = {
         christian = import ../home_manager/caHomeConfig.nix {
-          inherit pkgs config ssh-keys;
+          inherit config ssh-keys nixpkgs system;
         };
       };
     };
@@ -168,6 +170,6 @@ in {
     security.sudo.wheelNeedsPassword = false;
     nix.settings.trusted-users = ["root" "christian"];
     # users.users.marianne.isNormalUser = true;
-    programs.gnupg.agent.enable = true;
+    # programs.gnupg.agent.enable = true;
   };
 }

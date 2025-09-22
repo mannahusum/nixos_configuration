@@ -1,23 +1,40 @@
 {
   config,
-  pkgs,
+  nixpkgs,
+  system,
   ssh-keys,
   ...
-}: {
+}: let
+  mypkgs = import nixpkgs {
+    inherit system;
+    config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+      "google-chrome"
+    ];
+    check = false;
+  };
+in {
   imports = [
     ./bashprofile.nix
     ./cassh.nix
     ./cagpg.nix
     ./neovim.nix
     ./passwordstore.nix
+    ./chrome.nix
     ./sway.nix
   ];
 
+  nixpkgs = {
+   inherit system;
+   config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+     "google-chrome"
+   ];
+  };
   ca = {
     bash.enable = true;
+    chrome.enable = true;
     ssh = {
       enable = true;
-      publicKeys = "${ssh-keys.packages."x86_64-linux".ssh_public_keys.out}";
+      publicKeys = "${ssh-keys.packages."${system}".ssh_public_keys.out}";
     };
     gpg.enable = true;
     # gpg.withExtraSocket = true;
@@ -30,8 +47,8 @@
   };
 
   home = {
-    file.ssh-keys.source = ssh-keys.packages."x86_64-linux".ssh_public_keys.out;
-    packages = with pkgs; [
+    file.ssh-keys.source = ssh-keys.packages."${system}".ssh_public_keys.out;
+    packages = with mypkgs; [
       file
       fzf
       qrcode

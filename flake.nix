@@ -8,6 +8,9 @@
     nixpkgs-utsushi = {
       url = "github:NixOS/nixpkgs/b0249fdf998d782e1058b0cf3239091e59e393ef";
     };
+    nixpkgs-makemkv = {
+      url = "github:NixOS/nixpkgs/ed9d88e5ee5dd5aa71c807c6f60c9c5cf58d3676";
+    };
     nix-darwin = {
       url = "github:LnL7/nix-darwin/nix-darwin-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -57,6 +60,7 @@
     self,
     nixpkgs,
     nixpkgs-utsushi,
+    nixpkgs-makemkv,
     nix-darwin,
     home-manager,
     disko,
@@ -69,10 +73,19 @@
     nix-flake-tests,
     ...
   } @ inputs:
-    flake-utils.lib.eachDefaultSystem (system: {
+  let 
+    mypkgs = system: import inputs.nixpkgs {
+      inherit system;
+      config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+        "google-chrome"
+      ];
+    };
+  in
+  flake-utils.lib.eachDefaultSystem (system:
+  {
       homeConfigurations = {
         christian_at_hydra = home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages."${system}";
+          pkgs = (mypkgs system);
           modules = [
             ./modules/christian/homeManager.nix
             {
@@ -95,7 +108,7 @@
       };
 
       checks = let
-        pkgs = nixpkgs.legacyPackages."${system}";
+        pkgs = (mypkgs system);
       in {
         ssh = nix-flake-tests.lib.check {
           inherit pkgs;
@@ -104,7 +117,7 @@
       };
 
       devShells.default = let
-        pkgs = nixpkgs.legacyPackages."${system}".extend nixos-luks-yk.overlay;
+        pkgs = (mypkgs system).extend nixos-luks-yk.overlay;
         install_remote = pkgs.writeShellApplication {
           name = "install-remote";
           runtimeInputs = [
@@ -149,29 +162,41 @@
     })
     // {
       nixosConfigurations = {
-        hydra = inputs.nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            ./computers/hydra/configuration.nix
-            ./computers/hydra/hardware-configuration.nix
-            ./computers/hydra/sops.nix
-            disko.nixosModules.disko
-            lanzaboote.nixosModules.lanzaboote
-            {
-              boot = {
-                bootspec.enable = true;
-                loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                lanzaboote = {
-                  enable = true;
-                  pkiBundle = "/etc/secureboot";
+        hydra = let
+            system = "x86_64-linux";
+          in inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ./computers/hydra/configuration.nix
+              ./computers/hydra/hardware-configuration.nix
+              ./computers/hydra/sops.nix
+              disko.nixosModules.disko
+              lanzaboote.nixosModules.lanzaboote
+              {
+                boot = {
+                  bootspec.enable = true;
+                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+                  lanzaboote = {
+                    enable = true;
+                    pkiBundle = "/etc/secureboot";
+                  };
                 };
-              };
-            }
-          ];
-          specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
+              }
+              # mypkgs{
+              #   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+              #     "google-chrome"
+              #   ];
+              #   nixpkgs.config.allowUnfree = true;
+              #   home-manager.useGlobalPkgs = false;
+              #   home-manager.useUserPackages = true;
+              # }
+            ];
+            specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix system;};
         };
-        alexandria = inputs.nixpkgs.lib.nixosSystem {
+        alexandria = let
           system = "x86_64-linux";
+        in inputs.nixpkgs.lib.nixosSystem {
+          inherit system;
           modules = [
             ./computers/alexandria/configuration.nix
             ./computers/alexandria/hardware-configuration.nix
@@ -189,35 +214,32 @@
               };
             }
           ];
-          specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix;};
+          specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs-makemkv nixpkgs home-manager sops-nix system;};
         };
       };
 
       darwinConfigurations."simple" = nix-darwin.lib.darwinSystem {
         modules = let
-          pkgs = import nixpkgs {
-            system = "aarch64-darwin";
-            config.allowUnfree = true;
-          };
+          pkgs = (mypkgs "aarch64-darwin");
         in [
           {
             # List packages installed in system profile. To search by name, run:
             # $ nix-env -qaP | grep wget
-            environment.systemPackages = [
-              pkgs.darwin.xcode
-              pkgs.git
-              pkgs.fzf # Fuzzy finder
-              pkgs.ripgrep # Faster grep
-              pkgs.jq # Command line JSON processor
-              pkgs.yq # Command line YAML processor
-              pkgs.neovim # Vim-fork focused on extensibility and usability
-              pkgs.pandoc # Universal document converter
-              pkgs.python3 # Python 3 programming language
-              pkgs.htop # Interactive process viewer
-              pkgs.tree # Display directories as trees
-              pkgs.jetbrains-mono # JetBrains Mono font
-              pkgs.ffmpeg # Multimedia framework
-              pkgs.alacritty # GPU-accelerated terminal emulator
+            environment.systemPackages = with pkgs; [
+              darwin.xcode
+              git
+              fzf # Fuzzy finder
+              ripgrep # Faster grep
+              jq # Command line JSON processor
+              yq # Command line YAML processor
+              neovim # Vim-fork focused on extensibility and usability
+              pandoc # Universal document converter
+              python3 # Python 3 programming language
+              htop # Interactive process viewer
+              tree # Display directories as trees
+              jetbrains-mono # JetBrains Mono font
+              ffmpeg # Multimedia framework
+              alacritty # GPU-accelerated terminal emulator
             ];
 
             # Auto upgrade nix package and the daemon service.

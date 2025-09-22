@@ -4,34 +4,25 @@
   lib,
   pkgs,
   sops-nix,
+  nixpkgs,
   system,
   ...
 }: {
   imports = [
-    sops-nix.nixosModules.sops
-    ./sops.nix
     (modulesPath + "/profiles/base.nix")
-    # ./x11.nix
-    ../../modules/keyboard.nix
-    ../../modules/wayland.nix
-    ../../modules/sshd.nix
-    ../../modules/saned.nix
-    ../../modules/nginx.nix
-    ../../modules/xandikos.nix
-    ../../modules/gitea.nix
-    ../../modules/yubikey.nix
-    ../../modules/users.nix
-    ../../modules/usermount.nix
-    ../shared-config.nix
+    ../modules/keyboard.nix
+    ../modules/wayland.nix
+    ../modules/sshd.nix
+    ../modules/saned.nix
+    ../modules/nginx.nix
+    ../modules/xandikos.nix
+    ../modules/gitea.nix
+    ../modules/yubikey.nix
+    ../modules/users.nix
+    ../modules/usermount.nix
   ];
 
-  options.hydra = {
-  };
-
   config = {
-    disko.devices = import ./disko-config.nix {
-      inherit lib;
-    };
     nixpkgs.config.allowUnfreePredicate = pkg:
       builtins.elem (lib.getName pkg) [
         "google-chrome"
@@ -67,7 +58,6 @@
       '';
       settings = {
         substituters = [
-          # "http://mannahusum.catbertsen.de:5000/"
           "https://nix-community.cachix.org"
         ];
         trusted-public-keys = [
@@ -78,13 +68,6 @@
     };
 
     services = {
-      # r53-ddns = {
-      #   zoneID = "Z04260616D6EKM0EH83P";
-      #   hostname = "hydra";
-      #   environmentFile = config.sops.templates."route53Credentials".path;
-      #   enable = true;
-      #   domain = "catbertsen.de";
-      # };
       avahi = {
         enable = true;
         nssmdns4 = true;
@@ -96,38 +79,11 @@
         };
         ipv6 = true;
       };
-      pcscd.enable = true;
-      resolved = {
-        enable = true;
-        dnssec = "true";
-        domains = [ "~." ];
-        fallbackDns = [ "1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one" ];
-        dnsovertls = "true";
-      };
     };
 
     casshd.enable = true;
-    casaned.enable = true;
-    canginx.enable = true;
-    caacme = {
-      enable = true;
-      credentialsfile = config.sops.templates."route53Credentials".path;
-    };
-    caxandikos = {
-      enable = true;
-      domain = "calendar.catbertsen.de";
-      passwordfile = config.sops.templates."xandikosBasicAuth".path;
-    };
-    cagitea = {
-      enable = true;
-      domain = "gitea.catbertsen.de";
-    };
     cawayland.enable = true;
     cayubikey.enable = true;
-    # environment.etc."sway/config.d/monitors.conf".text = ''
-    #   output "DP-1" mode 3840x2160@30Hz pos 0 0
-    #   output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
-    # '';
     cakeyboard.enable = true;
     time.timeZone = "Europe/Berlin";
     i18n = {
@@ -138,25 +94,16 @@
       };
     };
     networking = {
-      firewall.enable = false;
-      nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
-      enableIPv6 = true;
-      hostId = "d22d38ba";
-      hostName = "hydra";
       tempAddresses = "disabled";
-      interfaces.enp2s0 = {
-        ipv4.addresses = [{
-          address = "192.168.10.254";
-          prefixLength = 24;
-        }];
-      };
-      defaultGateway = {
-        address = "192.168.10.1";
-        interface = "enp2s0";
-      };
       hosts = {
+        "192.168.10.252" = [
+          "alexandria.windows.catbertsen.de"
+          "alexandria.catbertsen.de"
+          "alexandria"
+        ];
         "192.168.10.253" = [
           "mannahusum.catbertsen.de"
+          "mannahusum"
         ];
         "192.168.10.254" = [
           "hydra.catbertsen.de"
@@ -164,8 +111,6 @@
           "gitea.catbertsen.de"
         ];
       };
-
-      useHostResolvConf = lib.mkForce false;
     };
     causermount.enable = true;
 
