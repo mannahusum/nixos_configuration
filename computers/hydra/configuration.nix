@@ -1,17 +1,29 @@
 ({
   config,
-  modulesPath,
   lib,
-  pkgs,
+  modulesPath,
+  nixos-luks-yk,
+  nixpkgs,
   sops-nix,
   system,
   ...
-}: {
+}: let
+  pkgs = import nixpkgs {
+    inherit system;
+    config.allowUnfreePredicate = pkg:
+      builtins.elem (lib.getName pkg) [
+        "makemkv"
+      ];
+    overlays = [
+      (import ../../packages/ssh/overlay.nix)
+      nixos-luks-yk.overlay
+    ];
+  };
+in {
   imports = [
     sops-nix.nixosModules.sops
     ./sops.nix
     (modulesPath + "/profiles/base.nix")
-    # ./x11.nix
     ../../modules/keyboard.nix
     ../../modules/wayland.nix
     ../../modules/sshd.nix
@@ -32,10 +44,16 @@
     disko.devices = import ./disko-config.nix {
       inherit lib;
     };
-    nixpkgs.config.allowUnfreePredicate = pkg:
-      builtins.elem (lib.getName pkg) [
-        "google-chrome"
+    nixpkgs = {
+      config.allowUnfreePredicate = pkg:
+        builtins.elem (lib.getName pkg) [
+          "google-chrome"
+        ];
+      overlays = [
+        (import ../../packages/ssh/overlay.nix)
+        nixos-luks-yk.overlay
       ];
+    };
     boot = {
       supportedFilesystems = ["zfs"];
       loader.efi = {

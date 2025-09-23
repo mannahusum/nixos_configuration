@@ -30,7 +30,7 @@ in {
       settings = {
         X11Forwarding = true;
         PasswordAuthentication = false;
-        # PermitRootLogin = lib.mkDefault false;
+        PermitRootLogin = lib.mkDefault "no";
         KbdInteractiveAuthentication = false;
         GatewayPorts = "yes";
         StreamLocalBindUnlink = "yes";

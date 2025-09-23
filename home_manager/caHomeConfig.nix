@@ -1,8 +1,9 @@
 {
-  config,
   nixpkgs,
   system,
-  ssh-keys,
+  forwardTo ? null,
+  createForwardPath ? false,
+  withExtraSocket ? false,
   ...
 }: let
   mypkgs = import nixpkgs {
@@ -11,6 +12,9 @@
       builtins.elem (nixpkgs.lib.getName pkg) [
         "google-chrome"
       ];
+    overlays = [
+      (import ../packages/ssh/overlay.nix)
+    ];
     check = false;
   };
 in {
@@ -30,16 +34,21 @@ in {
       builtins.elem (nixpkgs.lib.getName pkg) [
         "google-chrome"
       ];
+    overlays = [
+      (import ../packages/ssh/overlay.nix)
+    ];
   };
+
   ca = {
     bash.enable = true;
     chrome.enable = true;
     ssh = {
       enable = true;
     };
-    gpg.enable = true;
-    # gpg.withExtraSocket = true;
-    # gpg.forwardTo = "";
+    gpg = {
+      inherit forwardTo createForwardPath withExtraSocket;
+      enable = true;
+    };
     neovim = {
       enable = true;
       backgroundservice = true;
@@ -48,7 +57,7 @@ in {
   };
 
   home = {
-    file.ssh-keys.source = ssh-keys.packages."${system}".ssh_public_keys.out;
+    # file.ssh-keys.source = mypkgs.al_public_keyfile;
     packages = with mypkgs; [
       file
       fzf

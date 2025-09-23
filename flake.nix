@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/nixos-24.11";
+      url = "github:nixos/nixpkgs/nixos-25.05";
     };
     nixpkgs-utsushi = {
       url = "github:NixOS/nixpkgs/b0249fdf998d782e1058b0cf3239091e59e393ef";
@@ -12,30 +12,26 @@
       url = "github:NixOS/nixpkgs/ed9d88e5ee5dd5aa71c807c6f60c9c5cf58d3676";
     };
     nix-darwin = {
-      url = "github:LnL7/nix-darwin/nix-darwin-24.11";
+      url = "github:LnL7/nix-darwin/nix-darwin-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
-      url = "github:nix-community/disko/v1.1.0";
+      url = "github:nix-community/disko/v1.12.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.3.0";
+      url = "github:nix-community/lanzaboote/v0.4.2";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     sops-nix = {
       url = "github:/Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    ssh-keys = {
-      url = "github:mannahusum/sshkeys_from_gpg_keyserver";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
@@ -61,7 +57,6 @@
     home-manager,
     disko,
     flake-utils,
-    ssh-keys,
     lanzaboote,
     sops-nix,
     nixos-luks-yk,
@@ -102,6 +97,9 @@
 
           extraSpecialArgs = {
             inherit inputs;
+            forwardTo = "/home/chrstian/.forwarded-sockets";
+            createForwardPath = true;
+            withExtraSocket = false;
           };
         };
       };
@@ -191,16 +189,8 @@
                   };
                 };
               }
-              # mypkgs{
-              #   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-              #     "google-chrome"
-              #   ];
-              #   nixpkgs.config.allowUnfree = true;
-              #   home-manager.useGlobalPkgs = false;
-              #   home-manager.useUserPackages = true;
-              # }
             ];
-            specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs home-manager sops-nix system;};
+            specialArgs = {inherit nixos-luks-yk nixpkgs-utsushi nixpkgs home-manager sops-nix system;};
           };
         alexandria = let
           system = "x86_64-linux";
@@ -224,7 +214,7 @@
                 };
               }
             ];
-            specialArgs = {inherit ssh-keys nixpkgs-utsushi nixpkgs-makemkv nixpkgs home-manager sops-nix system;};
+            specialArgs = {inherit nixos-luks-yk nixpkgs-utsushi nixpkgs-makemkv nixpkgs home-manager sops-nix system;};
           };
       };
 

@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  ssh-keys,
   home-manager,
   nixpkgs,
   system,
@@ -91,10 +90,7 @@ in {
           dash
           coreutils-full
         ];
-        openssh.authorizedKeys.keyFiles = [
-          # The keys are the same for any system type
-          ssh-keys.packages."${system}".ssh_public_keys.out
-        ];
+        openssh.authorizedKeys.keys = pkgs.al_public_keys;
       };
     };
   in {
@@ -143,7 +139,9 @@ in {
     home-manager = {
       users = {
         christian = import ../home_manager/caHomeConfig.nix {
-          inherit config ssh-keys nixpkgs system;
+          inherit config nixpkgs system;
+          forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
+          createForwardPath = true;
         };
       };
     };

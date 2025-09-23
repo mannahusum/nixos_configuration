@@ -89,15 +89,16 @@
       '';
     };
     fonts.fontconfig.enable = true;
-    home.packages = with pkgs; [
-      nerdfonts
-      alacritty
-      grim
-      neovide
-      wl-clipboard
-      mako
-      wayland
-      xdg-utils
-    ];
+    home.packages = with pkgs;
+      [
+        alacritty
+        grim
+        neovide
+        wl-clipboard
+        mako
+        wayland
+        xdg-utils
+      ]
+      ++ (builtins.filter lib.attrsets.isDerivation (builtins.attrValues nerd-fonts));
   };
 }
