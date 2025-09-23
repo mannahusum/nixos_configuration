@@ -531,8 +531,16 @@ with lib; let
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKAcdptqXxeaqYxl4D9nXfZ+TESsif5+v7EkEql8GJWR"
       ];
       gpgSocket = "/home/christian/.forwarded-sockets/S.gpg-agent";
+    };
+    "alexandria" = {
+      hostname = "alexandria.catbertsen.de";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWUZ1tgwe/Q7eUT0qiIRn1oXYXi5gBMzt6k6N9XXeU1iQ35s7lPdZHKgPG8/Czrp0iU5VsG+2jasaAMgU4ahVpCqFkKxKKIfBy9L93h7t/zONvfUFwKF5RoLIB2S4S7Smj+fpQ18OJRzOf//wYDb0JlMyv5U+0RaQALQu2+AbI0urZ0V8CbR/wysZGdsYAuoJ+n+Udhgr35rfZDUteOf/dKjAZyF0wLogK6oJDLmTeFdILVp4XkSdwOeMEwAXW3s4A1gPHSP5OBDv9ChD4sZ9Arjs1jA2R12y+4yd6MiaMdriRCKtXOc8v+GTDVKAQ72GLdtZ4Wf0Tmqz53aQNOnal1Y0ckF9tUtFDUzO0dFx+3sPa1ypWkuTirUKyR5+QmKoaupRvsIAG2PtqUl9+OM6j7/rn5eRLPfDgkgideq18TREaDAuezTjsWB1ZoKyfN1HBuKtE88jpW1pngYPTbmH3DxkJpqZa/IDz6txggB2e0iLBEEYXrlLZJt5744vdusqy0f7JRtgl8uhNyeu0BH6r+ycSpFI5SrjM2fLba9EXxvQl7fK0uB1NLp0bANA91EmjwCRLmPQ+0o8m5UnCu54TDiTlRqKozC1J1Svz2ecY0jvAyqqaYiQmxGTWFifqqCcjO1c2viIrEbid4GGrBpFxoxH7uvYruutT6hmYT/1ZLw=="
+        "alexandria ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO/0+jHTvMJejYEduVNngIMhDi37IJ+o1dyXmTK3aORc"
+      ];
+      gpgSocket = "/home/christian/.forwarded-sockets/S.gpg-agent";
       overrides = {
-        user = "christian";
+        proxyJump = "hydra";
       };
     };
     "mannahusum" = {
@@ -541,6 +549,10 @@ with lib; let
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJOPI+OGCetpSOAsUBT4U9obDBLzfApbH+4WMemD9xDq"
         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0uA5pX6RzBwOhBXRImMVmz6Ul0uIQPTvmLIiF7O3RZHw2p+8IukERO8iSSBmmD7wjH+lac2UqmlYnBvyWECefmUSsSVe7nF59Ksd8XCv182M0kugzvt8gatKZxSpCKNSB7zo9RWhrD74RqiZwJPqInUo7Zp4PwVwrU4MaNq4aUNxMfwlJyNvCN0XFVU+Khq0c+VhIgptr2qTRXlTGDjvNoXclO3LJ1770ImaVdaxpS4a+KXhF8kUZlmzJe+gr8zDE2kEdYX7RJvmx9rCm4eldCKoi9S9gzGfq4+Boo1q+y5ExhsvB2eifyaxW/OZ0kbNpyX7hxVxSIDZLH6Oo0QOLbA6Z+dLx4ySi/hK+2teLPJjJ2kuc391jmbNRf/kIVb6sT2NgR1mlUFA7CPIVE2n5yKQsCCIa1wEhSTqaGBRYj9X+MDL5I3HePuE1W/M8IruiQWeYF5VZ5L6Sg6rIJc5UBnuclv2ZFyfeV8OnsqHBYc2Qe3oAWsDWr3llIiOAhI0ComRcRSC4Aw782PubLzYQY8xfFGp+CfNgs9AxHJN6xnazH+nXfTZsPa/YoZdO/xNs/0KMRAlIVg9hYnCKrTn2d5l7qFwKMJPHHc77J2sUyOl+auvKyXjmK8vpzYD+yMAxMn/tDi1DBw1V2iemWXuLp63iBOi4xyV3lAmrPlEpuw=="
       ];
+      gpgSocket = "/home/christian/.forwarded-sockets/S.gpg-agent";
+      overrides = {
+        proxyJump = "hydra";
+      };
     };
   };
   cfg = config.ca.ssh;
