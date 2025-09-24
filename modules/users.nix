@@ -1,9 +1,10 @@
 {
   config,
-  pkgs,
-  lib,
   home-manager,
+  lib,
   nixpkgs,
+  overlays,
+  pkgs,
   system,
   ...
 }: let
@@ -139,7 +140,7 @@ in {
     home-manager = {
       users = {
         christian = import ../home_manager/caHomeConfig.nix {
-          inherit config nixpkgs system;
+          inherit config nixpkgs overlays system;
           forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
           createForwardPath = true;
         };

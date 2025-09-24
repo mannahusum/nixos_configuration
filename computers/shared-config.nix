@@ -6,16 +6,16 @@
 }: {
   imports = [
     (modulesPath + "/profiles/base.nix")
-    ../modules/keyboard.nix
-    ../modules/wayland.nix
-    ../modules/sshd.nix
-    ../modules/saned.nix
-    ../modules/nginx.nix
-    ../modules/xandikos.nix
     ../modules/gitea.nix
-    ../modules/yubikey.nix
-    ../modules/users.nix
+    ../modules/keyboard.nix
+    ../modules/nginx.nix
+    ../modules/saned.nix
+    ../modules/sshd.nix
     ../modules/usermount.nix
+    ../modules/users.nix
+    ../modules/wayland.nix
+    ../modules/xandikos.nix
+    ../modules/yubikey.nix
   ];
 
   config = {
@@ -110,16 +110,16 @@
     };
     causermount.enable = true;
 
-    environment.systemPackages = [
-      pkgs.git
-      pkgs.mokutil
-      pkgs.sbctl
-      pkgs.tpm2-tss
-      pkgs.git-crypt
-      pkgs.neovim
-      pkgs.ripgrep
-      pkgs.xterm # for resize command
-      pkgs.file
+    environment.systemPackages = with pkgs; [
+      git
+      mokutil
+      sbctl
+      tpm2-tss
+      git-crypt
+      neovim
+      ripgrep
+      xterm # for resize command
+      file
     ];
     system.stateVersion = "23.11";
   };

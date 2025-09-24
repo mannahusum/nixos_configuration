@@ -2,39 +2,26 @@
   config,
   lib,
   modulesPath,
-  nixos-luks-yk,
-  nixpkgs,
+  overlays,
+  pkgs,
   sops-nix,
-  system,
   ...
-}: let
-  pkgs = import nixpkgs {
-    inherit system;
-    config.allowUnfreePredicate = pkg:
-      builtins.elem (lib.getName pkg) [
-        "makemkv"
-      ];
-    overlays = [
-      (import ../../packages/ssh/overlay.nix)
-      nixos-luks-yk.overlay
-    ];
-  };
-in {
+}: {
   imports = [
-    sops-nix.nixosModules.sops
-    ./sops.nix
-    (modulesPath + "/profiles/base.nix")
-    ../../modules/keyboard.nix
-    ../../modules/wayland.nix
-    ../../modules/sshd.nix
-    ../../modules/saned.nix
-    ../../modules/nginx.nix
-    ../../modules/xandikos.nix
     ../../modules/gitea.nix
-    ../../modules/yubikey.nix
-    ../../modules/users.nix
+    ../../modules/keyboard.nix
+    ../../modules/nginx.nix
+    (modulesPath + "/profiles/base.nix")
+    ../../modules/saned.nix
+    ../../modules/sshd.nix
     ../../modules/usermount.nix
+    ../../modules/users.nix
+    ../../modules/wayland.nix
+    ../../modules/xandikos.nix
+    ../../modules/yubikey.nix
     ../shared-config.nix
+    ./sops.nix
+    sops-nix.nixosModules.sops
   ];
 
   options.hydra = {
@@ -45,14 +32,11 @@ in {
       inherit lib;
     };
     nixpkgs = {
+      inherit overlays;
       config.allowUnfreePredicate = pkg:
         builtins.elem (lib.getName pkg) [
           "google-chrome"
         ];
-      overlays = [
-        (import ../../packages/ssh/overlay.nix)
-        nixos-luks-yk.overlay
-      ];
     };
     boot = {
       supportedFilesystems = ["zfs"];
@@ -189,16 +173,16 @@ in {
     };
     causermount.enable = true;
 
-    environment.systemPackages = [
-      pkgs.git
-      pkgs.mokutil
-      pkgs.sbctl
-      pkgs.tpm2-tss
-      pkgs.git-crypt
-      pkgs.neovim
-      pkgs.ripgrep
-      pkgs.xterm # for resize command
-      pkgs.file
+    environment.systemPackages = with pkgs; [
+      git
+      mokutil
+      sbctl
+      tpm2-tss
+      git-crypt
+      neovim
+      ripgrep
+      xterm # for resize command
+      file
     ];
     system.stateVersion = "23.11";
   };

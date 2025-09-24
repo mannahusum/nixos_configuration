@@ -6,8 +6,6 @@
 }:
 with lib; let
   cfg = config.ca.gpg;
-
-  mypkgs = pkgs.extend (import ../packages/ssh/overlay.nix);
 in {
   imports = [
     ./bashprofile.nix
@@ -152,8 +150,8 @@ in {
 
             check_sockets
 
-            ${pkgs.gnupg}/bin/gpg --quiet --import "${mypkgs.al_pgp_key}"
-            importTrust "${mypkgs.al_pgp_key}" 5
+            ${pkgs.gnupg}/bin/gpg --quiet --import "${pkgs.al_pgp_key}"
+            importTrust "${pkgs.al_pgp_key}" 5
             unset GNUPGHOME keyId importTrust
 
             [ -S "$(${pkgs.gnupg}/bin/gpgconf --list-dirs agent-socket)" ] \

@@ -5,7 +5,6 @@
   ...
 }:
 with lib; let
-  mypkgs = pkgs.extend (import ../packages/ssh/overlay.nix);
   itivHosts = {
     "bck" = {
       hostname = "bck.itiv.kit.edu";
@@ -570,7 +569,7 @@ with lib; let
   privateKnownHost = known_hosts_for "known_hosts_ca" privateHosts;
   itivKnownHosts = known_hosts_for "itiv_known_hosts" itivHosts;
 
-  identityFiles = map (builtins.toFile "key.pub") mypkgs.al_public_keys;
+  identityFiles = map (builtins.toFile "key.pub") pkgs.al_public_keys;
 
   host-config = defaults: host: socket: value: (
     let

@@ -1,25 +1,13 @@
 ({
-  modulesPath,
   lib,
-  sops-nix,
-  nixpkgs,
-  nixos-luks-yk,
+  modulesPath,
   nixpkgs-makemkv,
+  overlays,
+  pkgs,
+  sops-nix,
   system,
   ...
-}: let
-  pkgs = import nixpkgs {
-    inherit system;
-    config.allowUnfreePredicate = pkg:
-      builtins.elem (lib.getName pkg) [
-        "makemkv"
-      ];
-    overlays = [
-      (import ../../packages/ssh/overlay.nix)
-      nixos-luks-yk.overlay
-    ];
-  };
-in {
+}: {
   imports = [
     sops-nix.nixosModules.sops
     ./sops.nix
@@ -43,14 +31,11 @@ in {
       inherit lib;
     };
     nixpkgs = {
+      inherit overlays;
       config.allowUnfreePredicate = pkg:
         builtins.elem (lib.getName pkg) [
           "google-chrome"
         ];
-      overlays = [
-        (import ../../packages/ssh/overlay.nix)
-        nixos-luks-yk.overlay
-      ];
     };
     boot = {
       supportedFilesystems = ["zfs"];
@@ -205,16 +190,16 @@ in {
             "makemkv"
           ];
       };
-    in [
-      pkgs.git
-      pkgs.mokutil
-      pkgs.sbctl
-      pkgs.tpm2-tss
-      pkgs.git-crypt
-      pkgs.neovim
-      pkgs.ripgrep
-      pkgs.xterm # for resize command
-      pkgs.file
+    in with pkgs; [
+      git
+      mokutil
+      sbctl
+      tpm2-tss
+      git-crypt
+      neovim
+      ripgrep
+      xterm # for resize command
+      file
       mkvpkgs.makemkv
     ];
 

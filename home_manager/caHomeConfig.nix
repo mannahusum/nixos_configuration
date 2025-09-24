@@ -1,42 +1,29 @@
 {
-  nixpkgs,
-  system,
-  forwardTo ? null,
   createForwardPath ? false,
+  forwardTo ? null,
+  nixpkgs,
+  overlays,
+  system,
   withExtraSocket ? false,
   ...
-}: let
-  mypkgs = import nixpkgs {
-    inherit system;
-    config.allowUnfreePredicate = pkg:
-      builtins.elem (nixpkgs.lib.getName pkg) [
-        "google-chrome"
-      ];
-    overlays = [
-      (import ../packages/ssh/overlay.nix)
-    ];
-    check = false;
-  };
-in {
+}: {
   imports = [
     ./bashprofile.nix
     ./cagpg.nix
     ./cassh.nix
     ./chrome.nix
     ./neovim.nix
+    ./packages.nix
     ./passwordstore.nix
     ./sway.nix
   ];
 
   nixpkgs = {
-    inherit system;
+    inherit overlays system;
     config.allowUnfreePredicate = pkg:
       builtins.elem (nixpkgs.lib.getName pkg) [
         "google-chrome"
       ];
-    overlays = [
-      (import ../packages/ssh/overlay.nix)
-    ];
   };
 
   ca = {
@@ -54,25 +41,6 @@ in {
       backgroundservice = true;
     };
     pass.enable = true;
-  };
-
-  home = {
-    # file.ssh-keys.source = mypkgs.al_public_keyfile;
-    packages = with mypkgs; [
-      file
-      fzf
-      home-manager
-      pandoc
-      pdftk
-      psmisc
-      qrcode
-      ranger
-      ripgrep
-      tldr
-      units
-      wipe
-      yubikey-manager
-    ];
   };
 
   home.stateVersion = "24.11";

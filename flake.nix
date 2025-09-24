@@ -64,12 +64,13 @@
     nix-flake-tests,
     ...
   } @ inputs: let
+    overlays = [
+      (import ./packages/ssh/overlay.nix)
+      nixos-luks-yk.overlay
+    ];
     mypkgs = system:
       import inputs.nixpkgs {
-        inherit system;
-        overlays = [
-          (import ./packages/ssh/overlay.nix)
-        ];
+        inherit system overlays;
         config.allowUnfreePredicate = pkg:
           builtins.elem (nixpkgs.lib.getName pkg) [
             "google-chrome"
@@ -79,9 +80,9 @@
     flake-utils.lib.eachDefaultSystem (system: {
       homeConfigurations = {
         christian_at_hydra = home-manager.lib.homeManagerConfiguration {
-          pkgs = mypkgs system;
+          inherit nixpkgs overlays system;
           modules = [
-            ./modules/christian/homeManager.nix
+            ./home-manager/caHomeConfig.nix
             {
               programs = {
                 home-manager.enable = true;
@@ -97,7 +98,7 @@
 
           extraSpecialArgs = {
             inherit inputs;
-            forwardTo = "/home/chrstian/.forwarded-sockets";
+            forwardTo = "/home/christian/.forwarded-sockets";
             createForwardPath = true;
             withExtraSocket = false;
           };
@@ -114,7 +115,7 @@
       };
 
       devShells.default = let
-        pkgs = (mypkgs system).extend nixos-luks-yk.overlay;
+        pkgs = mypkgs system;
         install_remote = pkgs.writeShellApplication {
           name = "install-remote";
           runtimeInputs = [
@@ -190,7 +191,9 @@
                 };
               }
             ];
-            specialArgs = {inherit nixos-luks-yk nixpkgs-utsushi nixpkgs home-manager sops-nix system;};
+            specialArgs = {
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-utsushi overlays sops-nix system;
+            };
           };
         alexandria = let
           system = "x86_64-linux";
@@ -214,7 +217,9 @@
                 };
               }
             ];
-            specialArgs = {inherit nixos-luks-yk nixpkgs-utsushi nixpkgs-makemkv nixpkgs home-manager sops-nix system;};
+            specialArgs = {
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+            };
           };
       };
 

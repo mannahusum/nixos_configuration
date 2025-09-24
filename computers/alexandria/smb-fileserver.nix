@@ -164,10 +164,14 @@ in {
     };
   };
 
-  system.nssModules = [config.services.samba.package];
-  system.nssDatabases.hosts = ["wins"];
-  system.nssDatabases.passwd = ["winbind"];
-  system.nssDatabases.group = ["winbind"];
+  system = {
+    nssModules = [config.services.samba.package];
+    nssDatabases = {
+      hosts = ["wins"];
+      passwd = ["winbind"];
+      group = ["winbind"];
+    };
+  };
 
   services = {
     samba = {
@@ -269,7 +273,9 @@ in {
     };
   };
 
-  networking.hostName = adNetbiosName;
-  networking.domain = adDomain;
-  networking.firewall.extraCommands = ''iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns'';
+  networking = {
+    hostName = adNetbiosName;
+    domain = adDomain;
+    firewall.extraCommands = ''iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns'';
+  };
 }
