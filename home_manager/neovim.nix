@@ -138,11 +138,13 @@ in {
         bash
         clang
         direnv
+        fd
         git
         jq
         nixpkgs-fmt
         ripgrep
         texliveFull
+        tree-sitter
         xdotool
         zathura
       ];
