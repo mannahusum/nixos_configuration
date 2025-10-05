@@ -1,10 +1,22 @@
 {
   config,
   lib,
+  system,
+  stdenvNoCC,
   ...
 }: let
   cfg = config.cakeyboard;
-in {
+in ({
+  options.cakeyboard = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Whether to set keyboard for Christian
+      '';
+    };
+  };
+} // (if lib.strings.hasSuffix "-linux" system then {
   imports = [
     ./wayland.nix
   ];
@@ -35,4 +47,13 @@ in {
       export XKB_DEFAULT_LAYOUT XKB_DEFAULT_MODEL XKB_DEFAULT_VARIANT XKB_DEFAULT_OPTIONS
     '';
   };
-}
+} else {
+  imports = [];
+  config = lib.mkIf cfg.enable {
+    nixpkgs.overlays = [
+      (self: super: {
+        neolayout = stdenvNoCC;
+      })
+    ];
+  };
+}))

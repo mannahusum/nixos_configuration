@@ -1,4 +1,4 @@
-({
+{
   config,
   lib,
   modulesPath,
@@ -186,4 +186,4 @@
     ];
     system.stateVersion = "23.11";
   };
-})
+}

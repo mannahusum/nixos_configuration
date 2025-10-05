@@ -2,6 +2,10 @@
   description = "Machine definition for computers at home";
 
   inputs = {
+    home-config = {
+      url = "path:myhomeconfig.nix";
+      flake = false;
+    };
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-25.05";
     };
@@ -11,34 +15,36 @@
     nixpkgs-makemkv = {
       url = "github:NixOS/nixpkgs/ed9d88e5ee5dd5aa71c807c6f60c9c5cf58d3676";
     };
-    nix-darwin = {
-      url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+    };
+    nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
+
+    disko = {
+      url = "github:nix-community/disko/v1.12.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    disko = {
-      url = "github:nix-community/disko/v1.12.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-    };
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v0.4.2";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-luks-yk = {
+      url = "github:akkesm/nixos-luks-yk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     sops-nix = {
       url = "github:/Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
-    nixos-luks-yk = {
-      url = "github:akkesm/nixos-luks-yk";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+
     nixos-anywhere = {
       url = "github:nix-community/nixos-anywhere";
       inputs = {
@@ -46,22 +52,24 @@
         disko.follows = "disko";
       };
     };
+
   };
 
   outputs = {
-    self,
-    nixpkgs,
-    nixpkgs-utsushi,
-    nixpkgs-makemkv,
-    nix-darwin,
-    home-manager,
     disko,
     flake-utils,
+    home-config,
+    home-manager,
     lanzaboote,
-    sops-nix,
-    nixos-luks-yk,
-    nixos-anywhere,
+    nix-darwin,
     nix-flake-tests,
+    nixos-anywhere,
+    nixos-luks-yk,
+    nixpkgs,
+    nixpkgs-makemkv,
+    nixpkgs-utsushi,
+    self,
+    sops-nix,
     ...
   } @ inputs: let
     overlays = [
@@ -155,7 +163,7 @@
               yubikey-personalization
             ]
             ++ (
-              if pkgs.lib.strings.hasPrefix "linux-" system
+              if pkgs.lib.strings.hasSuffix "-linux" system
               then [
                 hextorb
                 rbtohex
@@ -223,12 +231,16 @@
           };
       };
 
-      darwinConfigurations."simple" = nix-darwin.lib.darwinSystem {
+      darwinConfigurations."mini" = nix-darwin.lib.darwinSystem {
         modules = let
           pkgs = mypkgs "aarch64-darwin";
         in [
           ./computers/mini/configuration.nix
         ];
+        specialArgs = {
+          inherit self;
+          system = "aarch64-darwin";
+        };
       };
     };
 }
