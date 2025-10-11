@@ -110,6 +110,7 @@ in {
       partOf = ["samba.target"];
 
       serviceConfig = {
+        ExecStartPre = "${pkgs.coreutils.out}/bin/chmod 600 /var/lib/acme/${toLower dcName}/key4root.pem";
         ExecStart = "${samba}/sbin/samba --foreground --no-process-group";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         LimitNOFILE = 16384;
