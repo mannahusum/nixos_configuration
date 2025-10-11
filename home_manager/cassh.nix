@@ -644,6 +644,9 @@ in {
   };
 
   config = mkIf cfg.enable {
+    home.sessionVariables = {
+      NIX_SSHOPTS = "-o ControlMaster=no";
+    };
     programs.ssh = {
       controlMaster = "yes";
       controlPath = "~/.ssh/master-%C";
