@@ -108,6 +108,7 @@ in {
               )
               // {
                 extraGroups = [
+                  "audio"
                   "cdrom"
                   "dialout"
                   "docker"
