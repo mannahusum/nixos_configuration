@@ -175,12 +175,14 @@
           type = "zfs_fs";
           options.mountpoint = "none";
         };
+        "media/audio" = smbShare "/media/audio";
         "media/games" = smbShare "/media/games";
         "media/games/wii" = smbShare "/media/games/wii";
+        "media/images" = smbShare "/media/images";
         "media/onqm" = smbShare "/media/onqm";
-        "media/video" = smbShare "/media/video";
-        "media/audio" = smbShare "/media/audio";
+        "media/software" = smbShare "/media/software";
         "media/ultrastar" = smbShare "/media/ultrastar";
+        "media/video" = smbShare "/media/video";
         "backup" = {
           type = "zfs_fs";
           options = {
