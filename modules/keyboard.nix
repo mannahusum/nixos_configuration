@@ -1,12 +1,14 @@
 {
   config,
   lib,
+  pkgs,
   system,
   stdenvNoCC,
   ...
 }: let
   cfg = config.cakeyboard;
 in ({
+
   options.cakeyboard = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -49,11 +51,28 @@ in ({
   };
 } else {
   imports = [];
-  config = lib.mkIf cfg.enable {
-    nixpkgs.overlays = [
-      (self: super: {
-        neolayout = stdenvNoCC;
-      })
-    ];
+  config = {
+  } // lib.mkIf cfg.enable {
+    # Basic installation of Neo Layout
+    system.systemBuilderCommands = ''
+      mkdir -p "''${out}/Library/Keyboard Layouts"
+      ln -s ${pkgs.neolayout.out}/neo-layouts.bundle "''${out}/Library/Keyboard Layouts"
+    '';
+    system.activationScripts.preActivation.text = ''
+      printf >&2 'setting up /Library/Keyboard Layouts/neo-layouts.bundle...\n'
+
+      ${pkgs.rsync}/bin/rsync \
+        --archive \
+        --copy-links \
+        --delete-during \
+        --delete-missing-args \
+        "$systemConfig/Library/Keyboard Layouts/neo-layouts.bundle" \
+        '/Library/Keyboard Layouts/'
+    '';
+
+    # Karabiner-Elements for other layers
+    services.karabiner-elements = {
+      enable = true;
+    };
   };
 }))
