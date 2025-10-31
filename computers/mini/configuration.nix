@@ -1,5 +1,6 @@
 {
   lib,
+  overlays,
   pkgs,
   self,
   ...
@@ -11,7 +12,7 @@
     # (modulesPath + "/profiles/base.nix")
     # ../../modules/acme.nix
     ../../modules/keyboard.nix
-    # ../../modules/sshd.nix
+    ../../modules/sshd.nix
     # ../../modules/saned.nix
     # ../../modules/nginx.nix
     # ../../modules/yubikey.nix
@@ -21,47 +22,13 @@
     # ./smb-fileserver.nix
   ];
 
-  nixpkgs.overlays = [
-    (self: super: {
-      neolayout = self.stdenv.mkDerivation {
-        pname = "neo-layouts";
-        version = "0";
-        src = self.fetchurl {
-          url = "https://dl.neo-layout.org/neo-layouts.dmg";
-          hash = "sha256-4kTXjWHp5EnQuaTyMWshCOwZCImWh7vMmIDRxOUg50U=";
-        };
-        meta = with lib; {
-          description = "Neo is an ergonomic keyboard layout optimized for the German language";
-          homepage = "https://neo-layout.org/";
-          # license = license.gpl3;
-          maintainers = [{
-            email = "christian@wudika.de";
-            github = "mannahusum";
-            githubId = 223651;
-            name = "Christian Albertsen";
-          }];
-          platforms = [
-            "x86_64-darwin"
-            "aarch64-darwin"
-          ];
-        };
-
-        nativeBuildInputs = with self; [ _7zz ];
-
-        unpackPhase = ''
-          7zz x $src
-        '';
-
-        installPhase = ''
-          mkdir -p $out
-          cp -r neo-layouts.bundle $out/neo-layouts.bundle
-        '';
-      };
-    })
-  ];
+  nixpkgs = {
+    inherit overlays;
+  };
 
   system.primaryUser = "christianalbertsen";
   cakeyboard.enable = true;
+  casshd.enable = true;
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget

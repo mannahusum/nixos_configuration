@@ -74,6 +74,7 @@
   } @ inputs: let
     overlays = [
       (import ./packages/ssh/overlay.nix)
+      (import ./packages/darwin/overlay.nix)
       nixos-luks-yk.overlay
     ];
     mypkgs = system:
@@ -232,13 +233,11 @@
       };
 
       darwinConfigurations."mini" = nix-darwin.lib.darwinSystem {
-        modules = let
-          pkgs = mypkgs "aarch64-darwin";
-        in [
+        modules = [
           ./computers/mini/configuration.nix
         ];
         specialArgs = {
-          inherit self;
+          inherit self overlays;
           system = "aarch64-darwin";
         };
       };

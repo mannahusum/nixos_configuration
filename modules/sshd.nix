@@ -1,6 +1,8 @@
 {
   config,
   lib,
+  pkgs,
+  system,
   ...
 }: let
   cfg = config.casshd;
@@ -18,14 +20,17 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.enable ({
+    services.openssh = {
+      enable = true;
+    };
+  } // (if lib.strings.hasSuffix "-linux" system then {
     programs.ssh = {
       setXAuthLocation = true;
       enableAskPassword = true;
     };
 
     services.openssh = {
-      enable = true;
       openFirewall = true;
       settings = {
         X11Forwarding = true;
@@ -36,5 +41,12 @@ in {
         StreamLocalBindUnlink = "yes";
       };
     };
-  };
+  } else if lib.strings.hasSuffix "-darwin" system then {
+    environment.systemPackages = with pkgs; [
+      ssh_askpass
+    ];
+    programs.ssh.extraConfig = ''
+      XAuthLocation ${pkgs.xorg.xauth}/bin/xauth
+    '';
+  } else {}));
 }

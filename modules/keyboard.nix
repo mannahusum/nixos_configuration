@@ -71,8 +71,9 @@ in ({
     '';
 
     # Karabiner-Elements for other layers
-    services.karabiner-elements = {
-      enable = true;
-    };
+    # Can currently not be enabled in stable nixpkgs, since darwin expects older elements
+    # services.karabiner-elements = {
+    #   enable = true;
+    # };
   };
 }))
