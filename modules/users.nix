@@ -10,9 +10,11 @@
 }: let
   cfg = config.causers;
 in {
-  imports = [
+  imports = if lib.strings.hasSuffix "-linux" system then [
     home-manager.nixosModules.home-manager
-  ];
+  ] else if lib.strings.hasSuffix "-darwin" system then [
+    home-manager.darwinModules.home-manager
+  ] else [] ;
 
   options.causers = {
     adminUsers = lib.mkOption {
@@ -94,7 +96,7 @@ in {
         openssh.authorizedKeys.keys = pkgs.al_public_keys;
       };
     };
-  in {
+  in if lib.strings.hasSuffix "-linux" system then {
     users = {
       users = builtins.listToAttrs (
         map (
@@ -150,5 +152,5 @@ in {
 
     security.sudo.wheelNeedsPassword = false;
     nix.settings.trusted-users = ["root" "christian"];
-  };
+  } else {};
 }

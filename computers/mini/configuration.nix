@@ -13,7 +13,7 @@
     # ../../modules/acme.nix
     ../../modules/keyboard.nix
     ../../modules/sshd.nix
-    # ../../modules/saned.nix
+    ../../modules/saned.nix
     # ../../modules/nginx.nix
     # ../../modules/yubikey.nix
     # ../../modules/system_administration/debug.nix
@@ -34,20 +34,21 @@
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     _7zz
+    alacritty # GPU-accelerated terminal emulator
     darwin.xcode
-    git
+    ffmpeg # Multimedia framework
     fzf # Fuzzy finder
-    ripgrep # Faster grep
+    git
+    htop # Interactive process viewer
+    jetbrains-mono # JetBrains Mono font
     jq # Command line JSON processor
-    yq # Command line YAML processor
     neovim # Vim-fork focused on extensibility and usability
     pandoc # Universal document converter
     python3 # Python 3 programming language
-    htop # Interactive process viewer
+    ripgrep # Faster grep
     tree # Display directories as trees
-    jetbrains-mono # JetBrains Mono font
-    ffmpeg # Multimedia framework
-    alacritty # GPU-accelerated terminal emulator
+    xar
+    yq # Command line YAML processor
   ];
 
   # Auto upgrade nix package and the daemon service.

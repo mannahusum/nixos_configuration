@@ -237,7 +237,7 @@
           ./computers/mini/configuration.nix
         ];
         specialArgs = {
-          inherit self overlays;
+          inherit home-manager nixpkgs-utsushi self overlays;
           system = "aarch64-darwin";
         };
       };

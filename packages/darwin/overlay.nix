@@ -63,4 +63,36 @@ self: super: {
       mainProgram = "ssh-askpass";
     };
   };
+
+  epsonscan2 = {
+    pname = "epsonscan2";
+    src = self.fetchurl {
+      url = "https://download.epson-europe.com/pub/download/6747/epson674793eu.dmg";
+      hash = "sha256-Dzf0X4apccIE/M8EJs8V0VBxTIl8A6snKoJUsL3E/MY=";
+    };
+    meta = {
+      description = "Scanner software for some Epson Scanners like DS-1660W";
+      homepage = "https://www.epson.de/de_DE/support/sc/epson-workforce-ds-1660w/s/s1492?selected-tab=&selected-os=macOS+Tahoe+26";
+      maintainers = [{
+        email = "christian@wudika.de";
+        github = "mannahusum";
+        githubId = 223651;
+        name = "Christian Albertsen";
+      }];
+      platforms = [
+        "aarch64-darwin"
+      ];
+    };
+
+    nativeBuildInputs = with self; [ xar ];
+
+    unpackPhase = ''
+      7zz x $src
+    '';
+
+    installPhase = ''
+      mkdir -p $out
+      find . -name Payload -exec tar -c "$out/" -xzvf '{}' ';'
+    '';
+  };
 }
