@@ -179,7 +179,8 @@ in {
         wsl = false
 
         [font]
-        size = 8.0
+        normal = ["Iosevka Nerd Font"]
+        size = 12.0
       '';
     };
 
