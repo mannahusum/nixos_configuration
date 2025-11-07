@@ -20,17 +20,14 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable ({
-    services.openssh = {
-      enable = true;
-    };
-  } // (if lib.strings.hasSuffix "-linux" system then {
+  config = lib.mkIf cfg.enable (if lib.strings.hasSuffix "-linux" system then {
     programs.ssh = {
       setXAuthLocation = true;
       enableAskPassword = true;
     };
 
     services.openssh = {
+      enable = true;
       openFirewall = true;
       settings = {
         X11Forwarding = true;
@@ -42,11 +39,14 @@ in {
       };
     };
   } else if lib.strings.hasSuffix "-darwin" system then {
+    services.openssh = {
+      enable = true;
+    };
     environment.systemPackages = with pkgs; [
       ssh_askpass
     ];
     programs.ssh.extraConfig = ''
       XAuthLocation ${pkgs.xorg.xauth}/bin/xauth
     '';
-  } else {}));
+  } else {});
 }
