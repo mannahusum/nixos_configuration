@@ -1,28 +1,39 @@
-({
-  modulesPath,
+{
+  config,
   lib,
+  modulesPath,
+  overlays,
   pkgs,
+  sops-nix,
   ...
 }: {
   imports = [
+    ../../modules/keyboard.nix
     (modulesPath + "/profiles/base.nix")
-    ../modules/gitea.nix
-    ../modules/keyboard.nix
-    ../modules/nginx.nix
-    ../modules/saned.nix
-    ../modules/sshd.nix
-    ../modules/usermount.nix
-    ../modules/users.nix
-    ../modules/wayland.nix
-    ../modules/xandikos.nix
-    ../modules/yubikey.nix
+    ../../modules/sshd.nix
+    ../../modules/usermount.nix
+    ../../modules/users.nix
+    ../../modules/wayland.nix
+    ../../modules/yubikey.nix
+    ../shared-config.nix
+    ./sops.nix
+    sops-nix.nixosModules.sops
   ];
 
+  options.hydra = {
+  };
+
   config = {
-    nixpkgs.config.allowUnfreePredicate = pkg:
-      builtins.elem (lib.getName pkg) [
-        "google-chrome"
-      ];
+    disko.devices = import ./disko-config.nix {
+      inherit lib;
+    };
+    nixpkgs = {
+      inherit overlays;
+      config.allowUnfreePredicate = pkg:
+        builtins.elem (lib.getName pkg) [
+          "google-chrome"
+        ];
+    };
     boot = {
       supportedFilesystems = ["zfs"];
       loader.efi = {
@@ -51,6 +62,7 @@
       '';
       settings = {
         substituters = [
+          # "http://mannahusum.catbertsen.de:5000/"
           "https://nix-community.cachix.org"
         ];
         trusted-public-keys = [
@@ -72,11 +84,26 @@
         };
         ipv6 = true;
       };
+      pcscd.enable = true;
+      resolved = {
+        enable = true;
+        dnssec = "true";
+        domains = ["~."];
+        fallbackDns = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
+        dnsovertls = "true";
+      };
     };
 
     casshd.enable = true;
-    cawayland.enable = true;
+    cawayland = {
+      enable = true;
+      displayManager = "gdm";
+    };
     cayubikey.enable = true;
+    # environment.etc."sway/config.d/monitors.conf".text = ''
+    #   output "DP-1" mode 3840x2160@30Hz pos 0 0
+    #   output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
+    # '';
     cakeyboard.enable = true;
     time.timeZone = "Europe/Berlin";
     i18n = {
@@ -87,23 +114,12 @@
       };
     };
     networking = {
-      tempAddresses = "disabled";
-      hosts = {
-        "192.168.10.252" = [
-          "alexandria.windows.catbertsen.de"
-          "alexandria.catbertsen.de"
-          "alexandria"
-        ];
-        "192.168.10.253" = [
-          "mannahusum.catbertsen.de"
-          "mannahusum"
-        ];
-        "192.168.10.254" = [
-          "hydra.catbertsen.de"
-          "calendar.catbertsen.de"
-          "gitea.catbertsen.de"
-        ];
-      };
+      firewall.enable = false;
+      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
+      enableIPv6 = true;
+      hostName = "ulysses";
+
+      useHostResolvConf = lib.mkForce false;
     };
     causermount.enable = true;
 
@@ -118,5 +134,6 @@
       xterm # for resize command
       file
     ];
+    system.stateVersion = "25.11";
   };
-})
+}

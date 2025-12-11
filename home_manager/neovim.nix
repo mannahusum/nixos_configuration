@@ -10,8 +10,8 @@ with lib; let
   vimrc_stuff = pkgs.fetchFromGitHub {
     owner = "mannahusum";
     repo = "vimrc_stuff";
-    rev = "7d94f761e37b66254a6de3be09e2aaecd751e448";
-    hash = "sha256-wMVsdG5jq/rvrC/Ikzg927mAo+S+C3yLqMsSt8MF5KA=";
+    rev = "14efe9d9d608924081c14f7a2186cbc67bbb55ff";
+    hash = "sha256-TUkm/RzpUlXt87aUd+TlSiB6j/EqRoJvf6q/zAmziBM=";
     leaveDotGit = true;
   };
 

@@ -10,11 +10,16 @@
 }: let
   cfg = config.causers;
 in {
-  imports = if lib.strings.hasSuffix "-linux" system then [
-    home-manager.nixosModules.home-manager
-  ] else if lib.strings.hasSuffix "-darwin" system then [
-    home-manager.darwinModules.home-manager
-  ] else [] ;
+  imports =
+    if lib.strings.hasSuffix "-linux" system
+    then [
+      home-manager.nixosModules.home-manager
+    ]
+    else if lib.strings.hasSuffix "-darwin" system
+    then [
+      home-manager.darwinModules.home-manager
+    ]
+    else [];
 
   options.causers = {
     adminUsers = lib.mkOption {
@@ -65,6 +70,16 @@ in {
         "networkmanager"
       ];
     };
+
+    defaultPinentry = lib.mkOption {
+      type = lib.types.enum ["bemenu" "gnome3"];
+      default = "bemenu";
+      example = "gnome";
+      description = ''
+        Default pinentry to be used by the home-manager configuration,
+        depending on desktopManager and therefore displayManager
+      '';
+    };
   };
 
   config = let
@@ -96,61 +111,65 @@ in {
         openssh.authorizedKeys.keys = pkgs.al_public_keys;
       };
     };
-  in if lib.strings.hasSuffix "-linux" system then {
-    users = {
-      users = builtins.listToAttrs (
-        map (
+  in
+    if lib.strings.hasSuffix "-linux" system
+    then {
+      users = {
+        users = builtins.listToAttrs (
+          map (
+            user: {
+              name = user;
+              value =
+                (
+                  if (builtins.hasAttr user myusers)
+                  then (builtins.getAttr user myusers)
+                  else {}
+                )
+                // {
+                  extraGroups = [
+                    "audio"
+                    "cdrom"
+                    "dialout"
+                    "docker"
+                    "kvm"
+                    "libvirtd"
+                    "lxd"
+                    "qemu-libvirtd"
+                    "render"
+                    "transmission"
+                    "video"
+                    "vboxusers"
+                    "wheel"
+                    "networkmanager"
+                  ];
+                };
+            }
+          ) ((builtins.attrNames myusers) ++ cfg.adminUsers ++ cfg.regularUsers)
+        );
+
+        groups = builtins.listToAttrs (map (
           user: {
             name = user;
-            value =
-              (
-                if (builtins.hasAttr user myusers)
-                then (builtins.getAttr user myusers)
-                else {}
-              )
-              // {
-                extraGroups = [
-                  "audio"
-                  "cdrom"
-                  "dialout"
-                  "docker"
-                  "kvm"
-                  "libvirtd"
-                  "lxd"
-                  "qemu-libvirtd"
-                  "render"
-                  "transmission"
-                  "video"
-                  "vboxusers"
-                  "wheel"
-                  "networkmanager"
-                ];
-              };
+            value = {};
           }
-        ) ((builtins.attrNames myusers) ++ cfg.adminUsers ++ cfg.regularUsers)
-      );
+        ) (builtins.attrNames myusers));
 
-      groups = builtins.listToAttrs (map (
-        user: {
-          name = user;
-          value = {};
-        }
-      ) (builtins.attrNames myusers));
+        mutableUsers = true;
+      };
 
-      mutableUsers = true;
-    };
-
-    home-manager = {
-      users = {
-        christian = import ../home_manager/caHomeConfig.nix {
-          inherit config nixpkgs overlays system;
-          forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
-          createForwardPath = true;
+      home-manager = {
+        users = {
+          christian = import ../home_manager/caHomeConfig.nix {
+            inherit config nixpkgs overlays system;
+            pinentry = cfg.defaultPinentry;
+            forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
+            createForwardPath = true;
+          };
         };
       };
-    };
 
-    security.sudo.wheelNeedsPassword = false;
-    nix.settings.trusted-users = ["root" "christian"];
-  } else {};
+      security.sudo.wheelNeedsPassword = false;
+      nix.settings.trusted-users = ["root" "christian"];
+    }
+    else {};
 }

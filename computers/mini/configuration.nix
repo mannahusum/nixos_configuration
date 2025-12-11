@@ -4,8 +4,7 @@
   pkgs,
   self,
   ...
-}:
-{
+}: {
   imports = [
     # sops-nix.nixosModules.sops
     # ./sops.nix
@@ -70,7 +69,7 @@
     ];
     settings = {
       experimental-features = "nix-command flakes";
-      system-features = [ "nixos-test" "apple-virt" ];
+      system-features = ["nixos-test" "apple-virt"];
     };
     extraOptions = ''
       extra-platforms = x86_64-darwin aarch64-darwin
@@ -89,7 +88,7 @@
       };
       ephemeral = true;
       maxJobs = 4;
-      supportedFeatures = [ "kvm" "benchmark" "big-parallel" "nixos-test" ];
+      supportedFeatures = ["kvm" "benchmark" "big-parallel" "nixos-test"];
     };
   };
 
@@ -138,4 +137,3 @@
     hostPlatform = "aarch64-darwin";
   };
 }
-

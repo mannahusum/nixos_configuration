@@ -190,18 +190,19 @@
             "makemkv"
           ];
       };
-    in with pkgs; [
-      git
-      mokutil
-      sbctl
-      tpm2-tss
-      git-crypt
-      neovim
-      ripgrep
-      xterm # for resize command
-      file
-      mkvpkgs.makemkv
-    ];
+    in
+      with pkgs; [
+        git
+        mokutil
+        sbctl
+        tpm2-tss
+        git-crypt
+        neovim
+        ripgrep
+        xterm # for resize command
+        file
+        mkvpkgs.makemkv
+      ];
 
     system.stateVersion = "23.11";
   };

@@ -6,8 +6,9 @@
       url = "path:myhomeconfig.nix";
       flake = false;
     };
+    nixos-hardware.url = "github:8bitbuddhist/nixos-hardware?ref=surface-rust-target-spec-fix";
     nixpkgs = {
-      url = "github:nixos/nixpkgs/nixos-25.05";
+      url = "github:nixos/nixpkgs/nixos-25.11";
     };
     nixpkgs-utsushi = {
       url = "github:NixOS/nixpkgs/b0249fdf998d782e1058b0cf3239091e59e393ef";
@@ -21,19 +22,19 @@
     nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
 
     disko = {
-      url = "github:nix-community/disko/v1.12.0";
+      url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.4.2";
+      url = "github:nix-community/lanzaboote";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-darwin = {
-      url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+      url = "github:LnL7/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-luks-yk = {
@@ -52,7 +53,6 @@
         disko.follows = "disko";
       };
     };
-
   };
 
   outputs = {
@@ -64,6 +64,7 @@
     nix-darwin,
     nix-flake-tests,
     nixos-anywhere,
+    nixos-hardware,
     nixos-luks-yk,
     nixpkgs,
     nixpkgs-makemkv,
@@ -222,6 +223,31 @@
                   lanzaboote = {
                     enable = true;
                     pkiBundle = "/etc/secureboot";
+                  };
+                };
+              }
+            ];
+            specialArgs = {
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+            };
+          };
+        ulysses = let
+          system = "x86_64-linux";
+        in
+          inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ./computers/ulysses/configuration.nix
+              nixos-hardware.nixosModules.microsoft-surface-pro-intel
+              disko.nixosModules.disko
+              lanzaboote.nixosModules.lanzaboote
+              {
+                boot = {
+                  bootspec.enable = true;
+                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+                  lanzaboote = {
+                    enable = true;
+                    pkiBundle = "/var/lib/sbctl";
                   };
                 };
               }

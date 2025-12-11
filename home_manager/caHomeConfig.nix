@@ -3,6 +3,7 @@
   forwardTo ? null,
   nixpkgs,
   overlays,
+  pinentry,
   system,
   withExtraSocket ? false,
   ...
@@ -33,7 +34,7 @@
       enable = true;
     };
     gpg = {
-      inherit forwardTo createForwardPath withExtraSocket;
+      inherit forwardTo createForwardPath pinentry withExtraSocket;
       enable = true;
     };
     neovim = {
