@@ -143,6 +143,32 @@ with lib; let
       };
       gpgSocket = null;
     };
+    "itiv-339screen1" = {
+      hostname = "itiv-339screen1.itiv.kit.edu";
+      hostkeys = [
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPdRz4JDu/qNH+HhQaYn4cM3CHmX8sePPb9tgBkhsKDsQV/SWGdLZl8eUP6JBryCREdSBg8rpq+uJhg+Q+TBUX8="
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC5Hth+DK+H23nOyMX680O4qFUoIFt1/6ZpeQErRv56HM5b3SJDutuXpr5/fQF77PiXuLtvNKvjvx76ICPpRQdQIbTN5umCxiKIHJeCXGJtvJZM7L7hVwzX1b9Io2VtXWajcyLZWvl4iBRWd51SVvgnzQOTkwfyut0wLj3BFXS2LR0CcRWWdf1do2PmYY3nAi0kH/npuhyC6tXywrKPaaIb7x7z24sKTFymTGt5mfI/2nerQB5rQS2ccnJwBZL40EhO9SIiYXNp939xQnC77QsZ+c7iHR80XNcyewV6EX/2r2y+NB19bKRWw2k55dUMdqxdxm8sUj+j9Ci113Ugn63N+UKe3L2gp4Bb8HOVZ80TnJ0ZX88/MgKZPKwnGDBMtV3+ix5XKDKzytb4MuQPLh0ot3n7zs54L7GJwzxngje+BL2yYwZK4qWahS8z9zDdH19EHjJCJZUfGVyvI3IpXgPwKXpKgRSw+xsld41ediOcm1dojJz12BGkDu//6hM0/dk="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIBhSLEWPSVgPFFqtHNuu4agn4gXbuaA6yiZoJqXEHyR"
+      ];
+      overrides = {
+        user = "pi";
+        proxyJump = "nixos-substitute";
+      };
+      gpgSocket = null;
+    };
+    "itiv-339screen2" = {
+      hostname = "itiv-339screen2.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC5Hth+DK+H23nOyMX680O4qFUoIFt1/6ZpeQErRv56HM5b3SJDutuXpr5/fQF77PiXuLtvNKvjvx76ICPpRQdQIbTN5umCxiKIHJeCXGJtvJZM7L7hVwzX1b9Io2VtXWajcyLZWvl4iBRWd51SVvgnzQOTkwfyut0wLj3BFXS2LR0CcRWWdf1do2PmYY3nAi0kH/npuhyC6tXywrKPaaIb7x7z24sKTFymTGt5mfI/2nerQB5rQS2ccnJwBZL40EhO9SIiYXNp939xQnC77QsZ+c7iHR80XNcyewV6EX/2r2y+NB19bKRWw2k55dUMdqxdxm8sUj+j9Ci113Ugn63N+UKe3L2gp4Bb8HOVZ80TnJ0ZX88/MgKZPKwnGDBMtV3+ix5XKDKzytb4MuQPLh0ot3n7zs54L7GJwzxngje+BL2yYwZK4qWahS8z9zDdH19EHjJCJZUfGVyvI3IpXgPwKXpKgRSw+xsld41ediOcm1dojJz12BGkDu//6hM0/dk="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPdRz4JDu/qNH+HhQaYn4cM3CHmX8sePPb9tgBkhsKDsQV/SWGdLZl8eUP6JBryCREdSBg8rpq+uJhg+Q+TBUX8="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIBhSLEWPSVgPFFqtHNuu4agn4gXbuaA6yiZoJqXEHyR"
+      ];
+      overrides = {
+        user = "pi";
+        proxyJump = "nixos-substitute";
+      };
+      gpgSocket = null;
+    };
     "jumphost" = {
       hostname = "jumphost.itiv.kit.edu";
       hostkeys = [
@@ -390,6 +416,15 @@ with lib; let
       ];
       gpgSocket = null;
     };
+    "pool-rocky10" = {
+      hostname = "pool-rocky10.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDDJ6vgeMPQrXYyQJYnxCKD6qgVgb0n4kcZtnKo1LBXAl2/KXIFzmboTcvUPQR3ZjEgsZN6QKzHdnfewhFT3M/cK5Pbpp/mrylSRIcPjvTMtXZL/80GAUPktn00aK53s+WLhJceyiAT+qNdC3W3IyA95oOY3H9qjIdfFuYROaAXE7fAm7waNWJhindQms+y2DleTne+6AMCZHSGtYBXPUiLWq2mYTK9v+pruo8Ry6XAFeGurAB9PGazNqdxJn4Fr9KVw7rQvl2itwfp8f10SUhco2sMLLM6BakutCsMgSV8snun4/bq3Vwl498wmcHfWiAjSL66SSliN5sMFelaW85lPhcWgvRdrMNCwWprRF7S4Pr7hf2INWxDlV3IhdHLc0qlBqmtVl2BJOHvx5T/BHCG4z00B0OZD73HuOV77d2P3dq2Pvr8ZUOMHCa2EY7rP0H8lk+wtH2FYslKXeAslUm1yM2TRoi/87JXC3owwBSmseqBu5+yxuJs652YXyo/pM0="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG7ydnvXw/+rkgId1LH+SDgl/dYQxQNQ2VV+jESz2mRakPRjUoR0BfnpKnoKu3RLgGNYw93bIpGQLvjt2ZC59D0="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINXzXJVkgpUyCD/7OQTv9OqiRRs80vbkigXpayQWtGwI"
+      ];
+      gpgSocket = null;
+    };
     "runner" = {
       hostname = "runner.itiv.kit.edu";
       hostkeys = [
@@ -494,6 +529,28 @@ with lib; let
       };
       gpgSocket = null;
     };
+    "workarm" = {
+      hostname = "workarm.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDNpzEmSBAA8SmRoxdluO9QxM4Qq6t7u1ORRidz2TTGNBvhgnRxT8rlhmdSVkICFDBWqmezDOuGFHmIFKLBjZreGskazycln8FfELmO1+NOt4TYptWEduWffiYA4dL8ALjOt3lmEOMgps1zNhdOgk3DnqUVp5V/gwPndubawc//sP6ve1pgeKCd2duPe0l4PTRXWkYL+CPIe7fRBIoZdsleqp2623gbfVIQu/p3t11l0aUL301gIlSH5EOd4gy2QQIjuuWqftkD+9dG3CUuW99UJHtuobERYk1R42WgKDWPr+WxLiv3o3sFd7yonaDFl+IdMSGqoYPSSgeZV5V5C95Goadl6jIQEm+Mdnoeo+UvA3WA7YugfGSd5GJRoscvfJiUNBcCVDb2VU00k7Me3DWTM0ESGJ79v4tk9CI43I72quAbfjT9IZE2UTno/9SG4kiFU5m2SHl8xSbumbBnx7CoOWqh1+vM2iskoTIhCZeYMwykChlcEbRxkDzu0/zkURM="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBElMxYr3LMRJt3r3e962moki4g6MQ2vlPiOmINwojNhrWJIZWULeZUC7GfEz8cf1ALPfXgnlH8z2fN+bn+oiqmc="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEpn2NxhTfCm18m4ayZZSk3V5xRFyorWb8zJSLwrwE3E"
+      ];
+      overrides = {
+        user = "root";
+      };
+      gpgSocket = null;
+    };
+    "workarm-sp" = {
+      hostname = "workarm-sp.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDaW/U8Bi3iz/V6V8tllWOVrlvrcitgP9rHuLmxnKkDkMZXi4wF9q/vnE8XWOG2AvDJ4L3kydVZYea6K7QDS0U6pSuHDcSNSPD+5N8Pu7q+agSW9sWtzeYCc86eKA+kXin4sl3/QYffX/rlm5Sr8F7iEfmOIFQgBF+58DQFTuQZLUltCNIxe6dvAO9CUScA616i+aTXYVV9LFZlRTjfFqKHBjnpJcnWZGWEgsvLuwlDcQeqpk88sEvDXS4OFvJ37IRqJA0XcxxU0ykKCXqKinMgeUCTX4do0HC+pbYcqpB3Y2RNavaVuQ32Pe+Ky31pvkEAeG3PL35R2YlJuISyj1Lh"
+      ];
+      overrides = {
+        user = "sysadmin";
+      };
+      gpgSocket = null;
+    };
     "work3" = {
       hostname = "work3.itiv.kit.edu";
       hostkeys = [
@@ -551,6 +608,19 @@ with lib; let
       gpgSocket = "/home/christian/.forwarded-sockets/S.gpg-agent";
       overrides = {
         proxyJump = "hydra";
+      };
+    };
+    "mini" = {
+      hostname = "192.168.10.249";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDjn/qTrUmmKbPbHtsjlDfdrkdqOOdIFl9Uc5qbU7q/wilu0+Jx+GWkmZK54qXJwjQmMPFrzXaP7HQGVWBHbD2IBMf3bcMzl7nzk3iZ0tNPG5BjKfe2xWohIdgUWdva0JOlI46fAZKN11Zc4H/4TnXCDS8SwQqyNcAjU8t768vpAfPTTNnE2iYDIJCXsz9Xh3bpHvYd7z8pUB4Zk5TM95bjh2A+bwiQXeYU/ooYEHl3fDmjIWJeQm00CwO1BD4EsvJCRkIzZ0Zjd0P3bzn3dyl5VxKno0V7SWsp/95UCeZm+C7wr/S0NYtLKZ6lWI+fVJRBN1Azh675EMlatxYTCSiTfjlOuCUh47L0Ikqq39Ev6a5nr7VuTc517f3pSyUmPSgKvV3aAZ2aVDIU+RWTUGZFEgonoQo+FUqFUaaR0afMu8ZWBQFpt6OwjgCxIWkvWoub+mG3ZtMWWbrrcGzWOkT7wt7664fEpKHup+zG+5IGZg4Owv3G0mHLqaPnmPk/G50="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBdmI9JovLniVi+D6hIyIeWC1/6RRV5JMK99GwbhBsMGC/pJLW+8nGzypngKRV0RRRijipnoGE2W56TYZjrjLwk="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFOu4nY103HxCCz5UuCokCcUM1tsKpDLMANo5gNOc4Jn"
+      ];
+      gpgSocket = "/home/christianalbertsen/.forwarded-sockets/S.gpg-agent";
+      overrides = {
+        proxyJump = "hydra";
+        user = "christianalbertsen";
       };
     };
   };
@@ -645,20 +715,39 @@ in {
 
   config = mkIf cfg.enable {
     home.sessionVariables = {
-      NIX_SSHOPTS = "-o ControlMaster=no";
+      NIX_SSHOPTS = "-o ControlMaster=no -o ClearAllForwardings=yes";
     };
+    ca.bash.extraProfile.ensureXauth = ''
+      [ -e "$HOME/.Xauthority" ] || touch "$HOME/.Xauthority"
+    '';
     programs.ssh = {
-      controlMaster = "yes";
-      controlPath = "~/.ssh/master-%C";
+      extraConfig = ''
+        XAuthLocation ${pkgs.xorg.xauth.out}/bin/xauth
+      '';
       enable = true;
-      userKnownHostsFile = "~/.ssh/known_hosts ${privateKnownHost} ${itivKnownHosts}";
+      enableDefaultConfig = false;
       matchBlocks = let
         toGpgSocket =
           if (cfg.forwardGpgSocket && (cfg.localGpgSocket != null))
           then cfg.localGpgSocket
           else "/run/user/1000/gnupg/S.gpg-agent";
       in
-        (configure-hosts itiv-host toGpgSocket itivHosts) // (configure-hosts private-host toGpgSocket privateHosts);
+        (configure-hosts itiv-host toGpgSocket itivHosts)
+        // (configure-hosts private-host toGpgSocket privateHosts)
+        // {
+          "*" = {
+            controlPath = "~/.ssh/master-%C";
+            controlMaster = "yes";
+            userKnownHostsFile = "~/.ssh/known_hosts ${privateKnownHost} ${itivKnownHosts}";
+            forwardAgent = false;
+            addKeysToAgent = "no";
+            compression = false;
+            serverAliveInterval = 0;
+            serverAliveCountMax = 3;
+            hashKnownHosts = false;
+            controlPersist = "no";
+          };
+        };
     };
   };
 }
