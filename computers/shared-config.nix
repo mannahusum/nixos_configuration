@@ -72,6 +72,9 @@
         };
         ipv6 = true;
       };
+      fwupd = {
+        enable= true;
+      };
     };
 
     casshd.enable = true;
