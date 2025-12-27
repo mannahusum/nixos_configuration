@@ -247,7 +247,6 @@
                   loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
                   lanzaboote = {
                     enable = true;
-                    pkiBundle = "/var/lib/sbctl";
                   };
                 };
               }
