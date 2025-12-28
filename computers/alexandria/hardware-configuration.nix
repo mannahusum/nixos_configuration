@@ -39,11 +39,9 @@
     graphics = {
       enable = true;
       extraPackages = with pkgs; [
-        amdvlk
         libvdpau-va-gl
       ];
       extraPackages32 = with pkgs; [
-        driversi686Linux.amdvlk
         driversi686Linux.libvdpau-va-gl
       ];
     };
