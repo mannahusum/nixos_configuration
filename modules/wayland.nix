@@ -5,10 +5,49 @@
   ...
 }: let
   cfg = config.cawayland;
-  windows-theme = pkgs.fetchFromGitHub {
-    owner = "B00merang-Project";
-    repo = "Windows-10";
-    rev = "3.2.1";
+    
+  windows-theme-gtk = pkgs.stdenv.mkDerivation {
+    name = "B00merang-Project-Windows-Theme";
+    version = "3.2.1";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "B00merang-Project";
+      repo = "Windows-10";
+      rev = "3.2.1";
+      hash = "sha256-O8sKYHyr1gX1pQRTTSw/kHREJ5MujbVjmLHJHbrUcRM=";
+    };
+
+    installPhase = ''
+      mkdir -p "$out/share/themes/Windows-10"
+      cp -r * "$out/share/themes/Windows-10"
+    '';
+  };
+
+  windows-theme-icons = pkgs.stdenv.mkDerivation {
+    name = "B00merang-Project-Windows-Icons";
+    version = "1.0";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "B00merang-Artwork";
+      repo = "Windows-10";
+      rev = "1.0";
+      hash = "sha256-Yz6a7FcgPfzz4w8cKp8oq7/usIBUUZV7qhVmDewmzrI=";
+    };
+
+    installPhase = ''
+      mkdir -p "$out/share/icons/Windows-10"
+      cp -r * "$out/share/icons/Windows-10"
+    '';
+  };
+
+  my-windows11-latin-fonts = pkgs.stdenvNoCC.mkDerivation {
+    pname = "windows11-latin-fonts";
+    version = "1";
+
+    src = pkgs.requireFile {
+      url = "Via script from C:\\Windows\\fonts";
+      sha256 = "1npq2zrdbmrqjp9slw3sfkz10wqr4cbxrq3sr50magr63d5gdghy";
+    };
   };
 in {
   imports = [
@@ -114,6 +153,7 @@ in {
         causers.defaultPinentry = "gnome3";
         environment.systemPackages = with pkgs; [
           adwaita-icon-theme
+          cascadia-code
           gjs
           gnomeExtensions.appindicator
           gnomeExtensions.arcmenu
@@ -123,6 +163,9 @@ in {
           gnomeExtensions.user-themes
           gnome-menus
           gnome-settings-daemon
+          gnome-tweaks
+          windows-theme-gtk
+          windows-theme-icons
         ];
         hardware.sensor.iio.enable = true;
         programs.dconf.enable = true;
@@ -130,6 +173,9 @@ in {
           {
             # lockAll = true; # prevents overriding
             settings = {
+              "org/gnome/settings-daemon/plugins/housekeeping" = {
+                "donation-reminder-enabled" = false;
+              };
               "org/gnome/shell" = {
                 enabled-extensions = [
                   "appindicatorsupport@rgcjonas.gmail.com"
@@ -162,8 +208,20 @@ in {
                 tray-order = "2";
               };
               "org/gnome/shell/extensions/dash-to-panel" = {
+                dot-style-focused = "DOTS";
+                dot-style-unfocused = "METRO";
+                multi-monitors = false;
+                panel-anchors = lib.gvariant.mkDictionaryEntry "LGD-0x100000a1" (lib.gvariant.mkVariant "MIDDLE");
+                panel-element-positions = ''{"LGD-0x100000a1":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"FUS-YV9S836192":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"FUS-YV9S827794":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}]}'';
                 panel-position = "BOTTOM";
                 location-clock = "STATUSRIGHT";
+              };
+              "org/gnome/shell/extensions/user-theme" = {
+                name = "Windows-10";
+              };
+              "org/gnome/desktop/interface" = {
+                gtk-theme = "Windows-10";
+                icon-theme = "Windows-10";
               };
               "org/gnome/desktop/wm/preferences" = {
                 button-layout = ":minimize,maximize,close";

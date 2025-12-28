@@ -16,7 +16,6 @@
       bashInteractive
       bat # cat clone
       cadaver
-      cope
       coreutils-full
       cyrus_sasl
       detect-secrets
