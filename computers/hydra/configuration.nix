@@ -146,28 +146,28 @@
       hostId = "d22d38ba";
       hostName = "hydra";
       tempAddresses = "disabled";
-      interfaces.enp2s0 = {
-        ipv4.addresses = [
-          {
-            address = "192.168.10.254";
-            prefixLength = 24;
-          }
-        ];
-      };
-      defaultGateway = {
-        address = "192.168.10.1";
-        interface = "enp2s0";
-      };
-      hosts = {
-        "192.168.10.253" = [
-          "mannahusum.catbertsen.de"
-        ];
-        "192.168.10.254" = [
-          "hydra.catbertsen.de"
-          "calendar.catbertsen.de"
-          "gitea.catbertsen.de"
-        ];
-      };
+      # interfaces.enp2s0 = {
+      #   ipv4.addresses = [
+      #     {
+      #       address = "192.168.10.254";
+      #       prefixLength = 24;
+      #     }
+      #   ];
+      # };
+      # defaultGateway = {
+      #   address = "192.168.10.1";
+      #   interface = "enp2s0";
+      # };
+      # hosts = {
+      #   "192.168.10.253" = [
+      #     "mannahusum.catbertsen.de"
+      #   ];
+      #   "192.168.10.254" = [
+      #     "hydra.catbertsen.de"
+      #     "calendar.catbertsen.de"
+      #     "gitea.catbertsen.de"
+      #   ];
+      # };
 
       useHostResolvConf = lib.mkForce false;
     };

@@ -138,42 +138,42 @@
 
     networking = {
       interfaces.br0 = {
-        ipv4.addresses = [
-          {
-            address = "192.168.10.252";
-            prefixLength = 24;
-          }
-        ];
+        # ipv4.addresses = [
+        #   {
+        #     address = "192.168.10.252";
+        #     prefixLength = 24;
+        #   }
+        # ];
       };
       bridges.br0.interfaces = [
         "eth0"
       ];
-      defaultGateway = {
-        address = "192.168.10.1";
-        interface = "br0";
-      };
+      # defaultGateway = {
+      #   address = "192.168.0.1";
+      #   interface = "br0";
+      # };
       hostId = "d22d38ba";
       hostName = "alexandria";
       tempAddresses = "disabled";
       hosts = {
-        "192.168.10.251" = [
-          "archon.catbertsen.de"
-          "archon.windows.catbertsen.de"
-          "archon"
-        ];
-        "192.168.10.252" = [
-          "alexandria.catbertsen.de"
-          "alexandria.windows.catbertsen.de"
-          "alexandria"
-        ];
-        "192.168.10.253" = [
-          "mannahusum.catbertsen.de"
-        ];
-        "192.168.10.254" = [
-          "hydra.catbertsen.de"
-          "calendar.catbertsen.de"
-          "gitea.catbertsen.de"
-        ];
+        # "192.168.10.251" = [
+        #   "archon.catbertsen.de"
+        #   "archon.windows.catbertsen.de"
+        #   "archon"
+        # ];
+        # "192.168.10.252" = [
+        #   "alexandria.catbertsen.de"
+        #   "alexandria.windows.catbertsen.de"
+        #   "alexandria"
+        # ];
+        # "192.168.10.253" = [
+        #   "mannahusum.catbertsen.de"
+        # ];
+        # "192.168.10.254" = [
+        #   "hydra.catbertsen.de"
+        #   "calendar.catbertsen.de"
+        #   "gitea.catbertsen.de"
+        # ];
       };
     };
 

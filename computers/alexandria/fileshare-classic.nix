@@ -11,8 +11,8 @@ with lib; let
   dcName = "alexandria.windows.catbertsen.de";
   adWorkgroup = "CATA";
   adNetbiosName = "alexandria";
-  staticIp = "192.168.10.252";
-  dnsForwarder = "192.168.10.1";
+  # staticIp = "192.168.10.252";
+  dnsForwarder = "8.8.8.8";
   smbShare = path: {
     inherit path;
     "read only" = "no";
@@ -25,14 +25,14 @@ with lib; let
   };
 in {
   # Disable resolveconf, we're using Samba internal DNS backend
-  environment.etc = {
-    "resolv.conf" = {
-      text = ''
-        search ${adDomain}
-        nameserver ${staticIp}
-      '';
-    };
-  };
+  # environment.etc = {
+  #   "resolv.conf" = {
+  #     text = ''
+  #       search ${adDomain}
+  #       nameserver ${staticIp}
+  #     '';
+  #   };
+  # };
 
   environment.systemPackages = with pkgs; [
     adcli
@@ -189,19 +189,19 @@ in {
         wii = smbShare "/media/games/wii";
         video = smbShare "/media/video";
         ultrastar = smbShare "/media/ultrastar";
-        onqm = {
-          path = "/media/onqm";
-          "public" = "no";
-          "valid users" = "christian";
-          "read only" = "no";
-          "map acl inherit" = "yes";
-          "inherit acls" = "yes";
-          "vfs objects" = "fruit acl_xattr";
-          "acl_xattr:default acl style" = "posix";
-          "access based share enum" = "yes";
-          # "hide unreadable" = "yes";
-          "smb3 unix extensions" = "yes";
-        };
+        # onqm = {
+        #   path = "/media/onqm";
+        #   "public" = "no";
+        #   "valid users" = "christian";
+        #   "read only" = "no";
+        #   "map acl inherit" = "yes";
+        #   "inherit acls" = "yes";
+        #   "vfs objects" = "fruit acl_xattr";
+        #   "acl_xattr:default acl style" = "posix";
+        #   "access based share enum" = "yes";
+        #   # "hide unreadable" = "yes";
+        #   "smb3 unix extensions" = "yes";
+        # };
         "tm_share" = {
           "path" = "/media/tm_share";
           "valid users" = "christian";

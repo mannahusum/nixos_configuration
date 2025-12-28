@@ -92,20 +92,20 @@
     networking = {
       tempAddresses = "disabled";
       hosts = {
-        "192.168.10.252" = [
-          "alexandria.windows.catbertsen.de"
-          "alexandria.catbertsen.de"
-          "alexandria"
-        ];
-        "192.168.10.253" = [
-          "mannahusum.catbertsen.de"
-          "mannahusum"
-        ];
-        "192.168.10.254" = [
-          "hydra.catbertsen.de"
-          "calendar.catbertsen.de"
-          "gitea.catbertsen.de"
-        ];
+        # "192.168.10.252" = [
+        #   "alexandria.windows.catbertsen.de"
+        #   "alexandria.catbertsen.de"
+        #   "alexandria"
+        # ];
+        # "192.168.10.253" = [
+        #   "mannahusum.catbertsen.de"
+        #   "mannahusum"
+        # ];
+        # "192.168.10.254" = [
+        #   "hydra.catbertsen.de"
+        #   "calendar.catbertsen.de"
+        #   "gitea.catbertsen.de"
+        # ];
       };
     };
     causermount.enable = true;
