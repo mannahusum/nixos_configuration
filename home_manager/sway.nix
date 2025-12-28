@@ -17,6 +17,7 @@
     };
     modifier = "Mod4";
     shotman = "${pkgs.shotman.out}/bin/shotman";
+    bemenu = "${lib.getExe' pkgs.bemenu "bemenu-run"}";
   in {
     home.sessionVariables = {
       XKB_DEFAULT_LAYOUT = "de,de,gr";
@@ -65,6 +66,7 @@
       config = {
         inherit modifier;
 
+        menu = bemenu;
         terminal = "${pkgs.alacritty.out}/bin/alacritty";
         keybindings = lib.mkOptionDefault {
           "${modifier}+p" = "exec ${shotman} --capture window";
@@ -93,10 +95,12 @@
       [
         alacritty
         grim
-        neovide
-        wl-clipboard
+        imv
         mako
+        mpv
+        neovide
         wayland
+        wl-clipboard
         xdg-utils
       ]
       ++ (builtins.filter lib.attrsets.isDerivation (builtins.attrValues nerd-fonts));
