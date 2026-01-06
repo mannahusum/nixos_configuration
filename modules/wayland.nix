@@ -40,15 +40,15 @@
     '';
   };
 
-  my-windows11-latin-fonts = pkgs.stdenvNoCC.mkDerivation {
-    pname = "windows11-latin-fonts";
-    version = "1";
+  # my-windows11-latin-fonts = pkgs.stdenvNoCC.mkDerivation {
+  #   pname = "windows11-latin-fonts";
+  #   version = "1";
 
-    src = pkgs.requireFile {
-      url = "Via script from C:\\Windows\\fonts";
-      sha256 = "1npq2zrdbmrqjp9slw3sfkz10wqr4cbxrq3sr50magr63d5gdghy";
-    };
-  };
+  #   src = pkgs.requireFile {
+  #     url = "Via script from C:\\Windows\\fonts";
+  #     sha256 = "1npq2zrdbmrqjp9slw3sfkz10wqr4cbxrq3sr50magr63d5gdghy";
+  #   };
+  # };
 in {
   imports = [
     ./users.nix
@@ -116,6 +116,13 @@ in {
   in
     lib.mkMerge [
       (lib.mkIf (cfg.displayManager == "regreet") {
+        programs.sway = {
+          enable = true;
+          wrapperFeatures.gtk = true;
+        };
+        environment.etc."greetd/environments".text = ''
+          sway
+        '';
         services.greetd = {
           enable = true;
           settings = {
@@ -231,21 +238,16 @@ in {
         ];
       })
       {
-        environment.etc."greetd/environments".text = ''
-          sway
-        '';
-        environment.systemPackages = with pkgs; [
-          wdisplays
-          solarc-gtk-theme
-          fira-code
-        ];
-
-        programs.sway = {
-          enable = true;
-          wrapperFeatures.gtk = true;
+        environment = {
+          sessionVariables.NIXOS_OZONE_WL = "1";
+          systemPackages = with pkgs; [
+            wdisplays
+            solarc-gtk-theme
+            fira-code
+          ];
         };
-        causers.regularUserGroups = ["input"];
 
+        causers.regularUserGroups = ["input"];
         nixpkgs.config.pulseaudio = true;
       }
     ]);

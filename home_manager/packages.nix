@@ -13,6 +13,7 @@
     homePython3 = pkgs.python314.withPackages homePythonPackages;
   in {
     packages = with pkgs; [
+      adoptopenjdk-icedtea-web
       bashInteractive
       bat # cat clone
       cadaver
