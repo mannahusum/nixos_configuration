@@ -108,29 +108,30 @@
       };
     };
 
-    casshd.enable = true;
-    casaned.enable = true;
-    canginx.enable = true;
     caacme = {
       enable = true;
       credentialsfile = config.sops.templates."route53Credentials".path;
-    };
-    caxandikos = {
-      enable = true;
-      domain = "calendar.catbertsen.de";
-      passwordfile = config.sops.templates."xandikosBasicAuth".path;
     };
     cagitea = {
       enable = true;
       domain = "gitea.catbertsen.de";
     };
+    cakeyboard.enable = true;
+    canginx.enable = true;
+    casaned.enable = true;
+    casshd.enable = true;
+    causermount.enable = true;
     cawayland.enable = true;
+    caxandikos = {
+      enable = true;
+      domain = "calendar.catbertsen.de";
+      passwordfile = config.sops.templates."xandikosBasicAuth".path;
+    };
     cayubikey.enable = true;
     # environment.etc."sway/config.d/monitors.conf".text = ''
     #   output "DP-1" mode 3840x2160@30Hz pos 0 0
     #   output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
     # '';
-    cakeyboard.enable = true;
     time.timeZone = "Europe/Berlin";
     i18n = {
       defaultLocale = "de_DE.UTF-8";
@@ -171,7 +172,6 @@
 
       useHostResolvConf = lib.mkForce false;
     };
-    causermount.enable = true;
 
     environment.systemPackages = with pkgs; [
       git
