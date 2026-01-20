@@ -28,6 +28,7 @@
       home-manager
       homePython3
       inetutils
+      ipmitool
       jq
       lsof
       lsscsi
@@ -57,6 +58,7 @@
       xorg.xauth
       yarn
       yubikey-manager
+      zathura
     ];
   };
 }

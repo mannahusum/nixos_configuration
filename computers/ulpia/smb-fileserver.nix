@@ -7,12 +7,14 @@
 with lib; let
   cfg = config.services.samba;
   samba = cfg.package;
+  # nssModulesPath = config.system.nssModules.path;
   adDomain = "windows.catbertsen.de";
-  dcName = "alexandria.windows.catbertsen.de";
+  dcName = "rex.windows.catbertsen.de";
   adWorkgroup = "CATA";
-  adNetbiosName = "alexandria";
+  adNetbiosName = "ulpia";
   # staticIp = "192.168.10.252";
-  dnsForwarder = "8.8.8.8";
+  # dnsForwarder = "192.168.10.251";
+  dnsForwarder = "192.168.10.1";
   smbShare = path: {
     inherit path;
     "read only" = "no";
@@ -25,14 +27,14 @@ with lib; let
   };
 in {
   # Disable resolveconf, we're using Samba internal DNS backend
-  # environment.etc = {
-  #   "resolv.conf" = {
-  #     text = ''
-  #       search ${adDomain}
-  #       nameserver ${staticIp}
-  #     '';
-  #   };
-  # };
+  environment.etc = {
+    "resolv.conf" = {
+      text = ''
+        search ${adDomain}
+        nameserver ${dnsForwarder}
+      '';
+    };
+  };
 
   environment.systemPackages = with pkgs; [
     adcli
@@ -41,6 +43,7 @@ in {
     sssd
     krb5
     realmd
+    openldap
   ];
 
   security.krb5 = {
@@ -48,12 +51,19 @@ in {
     package = pkgs.krb5;
     settings = {
       libdefaults = {
-        udp_preference_limit = 0;
         default_realm = lib.strings.toUpper adDomain;
+        dns_lookup_realm = "false";
+        dns_lookup_kdc = "true";
+        dns_canonicalize_hostname = "true";
+        rdns = "true";
       };
       realms."${lib.strings.toUpper adDomain}" = {
-        kdc = dcName;
-        admin_server = dcName;
+        default_domain = "${lib.strings.toLower adDomain}";
+        # kdc = dcName;
+        # admin_server = dcName;
+      };
+      "domain_realm" = {
+        "${adNetbiosName}" = lib.strings.toUpper adDomain;
       };
     };
   };
@@ -67,19 +77,6 @@ in {
         "ptbtime3.ptb.de"
       ];
     };
-    kerberos_server = {
-      enable = false;
-      settings = {
-        realms."${adDomain}" = {
-          acl = [
-            {
-              principal = "Administrator";
-              access = ["add" "cpw"];
-            }
-          ];
-        };
-      };
-    };
   };
 
   # Rebuild Samba with LDAP, MDNS and Domain Controller support
@@ -87,9 +84,9 @@ in {
     (_self: super: {
       samba =
         (super.samba.override {
-          enableLDAP = true;
+          enableLDAP = false;
           enableMDNS = true;
-          enableDomainController = true;
+          enableDomainController = false;
           enableProfiling = true; # Optional for logging
           # Set pythonpath manually (bellow with overrideAttrs) as it is not set on 22.11 due to bug
         })
@@ -110,10 +107,6 @@ in {
       partOf = ["samba.target"];
 
       serviceConfig = {
-        ExecStartPre = [
-          "${pkgs.coreutils.out}/bin/chmod 600 /var/lib/acme/${toLower dcName}/key.pem"
-          "${pkgs.coreutils.out}/bin/chown root:root /var/lib/acme/${toLower dcName}/key.pem"
-        ];
         ExecStart = "${samba}/sbin/samba --foreground --no-process-group";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         LimitNOFILE = 16384;
@@ -130,7 +123,7 @@ in {
     useRoot = true;
     defaults.email = "christian@wudika.de";
     certs = {
-      "alexandria.windows.catbertsen.de" = {
+      "ulpia.windows.catbertsen.de" = {
         dnsResolver = "205.251.193.108:53";
         dnsProvider = "route53";
         # credentialsFile = "/run/windows.catbertsen.de.env";
@@ -138,21 +131,49 @@ in {
         webroot = null;
         postRun = ''
           ${pkgs.coreutils.out}/bin/chmod 600 key.pem
-          ${pkgs.coreutils.out}/bin/chown root:root key.pem
           # ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
         '';
       };
-      "alexandria.catbertsen.de" = {
+      "ulpia.catbertsen.de" = {
         dnsResolver = "205.251.194.49:53";
         dnsProvider = "route53";
         credentialsFile = config.sops.templates."route53CatbertsenCredentials".path;
         webroot = null;
         postRun = ''
           ${pkgs.coreutils.out}/bin/chmod 600 key.pem
-          ${pkgs.coreutils.out}/bin/chown root:root key.pem
           # ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
         '';
       };
+      "rex.windows.catbertsen.de" = {
+        dnsResolver = "205.251.193.108:53";
+        dnsProvider = "route53";
+        # credentialsFile = "/run/windows.catbertsen.de.env";
+        credentialsFile = config.sops.templates."route53WindowsCatbertsenCredentials".path;
+        webroot = null;
+        postRun = ''
+          ${pkgs.coreutils.out}/bin/chmod 600 key.pem
+          # ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
+        '';
+      };
+      "rex.catbertsen.de" = {
+        dnsResolver = "205.251.194.49:53";
+        dnsProvider = "route53";
+        credentialsFile = config.sops.templates."route53CatbertsenCredentials".path;
+        webroot = null;
+        postRun = ''
+          ${pkgs.coreutils.out}/bin/chmod 600 key.pem
+          # ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
+        '';
+      };
+    };
+  };
+
+  system = {
+    nssModules = [config.services.samba.package];
+    nssDatabases = {
+      hosts = ["wins"];
+      passwd = ["winbind"];
+      group = ["winbind"];
     };
   };
 
@@ -167,7 +188,7 @@ in {
           "dns forwarder" = dnsForwarder;
           "netbios name" = adNetbiosName;
           "realm" = "${toUpper adDomain}";
-          "server role" = "active directory domain controller";
+          "server role" = "member server";
           "workgroup" = adWorkgroup;
           "idmap_ldb:use rf2307" = "yes";
           "fruit:aapl" = "yes";
@@ -176,6 +197,7 @@ in {
           "tls enabled" = "yes";
           "tls keyfile" = "/var/lib/acme/${toLower dcName}/key.pem";
           "tls verify peer" = "ca_and_name_if_available";
+          "winbind nss info" = "rfc2307";
         };
         homes = {
           "read only" = "no";
@@ -196,19 +218,19 @@ in {
         wii = smbShare "/media/games/wii";
         video = smbShare "/media/video";
         ultrastar = smbShare "/media/ultrastar";
-        # onqm = {
-        #   path = "/media/onqm";
-        #   "public" = "no";
-        #   "valid users" = "christian";
-        #   "read only" = "no";
-        #   "map acl inherit" = "yes";
-        #   "inherit acls" = "yes";
-        #   "vfs objects" = "fruit acl_xattr";
-        #   "acl_xattr:default acl style" = "posix";
-        #   "access based share enum" = "yes";
-        #   # "hide unreadable" = "yes";
-        #   "smb3 unix extensions" = "yes";
-        # };
+        onqm = {
+          path = "/media/onqm";
+          "public" = "no";
+          "valid users" = "christian";
+          "read only" = "no";
+          "map acl inherit" = "yes";
+          "inherit acls" = "yes";
+          "vfs objects" = "fruit acl_xattr";
+          "acl_xattr:default acl style" = "posix";
+          "access based share enum" = "yes";
+          # "hide unreadable" = "yes";
+          "smb3 unix extensions" = "yes";
+        };
         "tm_share" = {
           "path" = "/media/tm_share";
           "valid users" = "christian";
@@ -255,5 +277,9 @@ in {
     };
   };
 
-  networking.firewall.extraCommands = ''iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns'';
+  networking = {
+    hostName = adNetbiosName;
+    domain = adDomain;
+    firewall.extraCommands = ''iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns'';
+  };
 }

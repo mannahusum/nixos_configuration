@@ -10,6 +10,7 @@
 }: {
   imports = [
     ./bashprofile.nix
+    ./cagit.nix
     ./cagpg.nix
     ./cassh.nix
     ./chrome.nix
@@ -30,9 +31,7 @@
   ca = {
     bash.enable = true;
     chrome.enable = true;
-    ssh = {
-      enable = true;
-    };
+    git.enable = true;
     gpg = {
       inherit forwardTo createForwardPath pinentry withExtraSocket;
       enable = true;
@@ -42,6 +41,9 @@
       backgroundservice = true;
     };
     pass.enable = true;
+    ssh = {
+      enable = true;
+    };
   };
 
   home.stateVersion = "24.11";

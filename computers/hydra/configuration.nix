@@ -11,6 +11,7 @@
     ../../modules/gitea.nix
     ../../modules/keyboard.nix
     ../../modules/nginx.nix
+    ../../modules/pixiecore.nix
     (modulesPath + "/profiles/base.nix")
     ../../modules/saned.nix
     ../../modules/sshd.nix
@@ -118,6 +119,7 @@
     };
     cakeyboard.enable = true;
     canginx.enable = true;
+    capixiecore.enable = true;
     casaned.enable = true;
     casshd.enable = true;
     causermount.enable = true;
@@ -144,7 +146,7 @@
       firewall.enable = false;
       nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       enableIPv6 = true;
-      hostId = "d22d38ba";
+      hostId = "b800626c";
       hostName = "hydra";
       tempAddresses = "disabled";
       # interfaces.enp2s0 = {

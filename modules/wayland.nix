@@ -5,7 +5,7 @@
   ...
 }: let
   cfg = config.cawayland;
-    
+
   windows-theme-gtk = pkgs.stdenv.mkDerivation {
     name = "B00merang-Project-Windows-Theme";
     version = "3.2.1";
@@ -39,11 +39,9 @@
       cp -r * "$out/share/icons/Windows-10"
     '';
   };
-
   # my-windows11-latin-fonts = pkgs.stdenvNoCC.mkDerivation {
   #   pname = "windows11-latin-fonts";
   #   version = "1";
-
   #   src = pkgs.requireFile {
   #     url = "Via script from C:\\Windows\\fonts";
   #     sha256 = "1npq2zrdbmrqjp9slw3sfkz10wqr4cbxrq3sr50magr63d5gdghy";
@@ -111,7 +109,8 @@ in {
     '';
     myswaycommand = pkgs.writeShellScriptBin "mysway" ''
       ${cfg.keyboardSettings}
-      ${pkgs.sway.out}/bin/sway --config ${myswayconfig}
+      ${pkgs.sway.out}/bin/sway --config ${myswayconfig} --unsupported-gpu
+      ${pkgs.coreutils.out}/bin/sleep 60
     '';
   in
     lib.mkMerge [
@@ -209,12 +208,14 @@ in {
                   (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "Alacritty.desktop"))
                   (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "org.gnome.Settings.desktop"))
                 ];
+                update-notifier-project-version = lib.gvariant.mkInt32 69;
               };
               "org/gnome/shell/extensions/topicons" = {
                 tray-pos = "Center";
                 tray-order = "2";
               };
               "org/gnome/shell/extensions/dash-to-panel" = {
+                extended-version = lib.gvariant.mkInt32 72;
                 dot-style-focused = "DOTS";
                 dot-style-unfocused = "METRO";
                 multi-monitors = false;
@@ -226,9 +227,19 @@ in {
               "org/gnome/shell/extensions/user-theme" = {
                 name = "Windows-10";
               };
+              "org/gnome/shell" = {
+                welcome-dialog-last-shown-version = "49.2";
+              };
+              "org/gnome/desktop/a11y" = {
+                always-show-universal-access-status = true;
+              };
+              "org/gnome/desktop/a11y/applications" = {
+                screen-keyboard-enabled = true;
+              };
               "org/gnome/desktop/interface" = {
                 gtk-theme = "Windows-10";
                 icon-theme = "Windows-10";
+                toolkit-accessibility = true;
               };
               "org/gnome/desktop/wm/preferences" = {
                 button-layout = ":minimize,maximize,close";

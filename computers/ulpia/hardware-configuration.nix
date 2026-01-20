@@ -14,11 +14,10 @@
 
   boot = {
     initrd = {
-      availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "amdgpu"];
-      kernelModules = ["amdgpu"];
+      availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "ie31200_edac" "intel_pch_thermal"];
       systemd.enable = true;
     };
-    kernelModules = ["kvm-amd"];
+    kernelModules = ["kvm-intel"];
     extraModulePackages = [];
   };
 
@@ -26,31 +25,16 @@
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-  networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp2s0.useDHCP = lib.mkDefault true;
-  # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
+  networking.useDHCP = lib.mkDefault false;
+  # networking.interfaces.br0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.eth1.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  services.xserver.videoDrivers = ["amdgpu"];
-
   hardware = {
-    cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+    cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
     graphics = {
       enable = true;
-      extraPackages = with pkgs; [
-        libvdpau-va-gl
-      ];
-      extraPackages32 = with pkgs; [
-        driversi686Linux.libvdpau-va-gl
-      ];
     };
   };
-  environment = {
-    systemPackages = [pkgs.vulkan-validation-layers];
-    variables = {
-      WLR_RENDERER = "vulkan";
-    };
-  };
-  programs.gamemode.enable = true;
 }

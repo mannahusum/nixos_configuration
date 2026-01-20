@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   modulesPath,
   overlays,
@@ -138,10 +137,10 @@
     networking = {
       firewall.enable = false;
       networkmanager.enable = true;
-      hostId = "a2d79e48";
+      hostId = "31c099d4";
       nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       enableIPv6 = true;
-      hostName = "ulysses";
+      hostName = "odysseus";
 
       useHostResolvConf = lib.mkForce false;
     };

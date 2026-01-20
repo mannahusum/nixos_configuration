@@ -8,11 +8,11 @@ with lib; let
   cfg = config.services.samba;
   samba = cfg.package;
   adDomain = "windows.catbertsen.de";
-  dcName = "alexandria.windows.catbertsen.de";
+  dcName = "ulpia.windows.catbertsen.de";
   adWorkgroup = "CATA";
-  adNetbiosName = "alexandria";
-  # staticIp = "192.168.10.252";
-  dnsForwarder = "8.8.8.8";
+  adNetbiosName = "ulpia";
+  staticIp = "192.168.10.252";
+  dnsForwarder = "192.168.10.1";
   smbShare = path: {
     inherit path;
     "read only" = "no";
@@ -25,14 +25,14 @@ with lib; let
   };
 in {
   # Disable resolveconf, we're using Samba internal DNS backend
-  # environment.etc = {
-  #   "resolv.conf" = {
-  #     text = ''
-  #       search ${adDomain}
-  #       nameserver ${staticIp}
-  #     '';
-  #   };
-  # };
+  environment.etc = {
+    "resolv.conf" = {
+      text = ''
+        search ${adDomain}
+        nameserver ${staticIp}
+      '';
+    };
+  };
 
   environment.systemPackages = with pkgs; [
     adcli
@@ -110,10 +110,6 @@ in {
       partOf = ["samba.target"];
 
       serviceConfig = {
-        ExecStartPre = [
-          "${pkgs.coreutils.out}/bin/chmod 600 /var/lib/acme/${toLower dcName}/key.pem"
-          "${pkgs.coreutils.out}/bin/chown root:root /var/lib/acme/${toLower dcName}/key.pem"
-        ];
         ExecStart = "${samba}/sbin/samba --foreground --no-process-group";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         LimitNOFILE = 16384;
@@ -130,27 +126,23 @@ in {
     useRoot = true;
     defaults.email = "christian@wudika.de";
     certs = {
-      "alexandria.windows.catbertsen.de" = {
+      "ulpia.windows.catbertsen.de" = {
         dnsResolver = "205.251.193.108:53";
         dnsProvider = "route53";
         # credentialsFile = "/run/windows.catbertsen.de.env";
         credentialsFile = config.sops.templates."route53WindowsCatbertsenCredentials".path;
         webroot = null;
         postRun = ''
-          ${pkgs.coreutils.out}/bin/chmod 600 key.pem
-          ${pkgs.coreutils.out}/bin/chown root:root key.pem
-          # ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
+          ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
         '';
       };
-      "alexandria.catbertsen.de" = {
+      "ulpia.catbertsen.de" = {
         dnsResolver = "205.251.194.49:53";
         dnsProvider = "route53";
         credentialsFile = config.sops.templates."route53CatbertsenCredentials".path;
         webroot = null;
         postRun = ''
-          ${pkgs.coreutils.out}/bin/chmod 600 key.pem
-          ${pkgs.coreutils.out}/bin/chown root:root key.pem
-          # ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
+          ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
         '';
       };
     };
@@ -174,7 +166,7 @@ in {
           "tls cafile" = "/etc/ssl/certs/ca-certificates.crt";
           "tls certfile" = "/var/lib/acme/${toLower dcName}/cert.pem";
           "tls enabled" = "yes";
-          "tls keyfile" = "/var/lib/acme/${toLower dcName}/key.pem";
+          "tls keyfile" = "/var/lib/acme/${toLower dcName}/key4root.pem";
           "tls verify peer" = "ca_and_name_if_available";
         };
         homes = {
@@ -196,19 +188,19 @@ in {
         wii = smbShare "/media/games/wii";
         video = smbShare "/media/video";
         ultrastar = smbShare "/media/ultrastar";
-        # onqm = {
-        #   path = "/media/onqm";
-        #   "public" = "no";
-        #   "valid users" = "christian";
-        #   "read only" = "no";
-        #   "map acl inherit" = "yes";
-        #   "inherit acls" = "yes";
-        #   "vfs objects" = "fruit acl_xattr";
-        #   "acl_xattr:default acl style" = "posix";
-        #   "access based share enum" = "yes";
-        #   # "hide unreadable" = "yes";
-        #   "smb3 unix extensions" = "yes";
-        # };
+        onqm = {
+          path = "/media/onqm";
+          "public" = "no";
+          "valid users" = "christian";
+          "read only" = "no";
+          "map acl inherit" = "yes";
+          "inherit acls" = "yes";
+          "vfs objects" = "fruit acl_xattr";
+          "acl_xattr:default acl style" = "posix";
+          "access based share enum" = "yes";
+          # "hide unreadable" = "yes";
+          "smb3 unix extensions" = "yes";
+        };
         "tm_share" = {
           "path" = "/media/tm_share";
           "valid users" = "christian";

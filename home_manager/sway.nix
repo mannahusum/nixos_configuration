@@ -25,7 +25,6 @@
       XKB_DEFAULT_VARIANT = "neo,,";
       XKB_DEFAULT_OPTIONS = ",,";
       NIXOS_OZONE_WL = 1;
-      WLR_RENDERER = "vulkan";
     };
     programs.swaylock = {
       enable = true;

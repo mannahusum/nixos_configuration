@@ -202,7 +202,7 @@
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-utsushi overlays sops-nix system;
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-utsushi overlays self sops-nix system;
             };
           };
         alexandria = let
@@ -223,6 +223,58 @@
                   lanzaboote = {
                     enable = true;
                     pkiBundle = "/etc/secureboot";
+                  };
+                };
+              }
+            ];
+            specialArgs = {
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+            };
+          };
+        ulpia = let
+          system = "x86_64-linux";
+        in
+          inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ./computers/ulpia/configuration.nix
+              ./computers/ulpia/hardware-configuration.nix
+              ./computers/ulpia/sops.nix
+              disko.nixosModules.disko
+              lanzaboote.nixosModules.lanzaboote
+              {
+                boot = {
+                  bootspec.enable = true;
+                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+                  # loader.systemd-boot.enable = true;
+                  lanzaboote = {
+                    enable = true;
+                    pkiBundle = "/run/secrets/secureboot";
+                  };
+                };
+              }
+            ];
+            specialArgs = {
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+            };
+          };
+        odysseus = let
+          system = "x86_64-linux";
+        in
+          inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ./computers/odysseus/configuration.nix
+              nixos-hardware.nixosModules.microsoft-surface-pro-intel
+              disko.nixosModules.disko
+              lanzaboote.nixosModules.lanzaboote
+              {
+                boot = {
+                  bootspec.enable = true;
+                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+                  lanzaboote = {
+                    enable = true;
+                    pkiBundle = "/var/lib/sbctl";
                   };
                 };
               }

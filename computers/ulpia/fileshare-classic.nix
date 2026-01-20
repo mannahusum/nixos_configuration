@@ -8,9 +8,9 @@ with lib; let
   cfg = config.services.samba;
   samba = cfg.package;
   adDomain = "windows.catbertsen.de";
-  dcName = "alexandria.windows.catbertsen.de";
+  dcName = "ulpia.windows.catbertsen.de";
   adWorkgroup = "CATA";
-  adNetbiosName = "alexandria";
+  adNetbiosName = "ulpia";
   # staticIp = "192.168.10.252";
   dnsForwarder = "8.8.8.8";
   smbShare = path: {
@@ -130,7 +130,7 @@ in {
     useRoot = true;
     defaults.email = "christian@wudika.de";
     certs = {
-      "alexandria.windows.catbertsen.de" = {
+      "ulpia.windows.catbertsen.de" = {
         dnsResolver = "205.251.193.108:53";
         dnsProvider = "route53";
         # credentialsFile = "/run/windows.catbertsen.de.env";
@@ -142,7 +142,7 @@ in {
           # ${pkgs.coreutils.out}/bin/install -o root -g root -m 600 key.pem key4root.pem
         '';
       };
-      "alexandria.catbertsen.de" = {
+      "ulpia.catbertsen.de" = {
         dnsResolver = "205.251.194.49:53";
         dnsProvider = "route53";
         credentialsFile = config.sops.templates."route53CatbertsenCredentials".path;
