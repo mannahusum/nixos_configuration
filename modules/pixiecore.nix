@@ -2,6 +2,11 @@
   config,
   lib,
   nixpkgs,
+  home-manager,
+  nixos-luks-yk,
+  nixpkgs-utsushi,
+  overlays,
+  sops-nix,
   ...
 }: let
   cfg = config.capixiecore;
@@ -43,22 +48,30 @@ in {
           pkgs,
           lib,
           modulesPath,
+          overlays,
           ...
         }: {
           imports = [
             (modulesPath + "/installer/netboot/netboot-minimal.nix")
+            ./users.nix
           ];
           config = {
-            ## Some useful options for setting up a new system
-            # services.getty.autologinUser = lib.mkForce "root";
-            # users.users.root.openssh.authorizedKeys.keys = [ ... ];
-            # console.keyMap = "de";
-            # hardware.video.hidpi.enable = true;
+            nixpkgs = {
+              inherit overlays;
+              config.allowUnfreePredicate = pkg:
+                builtins.elem (lib.getName pkg) [
+                  "google-chrome"
+                ];
+            };
 
             system.stateVersion = config.system.nixos.release;
           };
         })
       ];
+      specialArgs = {
+        inherit home-manager nixos-luks-yk nixpkgs nixpkgs-utsushi overlays sops-nix;
+        system = "x86_64-linux";
+      };
     };
   in
     lib.mkIf cfg.enable {

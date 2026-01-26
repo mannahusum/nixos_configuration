@@ -44,12 +44,10 @@
       };
     };
     nix = {
-      extraOptions = ''
-        keep-outputs = true
-        keep-derivations = true
-        experimental-features = nix-command flakes
-      '';
       settings = {
+        keep-outputs = true;
+        keep-derivations = true;
+        experimental-features = "nix-command flakes";
         substituters = [
           "https://nix-community.cachix.org"
         ];
@@ -73,7 +71,7 @@
         ipv6 = true;
       };
       fwupd = {
-        enable= true;
+        enable = true;
       };
     };
 
@@ -110,16 +108,50 @@
     };
     causermount.enable = true;
 
+    programs = {
+      bat.enable = true;
+      cdemu.enable = true;
+      direnv = {
+        enable = true;
+        enableBashIntegration = true;
+        nix-direnv.enable = true;
+      };
+      flashprog.enable = true;
+      fuse.enable = true;
+      git.enable = true;
+      iotop.enable = true;
+      java = {
+        binfmt = true;
+        enable = true;
+      };
+      less.enable = true;
+      minipro.enable = true;
+      nix-index = {
+        enable = true;
+        enableBashIntegration = true;
+      };
+      screen.enable = true;
+      tcpdump.enable = true;
+      vivid = {
+        enable = true;
+        theme = "solarized-dark";
+      };
+      yazi = {
+        enable = true;
+      };
+      # zoom-us.enable = true;
+    };
+
     environment.systemPackages = with pkgs; [
+      file
       git
-      mokutil
-      sbctl
-      tpm2-tss
       git-crypt
       neovim
+      psmisc
       ripgrep
+      sbctl
+      tpm2-tss
       xterm # for resize command
-      file
     ];
   };
 })

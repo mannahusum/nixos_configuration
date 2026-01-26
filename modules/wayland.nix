@@ -174,81 +174,109 @@ in {
           windows-theme-icons
         ];
         hardware.sensor.iio.enable = true;
-        programs.dconf.enable = true;
-        programs.dconf.profiles.user.databases = [
-          {
-            # lockAll = true; # prevents overriding
-            settings = {
-              "org/gnome/settings-daemon/plugins/housekeeping" = {
-                "donation-reminder-enabled" = false;
-              };
-              "org/gnome/shell" = {
-                enabled-extensions = [
-                  "appindicatorsupport@rgcjonas.gmail.com"
-                  "arcmenu@arcmenu.com"
-                  "dash-to-panel@jderose9.github.com"
-                  "ding@rastersoft.com"
-                  "topiconsfix@aleskva@devnullmail.com"
-                  "user-theme@gnome-shell-extensions.gcampax.github.com"
-                ];
-                favorite-apps = [
-                  "org.gnome.Nautilus.desktop"
-                  "google-chrome.desktop"
-                  "Alacritty.desktop"
-                  "neovide.desktop"
-                ];
-              };
-              "org/gnome/shell/extensions/arcmenu" = {
-                position-in-panel = "Left";
-                multi-monitor = true;
-                menu-layout = "Windows";
-                menu-button-appearance = "Icon";
-                windows-layout-extra-shortcuts = lib.gvariant.mkArray [
-                  (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "org.gnome.Nautilus.desktop"))
-                  (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "Alacritty.desktop"))
-                  (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "org.gnome.Settings.desktop"))
-                ];
-                update-notifier-project-version = lib.gvariant.mkInt32 69;
-              };
-              "org/gnome/shell/extensions/topicons" = {
-                tray-pos = "Center";
-                tray-order = "2";
-              };
-              "org/gnome/shell/extensions/dash-to-panel" = {
-                extended-version = lib.gvariant.mkInt32 72;
-                dot-style-focused = "DOTS";
-                dot-style-unfocused = "METRO";
-                multi-monitors = false;
-                panel-anchors = lib.gvariant.mkDictionaryEntry "LGD-0x100000a1" (lib.gvariant.mkVariant "MIDDLE");
-                panel-element-positions = ''{"LGD-0x100000a1":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"FUS-YV9S836192":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"FUS-YV9S827794":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}]}'';
-                panel-position = "BOTTOM";
-                location-clock = "STATUSRIGHT";
-              };
-              "org/gnome/shell/extensions/user-theme" = {
-                name = "Windows-10";
-              };
-              "org/gnome/shell" = {
-                welcome-dialog-last-shown-version = "49.2";
-              };
-              "org/gnome/desktop/a11y" = {
-                always-show-universal-access-status = true;
-              };
-              "org/gnome/desktop/a11y/applications" = {
-                screen-keyboard-enabled = true;
-              };
-              "org/gnome/desktop/interface" = {
-                gtk-theme = "Windows-10";
-                icon-theme = "Windows-10";
-                toolkit-accessibility = true;
-              };
-              "org/gnome/desktop/wm/preferences" = {
-                button-layout = ":minimize,maximize,close";
-              };
-            };
-          }
-        ];
+        programs = {
+          dconf = {
+            enable = true;
+            profiles.user.databases = [
+              {
+                # lockAll = true; # prevents overriding
+                settings = {
+                  "org/gnome/settings-daemon/plugins/housekeeping" = {
+                    "donation-reminder-enabled" = false;
+                  };
+                  "org/gnome/shell" = {
+                    enabled-extensions = [
+                      "appindicatorsupport@rgcjonas.gmail.com"
+                      "arcmenu@arcmenu.com"
+                      "dash-to-panel@jderose9.github.com"
+                      "ding@rastersoft.com"
+                      "topiconsfix@aleskva@devnullmail.com"
+                      "user-theme@gnome-shell-extensions.gcampax.github.com"
+                    ];
+                    favorite-apps = [
+                      "org.gnome.Nautilus.desktop"
+                      "google-chrome.desktop"
+                      "Alacritty.desktop"
+                      "neovide.desktop"
+                    ];
+                  };
+                  "org/gnome/shell/extensions/arcmenu" = {
+                    position-in-panel = "Left";
+                    multi-monitor = true;
+                    menu-layout = "Windows";
+                    menu-button-appearance = "Icon";
+                    windows-layout-extra-shortcuts = lib.gvariant.mkArray [
+                      (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "org.gnome.Nautilus.desktop"))
+                      (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "Alacritty.desktop"))
+                      (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "org.gnome.Settings.desktop"))
+                    ];
+                    update-notifier-project-version = lib.gvariant.mkInt32 69;
+                  };
+                  "org/gnome/shell/extensions/topicons" = {
+                    tray-pos = "Center";
+                    tray-order = "2";
+                  };
+                  "org/gnome/shell/extensions/dash-to-panel" = {
+                    extended-version = lib.gvariant.mkInt32 72;
+                    dot-style-focused = "DOTS";
+                    dot-style-unfocused = "METRO";
+                    multi-monitors = false;
+                    panel-anchors = lib.gvariant.mkDictionaryEntry "LGD-0x100000a1" (lib.gvariant.mkVariant "MIDDLE");
+                    panel-element-positions = ''{"LGD-0x100000a1":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"FUS-YV9S836192":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"FUS-YV9S827794":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":true,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}]}'';
+                    panel-position = "BOTTOM";
+                    location-clock = "STATUSRIGHT";
+                  };
+                  "org/gnome/shell/extensions/user-theme" = {
+                    name = "Windows-10";
+                  };
+                  "org/gnome/shell" = {
+                    welcome-dialog-last-shown-version = "49.2";
+                  };
+                  "org/gnome/desktop/a11y" = {
+                    always-show-universal-access-status = true;
+                  };
+                  "org/gnome/desktop/a11y/applications" = {
+                    screen-keyboard-enabled = true;
+                  };
+                  "org/gnome/desktop/interface" = {
+                    gtk-theme = "Windows-10";
+                    icon-theme = "Windows-10";
+                    toolkit-accessibility = true;
+                  };
+                  "org/gnome/desktop/wm/preferences" = {
+                    button-layout = ":minimize,maximize,close";
+                  };
+                };
+              }
+            ];
+          };
+          gnome-disks.enable = true;
+        };
       })
       {
+        programs = {
+          ausweisapp = {
+            enable = true;
+            openFirewall = true;
+          };
+          browserpass.enable = true;
+          # captive-browser.enable = true;
+          firefox = {
+            enable = true;
+            languagePacks = [
+              "de"
+              "en-US"
+              "es-ES"
+              "fi"
+              "fr"
+              "sv-SE"
+            ];
+          };
+          system-config-printer.enable = true;
+          thunderbird.enable = true;
+          traceroute.enable = true;
+          wshowkeys.enable = true;
+        };
         environment = {
           sessionVariables.NIXOS_OZONE_WL = "1";
           systemPackages = with pkgs; [

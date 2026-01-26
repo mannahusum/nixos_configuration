@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   modulesPath,
   overlays,
@@ -16,6 +15,7 @@
     ../../modules/wayland.nix
     ../../modules/yubikey.nix
     ../shared-config.nix
+    ../disko-config.nix
     ./sops.nix
     sops-nix.nixosModules.sops
   ];
@@ -46,8 +46,12 @@
       sensor.iio.enable = true;
       microsoft-surface.kernelVersion = "stable";
     };
-    disko.devices = import ./disko-config.nix {
-      inherit lib;
+    cadrives = {
+      enable = true;
+      system = ["/dev/disk/by-id/nvme-KBG30ZPZ512G_TOSHIBA_494Y1154YMMS"];
+      homesFor = ["christian" "marianne"];
+      swapsize = "32G";
+      espsize = "1G";
     };
     nixpkgs = {
       inherit overlays;
@@ -77,11 +81,6 @@
       };
     };
     nix = {
-      extraOptions = ''
-        keep-outputs = true
-        keep-derivations = true
-        experimental-features = nix-command flakes
-      '';
       settings = {
         substituters = [
           # "http://mannahusum.catbertsen.de:5000/"

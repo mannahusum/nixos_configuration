@@ -15,6 +15,7 @@
     ../../modules/wayland.nix
     ../../modules/yubikey.nix
     ../shared-config.nix
+    ../disko-config.nix
     ./sops.nix
     sops-nix.nixosModules.sops
   ];
@@ -45,9 +46,16 @@
       sensor.iio.enable = true;
       microsoft-surface.kernelVersion = "stable";
     };
-    disko.devices = import ./disko-config.nix {
-      inherit lib;
+    cadrives = {
+      enable = true;
+      system = ["/dev/disk/by-id/nvme-KBG30ZPZ512G_TOSHIBA_988Y10GMYMMS"];
+      homesFor = ["christian" "marianne"];
+      swapsize = "32G";
+      espsize = "1G";
     };
+    # disko.devices = import ./disko-config.nix {
+    #   inherit lib;
+    # };
     nixpkgs = {
       inherit overlays;
       config.allowUnfreePredicate = pkg:
@@ -76,11 +84,6 @@
       };
     };
     nix = {
-      extraOptions = ''
-        keep-outputs = true
-        keep-derivations = true
-        experimental-features = nix-command flakes
-      '';
       settings = {
         substituters = [
           # "http://mannahusum.catbertsen.de:5000/"

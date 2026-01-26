@@ -258,6 +258,33 @@
               inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
             };
           };
+        alexandretta = let
+          system = "x86_64-linux";
+        in
+          inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ./computers/alexandretta/configuration.nix
+              ./computers/alexandretta/hardware-configuration.nix
+              ./computers/alexandretta/sops.nix
+              disko.nixosModules.disko
+              #lanzaboote.nixosModules.lanzaboote
+              {
+                boot = {
+                  # bootspec.enable = true;
+                  # loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+                  loader.systemd-boot.enable = true;
+                  # lanzaboote = {
+                  #   enable = true;
+                  #   pkiBundle = "/run/secrets/secureboot";
+                  # };
+                };
+              }
+            ];
+            specialArgs = {
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+            };
+          };
         odysseus = let
           system = "x86_64-linux";
         in

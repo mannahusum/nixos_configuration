@@ -1,31 +1,26 @@
 {
-  lib,
   overlays,
   pkgs,
   self,
   ...
 }: {
   imports = [
-    # sops-nix.nixosModules.sops
-    # ./sops.nix
-    # (modulesPath + "/profiles/base.nix")
-    # ../../modules/acme.nix
+    ../shared-config.nix
     ../../modules/keyboard.nix
     ../../modules/sshd.nix
     ../../modules/saned.nix
-    # ../../modules/nginx.nix
-    # ../../modules/yubikey.nix
-    # ../../modules/system_administration/debug.nix
-    # ../../modules/users.nix
-    # ./fileshare-classic.nix
-    # ./smb-fileserver.nix
   ];
 
   nixpkgs = {
     inherit overlays;
+
+    # allowUnfree is required to install some packages that are not "free" software.
+    config.allowUnfree = true;
+
+    # The platform the configuration will be used on.
+    hostPlatform = "aarch64-darwin";
   };
 
-  system.primaryUser = "christianalbertsen";
   cakeyboard.enable = true;
   casshd.enable = true;
 
@@ -68,12 +63,9 @@
       }
     ];
     settings = {
-      experimental-features = "nix-command flakes";
       system-features = ["nixos-test" "apple-virt"];
+      extra-platforms = ["x86_64-darwin" "aarch64-darwin"];
     };
-    extraOptions = ''
-      extra-platforms = x86_64-darwin aarch64-darwin
-    '';
     linux-builder = {
       enable = true;
       config = {
@@ -112,6 +104,8 @@
   };
 
   system = {
+    primaryUser = "christianalbertsen";
+
     # Set Git commit hash for darwin-version.
     configurationRevision = self.rev or self.dirtyRev or null;
 
@@ -127,13 +121,5 @@
     #   screencapture.location = "~/Pictures/screenshots";
     #   screensaver.askForPasswordDelay = 10; # in seconds
     # };
-  };
-
-  nixpkgs = {
-    # allowUnfree is required to install some packages that are not "free" software.
-    config.allowUnfree = true;
-
-    # The platform the configuration will be used on.
-    hostPlatform = "aarch64-darwin";
   };
 }

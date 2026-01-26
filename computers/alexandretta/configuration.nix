@@ -30,19 +30,11 @@
   config = {
     cadrives = {
       enable = true;
-      boot = "/dev/disk/by-id/usb-Swissbit_USB_Flash_Drive_601924969200008C-0:0";
-      system = [
-        "/dev/disk/by-id/nvme-Lexar_SSD_NM620_2TB_QBS830R004175P1125"
-        "/dev/disk/by-id/nvme-Lexar_SSD_NM620_2TB_QBS830R000758P1125"
-      ];
-      storage = [
-        "/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL28WN0G"
-        "/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL2E4EBQ"
-        "/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL2E4HML"
-        "/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL2EFR06"
-      ];
+      boot = "/dev/disk/by-id/usb-Swissbit_USB_Flash_Drive_601924969200009D-0:0";
+      system = ["/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XA16328H"];
+      storage = ["/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL287GM9"];
       swapsize = "172G";
-      l2arcsize = "1024G";
+      l2arcsize = "512G";
       espsize = "1G";
       homesFor = ["christian" "marianne"];
     };
@@ -117,12 +109,12 @@
       enable = true;
       links = {
         "20-persistent-net-name-eth0" = {
-          matchConfig.PermanentMACAddress = "00:1e:67:54:16:8a";
+          matchConfig.PermanentMACAddress = "00:1e:67:54:25:6c";
 
           linkConfig.Name = "eth0";
         };
         "20-persistent-net-name-eth1" = {
-          matchConfig.PermanentMACAddress = "00:1e:67:54:16:8b";
+          matchConfig.PermanentMACAddress = "00:1e:67:54:25:6d";
           linkConfig.Name = "eth1";
         };
         "25-br0" = {
@@ -162,7 +154,7 @@
       };
     };
 
-    # containers.rex = {
+    # containers.regina = {
     #   privateNetwork = true;
     #   hostBridge = "br0";
     #   localAddress = "192.168.10.251/24";
@@ -187,8 +179,8 @@
     # };
 
     networking = {
-      hostId = "d22d38ba";
-      hostName = "ulpia";
+      hostId = "16c516f2";
+      hostName = "alexandretta";
       tempAddresses = "disabled";
     };
 
@@ -211,6 +203,7 @@
         file
         git
         git-crypt
+        ipmitool
         mkvpkgs.makemkv
         neovim
         ripgrep
