@@ -38,13 +38,6 @@
       espsize = "1G";
       homesFor = ["christian" "marianne"];
     };
-    nixpkgs = {
-      inherit overlays;
-      config.allowUnfreePredicate = pkg:
-        builtins.elem (lib.getName pkg) [
-          "google-chrome"
-        ];
-    };
     boot = {
       supportedFilesystems = ["zfs"];
       loader.efi = {
@@ -71,8 +64,6 @@
     nix = {
       settings = {
         substituters = [
-          # "https://hydra.catbertsen.de:5000/"
-          # "http://mannahusum.catbertsen.de:5000/"
           "https://nix-community.cachix.org"
         ];
         trusted-public-keys = [

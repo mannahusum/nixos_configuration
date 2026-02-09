@@ -202,7 +202,7 @@
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-utsushi overlays self sops-nix system;
+              inherit home-manager nixos-luks-yk nixos-anywhere nixpkgs nixpkgs-utsushi overlays self sops-nix system;
             };
           };
         alexandria = let
@@ -246,10 +246,8 @@
                 boot = {
                   bootspec.enable = true;
                   loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                  # loader.systemd-boot.enable = true;
                   lanzaboote = {
                     enable = true;
-                    pkiBundle = "/run/secrets/secureboot";
                   };
                 };
               }

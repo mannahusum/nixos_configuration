@@ -52,6 +52,7 @@
 
       tldr
       units
+      unrar
       unzip
       usbutils
       wipe

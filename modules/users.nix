@@ -112,8 +112,8 @@ in {
       };
     };
   in
-    if lib.strings.hasSuffix "-linux" system
-    then {
+  lib.mkMerge [
+    (lib.mkIf (lib.strings.hasSuffix "-linux" system) {
       users = {
         users = builtins.listToAttrs (
           map (
@@ -170,6 +170,9 @@ in {
 
       security.sudo.wheelNeedsPassword = false;
       nix.settings.trusted-users = ["root" "christian"];
+    })
+    {
+      users.users.root.openssh.authorizedKeys.keys = pkgs.testing_all_ssh_public_keys;
     }
-    else {};
+  ];
 }

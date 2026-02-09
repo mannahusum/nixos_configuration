@@ -1,6 +1,7 @@
 ({
   modulesPath,
   lib,
+  overlays,
   pkgs,
   ...
 }: {
@@ -19,10 +20,14 @@
   ];
 
   config = {
-    nixpkgs.config.allowUnfreePredicate = pkg:
-      builtins.elem (lib.getName pkg) [
-        "google-chrome"
-      ];
+    nixpkgs = {
+      inherit overlays;
+      config.allowUnfreePredicate = pkg:
+        builtins.elem (lib.getName pkg) [
+          "google-chrome"
+          "unrar"
+        ];
+    };
     boot = {
       supportedFilesystems = ["zfs"];
       loader.efi = {
