@@ -170,6 +170,21 @@
       useHostResolvConf = lib.mkForce false;
     };
 
+    services.printing = {
+      enable = true;
+    };
+    hardware.printers = {
+      ensurePrinters = [
+        {
+          name = "kyocera5021cdw";
+          location = "Yorckstraße 38, Arbeitszimmer";
+          deviceUri = "dnssd://Kyocera%20ECOSYS%20P5021cdw._ipp._tcp.local/?uuid=4509a320-0061-004d-0036-0025074fb3d9";
+          model = "everywhere";
+        }
+      ];
+      ensureDefaultPrinter = "kyocera5021cdw";
+    };
+
     environment.systemPackages = with pkgs; [
       git
       mokutil
