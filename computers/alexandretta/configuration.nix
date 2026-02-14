@@ -2,7 +2,6 @@
   lib,
   modulesPath,
   nixpkgs-makemkv,
-  overlays,
   pkgs,
   sops-nix,
   system,
@@ -15,6 +14,7 @@
     ../shared-config.nix
     ../disko-config.nix
     ../../modules/acme.nix
+    ../../modules/arm.nix
     ../../modules/keyboard.nix
     ../../modules/wayland.nix
     ../../modules/sshd.nix
@@ -28,6 +28,7 @@
   ];
 
   config = {
+    caarm.enable = true;
     cadrives = {
       enable = true;
       boot = "/dev/disk/by-id/usb-Swissbit_USB_Flash_Drive_601924969200009D-0:0";
@@ -71,18 +72,6 @@
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         ];
       };
-    };
-    services.minidlna = {
-      enable = true;
-      settings = {
-        notify_interval = 60;
-        friendly_name = "Ulpia";
-        media_dir = [
-          "V,/media/video"
-        ];
-        inotify = "yes";
-      };
-      openFirewall = true;
     };
     casshd.enable = true;
     cawayland.enable = true;
@@ -175,9 +164,28 @@
       tempAddresses = "disabled";
     };
 
-    services.zfs.autoSnapshot = {
-      enable = true;
-      flags = "-k -p -u";
+    services = {
+      fwupd = {
+        enable = true;
+        extraRemotes = [ "lvfs-testing" ];
+        uefiCapsuleSettings.DisableCapsuleUpdateOnDisk = true;
+      };
+      minidlna = {
+        enable = true;
+        settings = {
+          notify_interval = 60;
+          friendly_name = "Alexandretta";
+          media_dir = [
+            "V,/media/video"
+          ];
+          inotify = "yes";
+        };
+        openFirewall = true;
+      };
+      zfs.autoSnapshot = {
+        enable = true;
+        flags = "-k -p -u";
+      };
     };
 
     environment.systemPackages = let
