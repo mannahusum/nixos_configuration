@@ -1,4 +1,7 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  ...
+}: {
   home = let
     homePythonPackages = python-packages:
       with python-packages; [

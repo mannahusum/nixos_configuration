@@ -10,9 +10,6 @@
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-25.11";
     };
-    nixpkgs-utsushi = {
-      url = "github:NixOS/nixpkgs/b0249fdf998d782e1058b0cf3239091e59e393ef";
-    };
     nixpkgs-makemkv = {
       url = "github:NixOS/nixpkgs/ed9d88e5ee5dd5aa71c807c6f60c9c5cf58d3676";
     };
@@ -68,7 +65,6 @@
     nixos-luks-yk,
     nixpkgs,
     nixpkgs-makemkv,
-    nixpkgs-utsushi,
     self,
     sops-nix,
     ...
@@ -202,7 +198,7 @@
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixos-anywhere nixpkgs nixpkgs-utsushi overlays self sops-nix system;
+              inherit home-manager nixos-luks-yk nixos-anywhere nixpkgs overlays self sops-nix system;
             };
           };
         alexandria = let
@@ -228,7 +224,7 @@
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
             };
           };
         ulpia = let
@@ -253,7 +249,7 @@
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
             };
           };
         alexandretta = let
@@ -280,7 +276,7 @@
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
             };
           };
         odysseus = let
@@ -305,7 +301,7 @@
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
             };
           };
         ulysses = let
@@ -329,9 +325,32 @@
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv nixpkgs-utsushi overlays sops-nix system;
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
             };
           };
+        axum = let
+          system = "aarch64-linux";
+        in inputs.nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./computers/axum/configuration.nix
+            nixos-hardware.nixosModules.raspberry-pi-4
+            disko.nixosModules.disko
+            lanzaboote.nixosModules.lanzaboote
+            # {
+            #   boot = {
+            #     bootspec.enable = true;
+            #     loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce = false;
+            #     lanzaboote = {
+            #       enable = true;
+            #     };
+            #   };
+            # }
+          ];
+          specialArgs = {
+            inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+          };
+        };
       };
 
       darwinConfigurations."mini" = nix-darwin.lib.darwinSystem {
@@ -339,7 +358,7 @@
           ./computers/mini/configuration.nix
         ];
         specialArgs = {
-          inherit home-manager nixpkgs-utsushi self overlays;
+          inherit home-manager self overlays;
           system = "aarch64-darwin";
         };
       };
