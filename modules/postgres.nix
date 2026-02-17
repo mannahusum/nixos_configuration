@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  options,
   ...
 }: let
   cfg = config.capostgres;

@@ -3,7 +3,6 @@
   lib,
   pkgs,
   system,
-  stdenvNoCC,
   ...
 }: let
   cfg = config.cakeyboard;

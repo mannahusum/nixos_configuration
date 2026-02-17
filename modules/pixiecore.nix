@@ -185,8 +185,9 @@ in {
   in
     lib.mkIf cfg.enable {
       services.pixiecore = let
-        build = sys.config.system.build;
+        inherit (sys.cnofig.system) build;
       in {
+        inherit (cfg) port statusPort;
         cmdLine = "init=${build.toplevel}/init loglevel=4";
         debug = true;
         dhcpNoBind = true;
@@ -195,8 +196,6 @@ in {
         kernel = "${build.kernel}/bzImage";
         mode = "boot";
         openFirewall = true;
-        port = cfg.port;
-        statusPort = cfg.statusPort;
       };
     };
 }
