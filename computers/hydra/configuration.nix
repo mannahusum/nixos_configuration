@@ -62,27 +62,24 @@
         '';
       };
     };
-    nix = {
-      settings = {
-        substituters = [
-          # "http://mannahusum.catbertsen.de:5000/"
-          "https://nix-community.cachix.org"
-        ];
-        trusted-public-keys = [
-          "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
-          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        ];
-      };
-    };
+    nix.buildMachines = [
+      {
+        hostName = "mini.local";
+        sshUser = "christianalbertsen";
+        systems = [ "aarch64-darwin" "aarch64-linux" ];
+        supportedFeatures = [ "apple-virt" "nixos-test" ];
+      }
+    ];
 
     services = {
-      # r53-ddns = {
-      #   zoneID = "Z04260616D6EKM0EH83P";
-      #   hostname = "hydra";
-      #   environmentFile = config.sops.templates."route53Credentials".path;
-      #   enable = true;
-      #   domain = "catbertsen.de";
-      # };
+      r53-ddns = {
+        ttl = 3600;
+        zoneID = "Z04260616D6EKM0EH83P";
+        hostname = "hydra";
+        environmentFile = config.sops.templates."route53Credentials".path;
+        enable = true;
+        domain = "catbertsen.de";
+      };
       avahi = {
         enable = true;
         nssmdns4 = true;
