@@ -4,7 +4,6 @@
 {
   config,
   lib,
-  pkgs,
   modulesPath,
   ...
 }: {
@@ -14,7 +13,7 @@
 
   boot = {
     initrd = {
-      availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "ie31200_edac" "intel_pch_thermal"];
+      availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "intel_pch_thermal"];
       systemd.enable = true;
     };
     kernelModules = ["kvm-intel"];
@@ -35,6 +34,19 @@
     cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
     graphics = {
       enable = true;
+    };
+    rasdaemon = {
+      enable = true;
+      mainboard = ''
+        vendor = Intel Corporation
+        model = S1200SP
+      '';
+      config = ''
+        PAGE_CE_REFRESH_CYCLE="24H"
+        PAGE_CE_THRESHOLD="50"
+        PAGE_CE_ACTION="soft"
+      '';
+      extraModules = [ "ie31200_edac" ];
     };
   };
 }

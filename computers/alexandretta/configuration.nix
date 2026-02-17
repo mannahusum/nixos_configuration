@@ -15,6 +15,7 @@
     ../disko-config.nix
     ../../modules/acme.nix
     ../../modules/arm.nix
+    ../../modules/backup-server.nix
     ../../modules/keyboard.nix
     ../../modules/wayland.nix
     ../../modules/sshd.nix
@@ -23,8 +24,6 @@
     ../../modules/yubikey.nix
     ../../modules/system_administration/debug.nix
     ../../modules/users.nix
-    ./fileshare-classic.nix
-    # ./smb-fileserver.nix
   ];
 
   config = {
@@ -72,6 +71,11 @@
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         ];
       };
+    };
+    cabackupserver = {
+      enable = true;
+      username = "alexandria-backup";
+      sshkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIENuJozoOGUX38alQSsfLhXGUQ/bj+LMBYtz4AU4mPJM syncoid@alexandria";
     };
     casshd.enable = true;
     cawayland.enable = true;
@@ -134,30 +138,6 @@
       };
     };
 
-    # containers.regina = {
-    #   privateNetwork = true;
-    #   hostBridge = "br0";
-    #   localAddress = "192.168.10.251/24";
-    #   autoStart = true;
-    #   config = { config, pkgs, lib, ... }: {
-    #     imports = [
-    #       ./active-directory.nix
-    #     ];
-    #
-    #     system.stateVersion = "24.11";
-    #
-    #     networking = {
-    #       firewall = {
-    #         enable = true;
-    #         allowedTCPPorts = [ 80 ];
-    #       };
-    #       # Use systemd-resolved inside the container
-    #       # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
-    #       useHostResolvConf = lib.mkForce false;
-    #     };
-    #   };
-    # };
-
     networking = {
       hostId = "16c516f2";
       hostName = "alexandretta";
@@ -182,10 +162,6 @@
         };
         openFirewall = true;
       };
-      zfs.autoSnapshot = {
-        enable = true;
-        flags = "-k -p -u";
-      };
     };
 
     environment.systemPackages = let
@@ -199,12 +175,14 @@
     in
       with pkgs; [
         efitools
+        fdupes
         file
         git
         git-crypt
         ipmitool
         mkvpkgs.makemkv
         neovim
+        rasdaemon
         ripgrep
         sbctl
         sbsigntool

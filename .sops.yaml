@@ -2,6 +2,7 @@
 keys:
   - &admin_christian F1A1F1A33787F28359E60BFB1DBDE5EC541E1874
   - &computer_alexandria age14hdf0lh8ykyqk48js6uyj3e8e43fjusnatrh8q5wt7tath3jsa5s5xr22s
+  - &computer_alexandretta age1czy8f8mxj0tge2f7v0z6ksgehs4cwyzflllhj9mwhz9gyuu4y4vsgtd9u7
   - &computer_hydra age13sypr3ave32sf4lvzckwlj65mkmerzaxh856v8sy7s240hkldfaqmn2agn
   - &computer_odysseus age1u2zf683vd7z048mqeyxwk7wthyjk8gm5k9f6frnph7pcjxx7upgq9nvyam
   - &computer_ulpia age1xn4f2mpql7yv2u4dexy9f53pk45vyd7pxj8qlkgsldxqm5mty4lsuluha7
@@ -15,6 +16,13 @@ creation_rules:
           - *admin_christian
         age:
           - *computer_alexandria
+  - path_regex: computers/alexandretta/secrets.yaml$
+    encrypted_regex: *to_encrypt
+    key_groups:
+      - pgp:
+          - *admin_christian
+        age:
+          - *computer_alexandretta
   - path_regex: computers/hydra/secrets.yaml$
     encrypted_regex: *to_encrypt
     key_groups:

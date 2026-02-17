@@ -1,4 +1,5 @@
 ({
+  config,
   lib,
   modulesPath,
   nixpkgs-makemkv,
@@ -12,18 +13,17 @@
     sops-nix.nixosModules.sops
     ./sops.nix
     (modulesPath + "/profiles/base.nix")
-    # ./x11.nix
+    ../shared-config.nix
     ../../modules/acme.nix
+    ../../modules/backup-client.nix
     ../../modules/keyboard.nix
     ../../modules/wayland.nix
     ../../modules/sshd.nix
     ../../modules/saned.nix
     ../../modules/nginx.nix
     ../../modules/yubikey.nix
-    ../../modules/system_administration/debug.nix
     ../../modules/users.nix
     ./fileshare-classic.nix
-    # ./smb-fileserver.nix
   ];
 
   config = {
@@ -90,6 +90,15 @@
       };
       openFirewall = true;
     };
+
+    cabackupclient = {
+      enable = true;
+      serverAddress = "alexandretta.local";
+      serverHostkey = ../alexandretta/extra-files/etc/ssh/ssh_host_ed25519_key.pub;
+      remoteUser = "${config.networking.hostName}-backup";
+      remotePath =  "tank/backup/alexandria";
+      dataSets = [ "tank/media" ];
+    };
     casshd.enable = true;
     cawayland.enable = true;
     # cayubikey.enable = true;
@@ -102,79 +111,61 @@
         LC_CTYPE = "de_DE.UTF-8";
       };
     };
-    systemd.network.links."70-persistent-net-name" = {
-      matchConfig.PermanentMACAddress = "70:20:84:06:50:50";
-      linkConfig.Name = "eth0";
+
+    services.resolved = {
+      enable = true;
+      dnssec = "true";
+      domains = ["~."];
+      fallbackDns = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
+      dnsovertls = "true";
+      llmnr = "resolve";
+    };
+    systemd.network = {
+      enable = true;
+      links = {
+        "20-persistent-net-name-eth0" = {
+          matchConfig.PermanentMACAddress = "70:20:84:06:50:50";
+          linkConfig.Name = "eth0";
+        };
+        "25-br0" = {
+          matchConfig.OriginalName = "br0";
+          linkConfig.MACAddressPolicy = "none";
+        };
+      };
+      netdevs = {
+        "10-br0" = {
+          netdevConfig = {
+            Kind = "bridge";
+            Name = "br0";
+            MACAddress = "none";
+          };
+        };
+      };
+      networks = {
+        "30-eth0" = {
+          matchConfig.Name = "eth0";
+          networkConfig.Bridge = "br0";
+          linkConfig.RequiredForOnline = "enslaved";
+        };
+        "40-br0" = {
+          matchConfig.Name = "br0";
+          bridgeConfig = {};
+          networkConfig = {
+            DHCP = "ipv4";
+            IPv6AcceptRA = true;
+            MulticastDNS = true;
+          };
+          linkConfig.RequiredForOnline = "routable";
+        };
+      };
     };
 
-    # containers.archon = {
-    #   privateNetwork = true;
-    #   hostBridge = "br0";
-    #   localAddress = "192.168.10.251/24";
-    #   autoStart = true;
-    #   config = { config, pkgs, lib, ... }: {
-    #     imports = [
-    #       ./active-directory.nix
-    #     ];
-    #
-    #     system.stateVersion = "24.11";
-    #
-    #     networking = {
-    #       firewall = {
-    #         enable = true;
-    #         allowedTCPPorts = [ 80 ];
-    #       };
-    #       # Use systemd-resolved inside the container
-    #       # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
-    #       useHostResolvConf = lib.mkForce false;
-    #     };
-    #   };
-    # };
-
     networking = {
-      interfaces.br0 = {
-        # ipv4.addresses = [
-        #   {
-        #     address = "192.168.10.252";
-        #     prefixLength = 24;
-        #   }
-        # ];
-      };
-      bridges.br0.interfaces = [
-        "eth0"
-      ];
-      # defaultGateway = {
-      #   address = "192.168.0.1";
-      #   interface = "br0";
-      # };
       hostId = "d22d38ba";
       hostName = "alexandria";
       tempAddresses = "disabled";
-      hosts = {
-        # "192.168.10.251" = [
-        #   "archon.catbertsen.de"
-        #   "archon.windows.catbertsen.de"
-        #   "archon"
-        # ];
-        # "192.168.10.252" = [
-        #   "alexandria.catbertsen.de"
-        #   "alexandria.windows.catbertsen.de"
-        #   "alexandria"
-        # ];
-        # "192.168.10.253" = [
-        #   "mannahusum.catbertsen.de"
-        # ];
-        # "192.168.10.254" = [
-        #   "hydra.catbertsen.de"
-        #   "calendar.catbertsen.de"
-        #   "gitea.catbertsen.de"
-        # ];
-      };
-    };
-
-    services.zfs.autoSnapshot = {
-      enable = true;
-      flags = "-k -p -u";
+      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
+      enableIPv6 = true;
     };
 
     environment.systemPackages = let

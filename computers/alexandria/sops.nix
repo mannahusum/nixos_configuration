@@ -3,6 +3,14 @@
     defaultSopsFile = ./secrets.yaml;
     age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
     secrets = {
+      "syncoid/public" = {
+        owner = config.services.syncoid.user;
+        mode = "0444";
+      };
+      "syncoid/private" = {
+        owner = config.services.syncoid.user;
+        mode = "0400";
+      };
       "secureboot/GUID" = {
         path = "/etc/secureboot/GUID";
       };

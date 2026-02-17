@@ -215,8 +215,7 @@ in {
           };
           postCreateHook = "zfs snapshot rpool@blank";
 
-          datasets = (
-            lib.lists.foldl' (a: b: a // b)
+          datasets = lib.lists.foldl' (a: b: a // b)
             {
               root = {
                 type = "zfs_fs";
@@ -247,8 +246,7 @@ in {
                 type = "zfs_fs";
                 mountpoint = "/home/${username}";
               };
-            }))
-          );
+            }));
         };
         tank = let
           smbShare = mountpoint: {
@@ -300,6 +298,13 @@ in {
               "media/software" = smbShare "/media/software";
               "media/ultrastar" = smbShare "/media/ultrastar";
               "media/video" = smbShare "/media/video";
+              "media/arm" = {
+                type = "zfs_fs";
+                options = {
+                  mountpoint = "legacy";
+                  "com.sun:auto-snapshot" = "false";
+                };
+              };
               "backup" = {
                 type = "zfs_fs";
                 options = {
