@@ -112,18 +112,6 @@
         "type": "github"
       }
     },
-    "home-config": {
-      "flake": false,
-      "locked": {
-        "path": "myhomeconfig.nix",
-        "type": "path"
-      },
-      "original": {
-        "path": "myhomeconfig.nix",
-        "type": "path"
-      },
-      "parent": []
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -390,7 +378,6 @@
       "inputs": {
         "disko": "disko",
         "flake-utils": "flake-utils",
-        "home-config": "home-config",
         "home-manager": "home-manager",
         "lanzaboote": "lanzaboote",
         "nix-darwin": "nix-darwin",

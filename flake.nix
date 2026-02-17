@@ -2,10 +2,10 @@
   description = "Machine definition for computers at home";
 
   inputs = {
-    home-config = {
-      url = "path:myhomeconfig.nix";
-      flake = false;
-    };
+    # home-config = {
+    #   url = "path:myhomeconfig.nix";
+    #   flake = false;
+    # };
     nixos-hardware.url = "github:8bitbuddhist/nixos-hardware?ref=surface-rust-target-spec-fix";
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-25.11";
@@ -55,7 +55,7 @@
   outputs = {
     disko,
     flake-utils,
-    home-config,
+    # home-config,
     home-manager,
     lanzaboote,
     nix-darwin,
@@ -262,16 +262,15 @@
               ./computers/alexandretta/hardware-configuration.nix
               ./computers/alexandretta/sops.nix
               disko.nixosModules.disko
-              #lanzaboote.nixosModules.lanzaboote
+              lanzaboote.nixosModules.lanzaboote
               {
                 boot = {
                   # bootspec.enable = true;
                   # loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
                   loader.systemd-boot.enable = true;
-                  # lanzaboote = {
-                  #   enable = true;
-                  #   pkiBundle = "/run/secrets/secureboot";
-                  # };
+                  lanzaboote = {
+                    enable = false;
+                  };
                 };
               }
             ];
@@ -330,27 +329,28 @@
           };
         axum = let
           system = "aarch64-linux";
-        in inputs.nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [
-            ./computers/axum/configuration.nix
-            nixos-hardware.nixosModules.raspberry-pi-4
-            disko.nixosModules.disko
-            lanzaboote.nixosModules.lanzaboote
-            # {
-            #   boot = {
-            #     bootspec.enable = true;
-            #     loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce = false;
-            #     lanzaboote = {
-            #       enable = true;
-            #     };
-            #   };
-            # }
-          ];
-          specialArgs = {
-            inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+        in
+          inputs.nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ./computers/axum/configuration.nix
+              nixos-hardware.nixosModules.raspberry-pi-4
+              disko.nixosModules.disko
+              lanzaboote.nixosModules.lanzaboote
+              # {
+              #   boot = {
+              #     bootspec.enable = true;
+              #     loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce = false;
+              #     lanzaboote = {
+              #       enable = true;
+              #     };
+              #   };
+              # }
+            ];
+            specialArgs = {
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+            };
           };
-        };
       };
 
       darwinConfigurations."mini" = nix-darwin.lib.darwinSystem {
