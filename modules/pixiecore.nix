@@ -185,7 +185,7 @@ in {
   in
     lib.mkIf cfg.enable {
       services.pixiecore = let
-        inherit (sys.cnofig.system) build;
+        inherit (sys.config.system) build;
       in {
         inherit (cfg) port statusPort;
         cmdLine = "init=${build.toplevel}/init loglevel=4";
