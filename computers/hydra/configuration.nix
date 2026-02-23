@@ -47,32 +47,9 @@
           "google-chrome"
         ];
     };
-    boot = {
-      supportedFilesystems = ["zfs"];
-      loader.efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot";
-      };
-      initrd = {
-        supportedFilesystems = ["zfs"];
-        systemd = {
-          enable = true;
-          emergencyAccess = true;
-          initrdBin = with pkgs; [
-            gptfdisk
-          ];
-        };
-      };
-      kernelParams = [
-        "console=ttyS0,115200"
-      ];
-      swraid = {
-        enable = true;
-        mdadmConf = ''
-          MAILADDR christian@wudika.de
-        '';
-      };
-    };
+    boot.kernelParams = [
+      "console=ttyS0,115200"
+    ];
     nix.buildMachines = [
       {
         hostName = "mini.local";

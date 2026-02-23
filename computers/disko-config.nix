@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
   cfg = config.cadrives;
@@ -65,10 +66,34 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    disko.devices = let
+  config = let
       swapviamdraid = (builtins.length cfg.system) > 1;
-    in {
+  in lib.mkIf cfg.enable {
+    boot = {
+      supportedFilesystems = ["zfs"];
+      loader.efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = "/boot";
+      };
+      initrd = {
+        supportedFilesystems = ["zfs"];
+        systemd = {
+          enable = true;
+          emergencyAccess = true;
+          initrdBin = with pkgs; [
+            gptfdisk
+          ];
+        };
+      };
+      swraid = lib.mkIf swapviamdraid {
+        enable = true;
+        mdadmConf = ''
+          MAILADDR christian@wudika.de
+        '';
+      };
+    };
+
+    disko.devices =  {
       disk = let
         bootlayout = device: {
           inherit device;
