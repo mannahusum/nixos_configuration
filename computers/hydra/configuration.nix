@@ -9,6 +9,7 @@
 }: {
   imports = [
     ../disko-config.nix
+    ../../modules/serial-console.nix
     ../../modules/gitea.nix
     ../../modules/keyboard.nix
     ../../modules/nginx.nix
@@ -30,6 +31,7 @@
   };
 
   config = {
+    caserialconsole.enable = true;
     cadrives = {
       enable = true;
       boot = null;
@@ -47,9 +49,9 @@
           "google-chrome"
         ];
     };
-    boot.kernelParams = [
-      "console=ttyS0,115200"
-    ];
+    # boot.kernelParams = [
+    #   "console=ttyS0,115200"
+    # ];
     nix.buildMachines = [
       {
         hostName = "mini.local";
