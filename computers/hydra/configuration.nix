@@ -30,17 +30,31 @@
   options.hydra = {
   };
 
-  config = {
+  config = let 
+    localdrives = ["nvme-Samsung_SSD_970_EVO_Plus_2TB_S4J4NX0R847857X" "ata-SanDisk_SSD_PLUS_2000GB_213705800853"];
+  in {
     caserialconsole.enable = true;
     cadrives = {
       enable = true;
       boot = null;
-      system = ["nvme-Samsung_SSD_970_EVO_Plus_2TB_S4J4NX0R847857X" "ata-SanDisk_SSD_PLUS_2000GB_213705800853"];
+      system = localdrives;
       storage = [];
       swapsize = "72G";
       l2arcsize = "0";
       espsize = "1G";
       homesFor = ["christian" "marianne"];
+    };
+    services.systembus-notify.enable = true;
+    services.smartd = {
+      enable = true;
+      autodetect = false;
+      devices = map (drivename: { device="/dev/disk/by-id/"+drivename; }) localdrives;
+      notifications.systembus-notify.enable = true;
+      # notifications.mail = {
+      #   enable = true;
+      #   sender = "hydra@catbertsen.de";
+      #   recipient = "christian@wudika.de";
+      # };
     };
     nixpkgs = {
       inherit overlays;
@@ -49,9 +63,6 @@
           "google-chrome"
         ];
     };
-    # boot.kernelParams = [
-    #   "console=ttyS0,115200"
-    # ];
     nix.buildMachines = [
       {
         hostName = "mini.local";
@@ -170,10 +181,6 @@
         }
       ];
       ensureDefaultPrinter = "kyocera5021cdw";
-    };
-    hardware.sensor.hddtemp = {
-      enable = true;
-      drives = ["/dev/disk/by-id/nvme-eui.0025385811b168ce" "/dev/disk/by-id/wwn-0x5001b448bc1f7726"];
     };
     environment.etc."sysconfig/lm_sensors" = {
       text = ''
