@@ -16,8 +16,9 @@
       sha256 = "1p15zlvrrayp0r4qpa4154kw12x4g9g8hyilwzv50xd0h4y736cf";
     };
     modifier = "Mod4";
-    shotman = "${pkgs.shotman.out}/bin/shotman";
     bemenu = "${lib.getExe' pkgs.bemenu "bemenu-run"}";
+    shotman = "${pkgs.shotman.out}/bin/shotman";
+    zenity = "${pkgs.zenity.out}/bin/zenity";
   in {
     home.sessionVariables = {
       XKB_DEFAULT_LAYOUT = "de,de,gr";
@@ -68,6 +69,7 @@
         menu = bemenu;
         terminal = "${pkgs.alacritty.out}/bin/alacritty";
         keybindings = lib.mkOptionDefault {
+          "${modifier}+Shift+e" = "exec ${zenity} --question --text='You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' && swaymsg exit";
           "${modifier}+p" = "exec ${shotman} --capture window";
           "${modifier}+Shift+p" = "exec ${shotman} --capture region";
           "${modifier}+Ctrl+p" = "exec ${shotman} --capture output";
