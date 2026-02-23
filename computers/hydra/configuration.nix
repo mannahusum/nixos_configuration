@@ -50,11 +50,32 @@
       autodetect = false;
       devices = map (drivename: { device="/dev/disk/by-id/"+drivename; }) localdrives;
       notifications.systembus-notify.enable = true;
-      # notifications.mail = {
-      #   enable = true;
-      #   sender = "hydra@catbertsen.de";
-      #   recipient = "christian@wudika.de";
-      # };
+      notifications.mail = {
+        enable = true;
+        sender = "hydra@catbertsen.de";
+        recipient = "christian@wudika.de";
+      };
+    };
+    services.postfix = {
+      enable = true;
+      settings.main = {
+        myorigin = "catbertsen.de";
+        mydomain = "catbertsen.de";
+        mydestination = null;
+        inet_interfaces = "loopback-only";
+        local_recipient_maps = null;
+        local_transport = "error:local mail delivery is disabled";
+        myhostname = "${config.networking.hostName}.catbertsen.de";
+        relayhost = ["smtp.protonmail.ch:587"];
+        smtp_sasl_auth_enable = true;
+        smtp_generic_maps = "regexp:${config.sops.templates.protonmail_from_rewrite.path}";
+        smtp_sasl_password_maps = "texthash:${config.sops.templates.protonmail_login.path}";
+        smtp_sasl_security_options = "noanonymous";
+        smtp_tls_security_level = "encrypt";
+        local_header_rewrite_clients = "static:all";
+        append_dot_mydomain = true;
+        smtputf8_enable = false;
+      };
     };
     nixpkgs = {
       inherit overlays;

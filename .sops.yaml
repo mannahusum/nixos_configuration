@@ -7,7 +7,7 @@ keys:
   - &computer_odysseus age1u2zf683vd7z048mqeyxwk7wthyjk8gm5k9f6frnph7pcjxx7upgq9nvyam
   - &computer_ulpia age1xn4f2mpql7yv2u4dexy9f53pk45vyd7pxj8qlkgsldxqm5mty4lsuluha7
   - &computer_ulysses age1lzpwgj240wsf24xa5lthpzsc6pgqwjp8tz4a75r2ss7du34ucsdscgp85n
-  - &to_encrypt '(aws|xandikos|private|secret|password|hashed|.*\.key)$'
+  - &to_encrypt '(aws|xandikos|private|secret|password|hashed|token|.*\.key)$'
 creation_rules:
   - path_regex: computers/alexandria/secrets.yaml$
     encrypted_regex: *to_encrypt
