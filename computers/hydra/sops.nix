@@ -30,20 +30,8 @@
       "xandikos/user" = {};
       "xandikos/password" = {};
       "xandikos/hashed" = {};
-      "protonmail/user" = {};
-      "protonmail/token" = {};
-    };
-    templates."protonmail_from_rewrite" = {
-      content = ''
-        /^.*$/ ${config.sops.placeholder."protonmail/user"}
-      '';
-      owner = "postfix";
-    };
-    templates."protonmail_login" = {
-      content = ''
-        smtp.protonmail.ch:587 ${config.sops.placeholder."protonmail/user"}:${config.sops.placeholder."protonmail/token"}
-      '';
-      owner = "postfix";
+      "mailserver/user" = {};
+      "mailserver/token" = {};
     };
     templates."route53Credentials" = {
       content = ''

@@ -9,6 +9,7 @@
 }: {
   imports = [
     ../disko-config.nix
+    ../../modules/postfix.nix
     ../../modules/serial-console.nix
     ../../modules/gitea.nix
     ../../modules/keyboard.nix
@@ -30,7 +31,7 @@
   options.hydra = {
   };
 
-  config = let 
+  config = let
     localdrives = ["nvme-Samsung_SSD_970_EVO_Plus_2TB_S4J4NX0R847857X" "ata-SanDisk_SSD_PLUS_2000GB_213705800853"];
   in {
     caserialconsole.enable = true;
@@ -48,7 +49,7 @@
     services.smartd = {
       enable = true;
       autodetect = false;
-      devices = map (drivename: { device="/dev/disk/by-id/"+drivename; }) localdrives;
+      devices = map (drivename: {device = "/dev/disk/by-id/" + drivename;}) localdrives;
       notifications.systembus-notify.enable = true;
       notifications.mail = {
         enable = true;
@@ -56,26 +57,10 @@
         recipient = "christian@wudika.de";
       };
     };
-    services.postfix = {
+    capostfix = {
       enable = true;
-      settings.main = {
-        myorigin = "catbertsen.de";
-        mydomain = "catbertsen.de";
-        mydestination = null;
-        inet_interfaces = "loopback-only";
-        local_recipient_maps = null;
-        local_transport = "error:local mail delivery is disabled";
-        myhostname = "${config.networking.hostName}.catbertsen.de";
-        relayhost = ["smtp.protonmail.ch:587"];
-        smtp_sasl_auth_enable = true;
-        smtp_generic_maps = "regexp:${config.sops.templates.protonmail_from_rewrite.path}";
-        smtp_sasl_password_maps = "texthash:${config.sops.templates.protonmail_login.path}";
-        smtp_sasl_security_options = "noanonymous";
-        smtp_tls_security_level = "encrypt";
-        local_header_rewrite_clients = "static:all";
-        append_dot_mydomain = true;
-        smtputf8_enable = false;
-      };
+      connection = "smtp.protonmail.ch:587";
+      mydomain = "catbertsen.de";
     };
     nixpkgs = {
       inherit overlays;
@@ -88,8 +73,8 @@
       {
         hostName = "mini.local";
         sshUser = "christianalbertsen";
-        systems = [ "aarch64-darwin" "aarch64-linux" ];
-        supportedFeatures = [ "apple-virt" "nixos-test" ];
+        systems = ["aarch64-darwin" "aarch64-linux"];
+        supportedFeatures = ["apple-virt" "nixos-test"];
       }
     ];
 
