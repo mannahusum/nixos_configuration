@@ -62,8 +62,8 @@ in {
         myhostname = "${config.networking.hostName}.${cfg.mydomain}";
         relayhost = ["${cfg.connection}"];
         smtp_sasl_auth_enable = true;
-        smtp_generic_maps =  "regexp:${config.sops.templates.mailserver_from_rewrite.path}";
-        smtp_sasl_password_maps =   "texthash:${config.sops.templates.mailserver_login.path}";
+        smtp_generic_maps = "regexp:${config.sops.templates.mailserver_from_rewrite.path}";
+        smtp_sasl_password_maps = "texthash:${config.sops.templates.mailserver_login.path}";
         smtp_sasl_security_options = "noanonymous";
         smtp_tls_security_level = "encrypt";
         local_header_rewrite_clients = "static:all";
@@ -73,4 +73,3 @@ in {
     };
   };
 }
-

@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   hardware = {
     raspberry-pi."4" = {
       apply-overlays-dtmerge.enable = true;

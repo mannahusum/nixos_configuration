@@ -31,9 +31,9 @@ in {
     # Configure our own serial-getty@ttyS0 service
     systemd.services."serial-getty@ttyS0" = {
       enable = true;
-      wantedBy = [ "getty.target" ];
-      after = [ "systemd-user-sessions.service" ];
-      wants = [ "systemd-user-sessions.service" ];
+      wantedBy = ["getty.target"];
+      after = ["systemd-user-sessions.service"];
+      wants = ["systemd-user-sessions.service"];
       serviceConfig = {
         Type = "idle";
         Restart = "always";
@@ -52,7 +52,6 @@ in {
 
     # Enable early console output during boot
     #boot.consoleLogLevel = 7;  # Show all kernel messages
-    boot.initrd.verbose = true;  # Show initrd messages
+    boot.initrd.verbose = true; # Show initrd messages
   };
 }
-

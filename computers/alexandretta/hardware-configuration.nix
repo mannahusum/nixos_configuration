@@ -46,7 +46,7 @@
         PAGE_CE_THRESHOLD="50"
         PAGE_CE_ACTION="soft"
       '';
-      extraModules = [ "ie31200_edac" ];
+      extraModules = ["ie31200_edac"];
     };
   };
 }

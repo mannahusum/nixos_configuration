@@ -16,20 +16,20 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable  {
+  config = lib.mkIf cfg.enable {
     programs.zsh.enable = true;
 
     users.users.arm = {
-      isNormalUser = true;        # Erstelle einen normalen Benutzer
-      home = "/media/arm";      # Home-Verzeichnis
-      group = "arm";              # Primäre Gruppe
-      extraGroups = [ "wheel" ];  # Optionale zusätzliche Gruppen (z. B. für sudo-Zugriff)
-      shell = pkgs.zsh;           # Benutzer-Shell (z. B. zsh oder bash)
+      isNormalUser = true; # Erstelle einen normalen Benutzer
+      home = "/media/arm"; # Home-Verzeichnis
+      group = "arm"; # Primäre Gruppe
+      extraGroups = ["wheel"]; # Optionale zusätzliche Gruppen (z. B. für sudo-Zugriff)
+      shell = pkgs.zsh; # Benutzer-Shell (z. B. zsh oder bash)
       uid = 1001;
     };
 
     users.groups.arm = {
-      gid = 1001;                         # Optional: spezifische GID
+      gid = 1001; # Optional: spezifische GID
     };
 
     # Runtime
@@ -49,7 +49,7 @@ in {
         pull = "always";
         image = "automaticrippingmachine/automatic-ripping-machine:latest";
         #ports = [ "8080:8080" ];
-        ports = [ "28982:8080" ];
+        ports = ["28982:8080"];
         environment = {
           ARM_UID = "1000";
           ARM_GID = "1001";
@@ -79,8 +79,7 @@ in {
 
     # Containers
     networking.firewall = {
-      allowedTCPPorts = [ 28982 ];
+      allowedTCPPorts = [28982];
     };
   };
 }
-

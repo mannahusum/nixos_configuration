@@ -78,7 +78,7 @@ in {
               }
           ) {}
           cfg.dataSets;
-        };
+      };
       syncoid = {
         enable = true;
         sshKey = config.sops.secrets."syncoid/private".path;
@@ -94,7 +94,7 @@ in {
               }
           ) {}
           cfg.dataSets;
-        };
       };
+    };
   };
 }

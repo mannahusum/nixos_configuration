@@ -20,13 +20,12 @@ in {
     };
   };
 
-  config =
-    lib.mkIf cfg.enable {
-      services.udisks2.enable = true;
-      environment.etc."udisks2/mount_options.conf".text = ''
-        [defaults]
-        ntfs_drivers=ntfs,ntfs3
-      '';
-      environment.defaultPackages = with pkgs; [udisks bashmount usermount];
-    };
+  config = lib.mkIf cfg.enable {
+    services.udisks2.enable = true;
+    environment.etc."udisks2/mount_options.conf".text = ''
+      [defaults]
+      ntfs_drivers=ntfs,ntfs3
+    '';
+    environment.defaultPackages = with pkgs; [udisks bashmount usermount];
+  };
 }

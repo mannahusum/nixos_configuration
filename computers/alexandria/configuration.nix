@@ -96,8 +96,8 @@
       serverAddress = "alexandretta.local";
       serverHostkey = ../alexandretta/extra-files/etc/ssh/ssh_host_ed25519_key.pub;
       remoteUser = "${config.networking.hostName}-backup";
-      remotePath =  "tank/backup/alexandria";
-      dataSets = [ "tank/media" ];
+      remotePath = "tank/backup/alexandria";
+      dataSets = ["tank/media"];
     };
     casshd.enable = true;
     cawayland.enable = true;

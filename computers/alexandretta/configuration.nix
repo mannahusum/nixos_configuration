@@ -147,7 +147,7 @@
     services = {
       fwupd = {
         enable = true;
-        extraRemotes = [ "lvfs-testing" ];
+        extraRemotes = ["lvfs-testing"];
         uefiCapsuleSettings.DisableCapsuleUpdateOnDisk = true;
       };
       minidlna = {

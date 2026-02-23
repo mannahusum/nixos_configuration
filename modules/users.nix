@@ -112,67 +112,67 @@ in {
       };
     };
   in
-  lib.mkMerge [
-    (lib.mkIf (lib.strings.hasSuffix "-linux" system) {
-      users = {
-        users = builtins.listToAttrs (
-          map (
+    lib.mkMerge [
+      (lib.mkIf (lib.strings.hasSuffix "-linux" system) {
+        users = {
+          users = builtins.listToAttrs (
+            map (
+              user: {
+                name = user;
+                value =
+                  (
+                    if (builtins.hasAttr user myusers)
+                    then (builtins.getAttr user myusers)
+                    else {}
+                  )
+                  // {
+                    extraGroups = [
+                      "audio"
+                      "cdrom"
+                      "dialout"
+                      "docker"
+                      "kvm"
+                      "libvirtd"
+                      "lxd"
+                      "qemu-libvirtd"
+                      "render"
+                      "transmission"
+                      "video"
+                      "vboxusers"
+                      "wheel"
+                      "networkmanager"
+                    ];
+                  };
+              }
+            ) ((builtins.attrNames myusers) ++ cfg.adminUsers ++ cfg.regularUsers)
+          );
+
+          groups = builtins.listToAttrs (map (
             user: {
               name = user;
-              value =
-                (
-                  if (builtins.hasAttr user myusers)
-                  then (builtins.getAttr user myusers)
-                  else {}
-                )
-                // {
-                  extraGroups = [
-                    "audio"
-                    "cdrom"
-                    "dialout"
-                    "docker"
-                    "kvm"
-                    "libvirtd"
-                    "lxd"
-                    "qemu-libvirtd"
-                    "render"
-                    "transmission"
-                    "video"
-                    "vboxusers"
-                    "wheel"
-                    "networkmanager"
-                  ];
-                };
+              value = {};
             }
-          ) ((builtins.attrNames myusers) ++ cfg.adminUsers ++ cfg.regularUsers)
-        );
+          ) (builtins.attrNames myusers));
 
-        groups = builtins.listToAttrs (map (
-          user: {
-            name = user;
-            value = {};
-          }
-        ) (builtins.attrNames myusers));
+          mutableUsers = true;
+        };
 
-        mutableUsers = true;
-      };
-
-      home-manager = {
-        users = {
-          christian = import ../home_manager/caHomeConfig.nix {
-            inherit config nixpkgs overlays system;
-            pinentry = cfg.defaultPinentry;
-            forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
-            createForwardPath = true;
+        home-manager = {
+          users = {
+            christian = import ../home_manager/caHomeConfig.nix {
+              inherit config nixpkgs overlays system;
+              pinentry = cfg.defaultPinentry;
+              forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
+              createForwardPath = true;
+            };
           };
         };
-      };
 
-      security.sudo.wheelNeedsPassword = false;
-      nix.settings.trusted-users = ["root" "christian"];
-    })
-    {
-      users.users.root.openssh.authorizedKeys.keys = pkgs.testing_all_ssh_public_keys;
-    }
-  ];
+        security.sudo.wheelNeedsPassword = false;
+        nix.settings.trusted-users = ["root" "christian"];
+      })
+      {
+        users.users.root.openssh.authorizedKeys.keys = pkgs.testing_all_ssh_public_keys;
+      }
+    ];
 }
