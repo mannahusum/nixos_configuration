@@ -20,6 +20,7 @@
       coreutils-full
       cyrus_sasl
       detect-secrets
+      disktype
       dmidecode
       enscript
       texliveFull

@@ -70,6 +70,7 @@
     ...
   } @ inputs: let
     overlays = [
+      (import ./packages/linux/overlay.nix)
       (import ./packages/ssh/overlay.nix)
       (import ./packages/darwin/overlay.nix)
       nixos-luks-yk.overlay
