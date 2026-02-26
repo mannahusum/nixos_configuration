@@ -15,21 +15,21 @@ in {
       '';
     };
     boot = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
+      type = lib.types.nullOr lib.types.str;
       default = null;
       description = ''
         Drive to be used as the boot drive or null, if it isn't used
       '';
     };
     system = lib.mkOption {
-      type = lib.types.listOf lib.types.path;
+      type = lib.types.listOf lib.types.str;
       default = [];
       description = ''
         The drives being used for for system installation
       '';
     };
     storage = lib.mkOption {
-      type = lib.types.listOf lib.types.path;
+      type = lib.types.listOf lib.types.str;
       default = [];
       description = ''
         Drives used for additional storage or archival
@@ -70,6 +70,12 @@ in {
     swapviamdraid = (builtins.length cfg.system) > 1;
   in
     lib.mkIf cfg.enable {
+      nixpkgs.config.packageOverrides = pkgs: {
+        zfsStable = pkgs.zfsStable.override {
+          enableMail = true;
+        };
+      };
+
       boot = {
         supportedFilesystems = ["zfs"];
         loader.efi = {
@@ -91,6 +97,19 @@ in {
           mdadmConf = ''
             MAILADDR christian@wudika.de
           '';
+        };
+      };
+
+      services = {
+        zfs = {
+          autoScrub.enable = true;
+          zed = {
+            enableMail = true;
+            settings = {
+              ZED_EMAIL_ADDR = [ "christian@wudika.de" ];
+              ZED_NOTIFY_VERBOSE = true;
+            };
+          };
         };
       };
 
@@ -343,7 +362,7 @@ in {
                 reserved = {
                   type = "zfs_fs";
                   options = {
-                    refreservation = "1G";
+                    refreservation = "10G";
                     mountpoint = "none";
                   };
                 };

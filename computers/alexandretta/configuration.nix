@@ -17,70 +17,64 @@
     ../../modules/arm.nix
     ../../modules/backup-server.nix
     ../../modules/keyboard.nix
-    ../../modules/wayland.nix
-    ../../modules/sshd.nix
-    ../../modules/saned.nix
     ../../modules/nginx.nix
-    ../../modules/yubikey.nix
-    ../../modules/system_administration/debug.nix
+    ../../modules/postfix.nix
+    ../../modules/saned.nix
+    ../../modules/serial-console.nix
+    ../../modules/sshd.nix
+    ../../modules/usermount.nix
     ../../modules/users.nix
+    ../../modules/wayland.nix
+    ../../modules/yubikey.nix
   ];
 
-  config = {
+  config = let
+    byidpath = name: "/dev/disk/by-id/" + name;
+    bootdrive = byidpath "usb-Swissbit_USB_Flash_Drive_601924969200009D-0:0";
+    systemdrives = map byidpath ["nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XA16328H"];
+    storagedrives = map byidpath ["ata-ST14000NM001G-2KJ103_ZL287GM9"];
+    localdrives = systemdrives++storagedrives;
+  in {
     caarm.enable = true;
-    cadrives = {
-      enable = true;
-      boot = "/dev/disk/by-id/usb-Swissbit_USB_Flash_Drive_601924969200009D-0:0";
-      system = ["/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NU0XA16328H"];
-      storage = ["/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL287GM9"];
-      swapsize = "172G";
-      l2arcsize = "512G";
-      espsize = "1G";
-      homesFor = ["christian" "marianne"];
-    };
-    boot = {
-      supportedFilesystems = ["zfs"];
-      loader.efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot";
-      };
-      initrd = {
-        supportedFilesystems = ["zfs"];
-        systemd = {
-          enable = true;
-          emergencyAccess = true;
-        };
-      };
-      kernelParams = [
-        "console=ttyS0,115200"
-      ];
-      swraid = {
-        enable = true;
-        mdadmConf = ''
-          MAILADDR christian@wudika.de
-        '';
-      };
-    };
-    nix = {
-      settings = {
-        substituters = [
-          "https://nix-community.cachix.org"
-        ];
-        trusted-public-keys = [
-          "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
-          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        ];
-      };
-    };
     cabackupserver = {
       enable = true;
       username = "alexandria-backup";
       sshkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIENuJozoOGUX38alQSsfLhXGUQ/bj+LMBYtz4AU4mPJM syncoid@alexandria";
     };
+    cakeyboard.enable = true;
+    capostfix = {
+      enable = true;
+      connection = "smtp.protonmail.ch:587";
+      mydomain = "catbertsen.de";
+    };
+    caserialconsole.enable = true;
     casshd.enable = true;
+    causermount.enable = true;
     cawayland.enable = true;
     # cayubikey.enable = true;
-    cakeyboard.enable = true;
+
+    cadrives = {
+      enable = true;
+      boot = bootdrive;
+      system = systemdrives;
+      storage = storagedrives;
+      swapsize = "172G";
+      l2arcsize = "512G";
+      espsize = "1G";
+      homesFor = ["christian" "marianne"];
+    };
+    services.systembus-notify.enable = true;
+    services.smartd = {
+      enable = true;
+      autodetect = false;
+      devices = map (drive: { device = drive; }) localdrives;
+      notifications.systembus-notify.enable = true;
+      notifications.mail = {
+        enable = true;
+        sender = "alexandria@catbertsen.de";
+        recipient = "christian@wudika.de";
+      };
+    };
     time.timeZone = "Europe/Berlin";
     i18n = {
       defaultLocale = "de_DE.UTF-8";
@@ -190,7 +184,7 @@
         xterm # for resize command
       ];
 
-    system.stateVersion = "23.11";
+    system.stateVersion = "25.11";
     programs.nix-ld = {
       enable = true;
       libraries = with pkgs; [

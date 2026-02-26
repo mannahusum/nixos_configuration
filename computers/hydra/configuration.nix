@@ -8,33 +8,62 @@
   ...
 }: {
   imports = [
+    sops-nix.nixosModules.sops
+    ./sops.nix
+    (modulesPath + "/profiles/base.nix")
+    ../shared-config.nix
     ../disko-config.nix
-    ../../modules/postfix.nix
-    ../../modules/serial-console.nix
+    ../../modules/acme.nix
     ../../modules/gitea.nix
     ../../modules/keyboard.nix
     ../../modules/nginx.nix
     ../../modules/pixiecore.nix
-    (modulesPath + "/profiles/base.nix")
+    ../../modules/postfix.nix
     ../../modules/saned.nix
+    ../../modules/serial-console.nix
     ../../modules/sshd.nix
     ../../modules/usermount.nix
     ../../modules/users.nix
     ../../modules/wayland.nix
     ../../modules/xandikos.nix
     ../../modules/yubikey.nix
-    ../shared-config.nix
-    ./sops.nix
-    sops-nix.nixosModules.sops
   ];
 
   options.hydra = {
   };
 
   config = let
-    localdrives = ["nvme-Samsung_SSD_970_EVO_Plus_2TB_S4J4NX0R847857X" "ata-SanDisk_SSD_PLUS_2000GB_213705800853"];
+    byidpath = name: "/dev/disk/by-id/" + name;
+    localdrives = map byidpath ["nvme-Samsung_SSD_970_EVO_Plus_2TB_S4J4NX0R847857X" "ata-SanDisk_SSD_PLUS_2000GB_213705800853"];
   in {
+    caacme = {
+      enable = true;
+      credentialsfile = config.sops.templates."route53Credentials".path;
+    };
+    cagitea = {
+      enable = true;
+      domain = "gitea.catbertsen.de";
+    };
+    cakeyboard.enable = true;
+    canginx.enable = true;
+    capixiecore.enable = true;
+    capostfix = {
+      enable = true;
+      connection = "smtp.protonmail.ch:587";
+      mydomain = "catbertsen.de";
+    };
+    casaned.enable = true;
     caserialconsole.enable = true;
+    casshd.enable = true;
+    causermount.enable = true;
+    cawayland.enable = true;
+    caxandikos = {
+      enable = true;
+      domain = "calendar.catbertsen.de";
+      passwordfile = config.sops.templates."xandikosBasicAuth".path;
+    };
+    cayubikey.enable = true;
+
     cadrives = {
       enable = true;
       boot = null;
@@ -49,25 +78,13 @@
     services.smartd = {
       enable = true;
       autodetect = false;
-      devices = map (drivename: {device = "/dev/disk/by-id/" + drivename;}) localdrives;
+      devices = map (drive: { device = drive; }) localdrives;
       notifications.systembus-notify.enable = true;
       notifications.mail = {
         enable = true;
         sender = "hydra@catbertsen.de";
         recipient = "christian@wudika.de";
       };
-    };
-    capostfix = {
-      enable = true;
-      connection = "smtp.protonmail.ch:587";
-      mydomain = "catbertsen.de";
-    };
-    nixpkgs = {
-      inherit overlays;
-      config.allowUnfreePredicate = pkg:
-        builtins.elem (lib.getName pkg) [
-          "google-chrome"
-        ];
     };
     nix.buildMachines = [
       {
@@ -108,27 +125,6 @@
       };
     };
 
-    caacme = {
-      enable = true;
-      credentialsfile = config.sops.templates."route53Credentials".path;
-    };
-    cagitea = {
-      enable = true;
-      domain = "gitea.catbertsen.de";
-    };
-    cakeyboard.enable = true;
-    canginx.enable = true;
-    capixiecore.enable = true;
-    casaned.enable = true;
-    casshd.enable = true;
-    causermount.enable = true;
-    cawayland.enable = true;
-    caxandikos = {
-      enable = true;
-      domain = "calendar.catbertsen.de";
-      passwordfile = config.sops.templates."xandikosBasicAuth".path;
-    };
-    cayubikey.enable = true;
     # environment.etc."sway/config.d/monitors.conf".text = ''
     #   output "DP-1" mode 3840x2160@30Hz pos 0 0
     #   output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
@@ -205,16 +201,17 @@
     };
 
     environment.systemPackages = with pkgs; [
+      file
       git
+      git-crypt
       lm_sensors
       mokutil
-      sbctl
-      tpm2-tss
-      git-crypt
       neovim
       ripgrep
+      sbctl
+      sbsigntool
+      tpm2-tss
       xterm # for resize command
-      file
     ];
     system.stateVersion = "23.11";
   };

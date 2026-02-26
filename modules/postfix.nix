@@ -52,6 +52,7 @@ in {
     };
     services.postfix = {
       enable = true;
+      setSendmail = true;
       settings.main = {
         myorigin = "${cfg.mydomain}";
         mydomain = "${cfg.mydomain}";
