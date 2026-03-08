@@ -18,6 +18,10 @@
     };
     nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
 
+    automatic-ripping-machine = {
+      url = "github:xieve/automatic-ripping-machine/dev?dir=nixos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -53,6 +57,7 @@
   };
 
   outputs = {
+    automatic-ripping-machine,
     disko,
     flake-utils,
     # home-config,
@@ -264,6 +269,7 @@
               ./computers/alexandretta/sops.nix
               disko.nixosModules.disko
               lanzaboote.nixosModules.lanzaboote
+              automatic-ripping-machine.nixosModules.default
               {
                 boot = {
                   # bootspec.enable = true;

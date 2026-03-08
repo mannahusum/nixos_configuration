@@ -1,10 +1,10 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }: let
   cfg = config.caarm;
+  baseFolder = "/media/arm/media";
 in {
   options.caarm = {
     enable = lib.mkOption {
@@ -17,63 +17,89 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    boot.kernelModules = [ "sg" ];
     programs.zsh.enable = true;
 
+    fileSystems."/mnt/dev/sr1" = {
+      device = "/dev/sr1";
+      fsType = "udf,iso9660";
+      options = [ "defaults" "utf8" "noauto" "ro" "user" ];
+    };
+    fileSystems."/mnt/dev/sr0" = {
+      device = "/dev/sr0";
+      fsType = "udf,iso9660";
+      options = [ "defaults" "utf8" "noauto" "ro" "user" ];
+    };
     users.users.arm = {
-      isNormalUser = true; # Erstelle einen normalen Benutzer
       home = "/media/arm"; # Home-Verzeichnis
-      group = "arm"; # Primäre Gruppe
-      extraGroups = ["wheel"]; # Optionale zusätzliche Gruppen (z. B. für sudo-Zugriff)
-      shell = pkgs.zsh; # Benutzer-Shell (z. B. zsh oder bash)
-      uid = 1001;
+      uid = 1000;
+      homeMode = "755";
+      extraGroups = ["cdrom" "video"];
     };
 
-    users.groups.arm = {
-      gid = 1001; # Optional: spezifische GID
+    services.automatic-ripping-machine = {
+      enable = true;
+      enableTranscoding = false;
+      appriseSettings = {
+        NTFY_TOPIC = "ootu1ipiexodohphu6zoo7Aedeifooseayozoa3the4thar1zoh1vahKimohH8ee";
+      };
+      settings = {
+        ALLOW_DUPLICATES = true;
+        ARM_CHECK_UDF = false;
+        ARM_NAME =  "Alexandretta";
+        AUTO_EJECT = true;
+        COMPLETED_PATH = "${baseFolder}/completed/";
+        DATE_FORMAT = "%Y-%m-%d %H:%M:%S";
+        DELRAWFILES = true;
+        DEST_EXT = "mkv";
+        DISABLE_LOGIN = true;
+        EMBY_REFRESH = false;
+        EXTRAS_SUB = "extras";
+        GET_AUDIO_TITLE = "musicbrainz";
+        GET_VIDEO_TITLE = true;
+        LOGLEVEL = "DEBUG";
+        MAINFEATURE = false;
+        MANUAL_WAIT_TIME = 60;
+        MANUAL_WAIT = true;
+        MAX_CONCURRENT_MAKEMKVINFO = 1;
+        MAX_CONCURRENT_TRANSCODES = 3;
+        MAXLENGTH = 99999;
+        # Media will be put into movies/ and shows/ subdirectories
+        METADATA_PROVIDER = "omdb";
+        MINLENGTH = 120;
+        NOTIFY_JOBID = false;
+        NOTIFY_RIP = true;
+        NOTIFY_TRANSCODE = true;
+        PREVENT_99 = true;
+        RAW_PATH = "${baseFolder}/raw/";
+        RIPMETHOD = "mkv";
+        RIP_POSTER = true;
+        # TODO: remove when config is final
+        TRANSCODE_PATH = "${baseFolder}/transcode/";
+        UMASK = "0o002";
+        VIDEOTYPE = "auto";
+        # WEBSERVER_IP = "127.0.0.1";
+        WEBSERVER_PORT = 28982;
+      };
     };
 
-    # Runtime
-    virtualisation = {
-      docker = {
-        enable = true;
-        autoPrune.enable = true;
-        daemon.settings = {
-          userland-proxy = false;
-          experimental = true;
-          ipv6 = true;
-          fixed-cidr-v6 = "fd00::/80";
+    systemd.services = {
+      "arm@" = {
+        serviceConfig = {
+          ReadWritePaths = [
+            "/media/arm"
+            "/mnt/dev"
+          ];
+          AssertCapability = [ "CAP_SYS_ADMIN" ];
+        };
+        environment = {
+          ARM_MAKEMKV_PERMA_KEY_FILE = config.sops.secrets."ripping/makemkv.key".path;
         };
       };
-      oci-containers.backend = "docker";
-      oci-containers.containers."arm-ripper" = {
-        pull = "always";
-        image = "automaticrippingmachine/automatic-ripping-machine:latest";
-        #ports = [ "8080:8080" ];
-        ports = ["28982:8080"];
+      armui = {
         environment = {
-          ARM_UID = "1000";
-          ARM_GID = "1001";
-          TZ = "Europe/Berlin";
+          ARM_OMDB_API_KEY_FILE = config.sops.secrets."ripping/omdbapi.key".path;
         };
-        volumes = [
-          "/mnt:/mnt"
-          "/media/arm:/home/arm"
-          "/etc/arm/config:/etc/arm/config"
-          "/media/audio/arm:/home/arm/Music"
-          "/var/log/arm:/home/arm/logs"
-          # "/media/arm/media:/home/arm/media"
-        ];
-        devices = [
-          "/dev/sr0:/dev/sr0"
-          "/dev/sr1:/dev/sr1"
-          "/dev/sr2:/dev/sr2"
-          "/dev/sr3:/dev/sr3"
-          "/dev/sg0:/dev/sg0"
-          "/dev/sg1:/dev/sg1"
-          "/dev/sg2:/dev/sg2"
-        ];
-        privileged = true;
-        autoStart = true;
       };
     };
 

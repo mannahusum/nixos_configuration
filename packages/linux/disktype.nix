@@ -13,6 +13,10 @@ in stdenv.mkDerivation {
     hash = "sha256-tnASVNiEErxdLbhpA3dF9l+UuQC1kYQVfQcvNYMsERE=";
   };
   doCheck = false;
+  installPhase = ''
+    mkdir -p "''${out}/bin"
+    cp disktype "''${out}/bin/"
+  '';
   meta = {
     homepage = "https://disktype.sourceforge.net/";
     description = "Tool to analyse the type of disk you are dealing with";

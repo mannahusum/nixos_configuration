@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{ 
+  lib,
+  pkgs,
+  ...
+}: {
   home = let
     homePythonPackages = python-packages:
       with python-packages; [
@@ -20,7 +24,6 @@
       coreutils-full
       cyrus_sasl
       detect-secrets
-      disktype
       dmidecode
       enscript
       texliveFull
@@ -61,6 +64,14 @@
       yarn
       yubikey-manager
       zathura
+    ] ++ [
+      cdparanoia
+      cdrdao
+      cdrkit
+      ddrescue
+      disktype
+      flac
+      makemkv
     ];
   };
 }
