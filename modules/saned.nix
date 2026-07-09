@@ -2,10 +2,11 @@
   config,
   lib,
   pkgs,
-  system,
   ...
 }: let
   cfg = config.casaned;
+  linux = lib.strings.hasSuffix "-linux" pkgs.stdenv.hostPlatform.system;
+  darwin = lib.strings.hasSuffix "-darwin" pkgs.stdenv.hostPlatform.system;
 in {
   imports = [
     ./users.nix
@@ -21,25 +22,19 @@ in {
     };
   };
 
-  config =
-    lib.mkIf cfg.enable {
-    }
-    // (
-      if lib.strings.hasSuffix "-linux" system
-      then {
-        hardware.sane = {
-          enable = true;
-          openFirewall = true;
-        };
-        services.saned.enable = true;
-        causers.regularUserGroups = ["lp" "scanner"];
-      }
-      else if lib.strings.hasSuffix "-darwin" system
-      then {
-        environment.systemPackages = with pkgs; [
-          epsonscan2
-        ];
-      }
-      else {}
-    );
+  config = lib.mkMerge [
+    (lib.mkIf (cfg.enable && linux) {
+      hardware.sane = {
+        enable = true;
+        openFirewall = true;
+      };
+      services.saned.enable = true;
+      causers.regularUserGroups = ["lp" "scanner"];
+    })
+    (lib.mkIf (cfg.enable && darwin) {
+      environment.systemPackages = with pkgs; [
+        epsonscan2
+      ];
+    })
+  ];
 }

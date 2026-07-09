@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
   cfg = config.cabackupclient;
@@ -52,6 +53,9 @@ in {
   };
 
   config = {
+    environment.systemPackages = with pkgs; [
+      rsync
+    ];
     services = {
       openssh.knownHosts."${cfg.serverAddress}".publicKey = builtins.readFile cfg.serverHostkey;
       sanoid = {

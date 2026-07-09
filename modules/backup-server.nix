@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
   cfg = config.cabackupserver;
@@ -29,6 +30,9 @@ in {
   };
 
   config = {
+    environment.systemPackages = with pkgs; [
+      rsync
+    ];
     users = {
       users = {
         "${cfg.username}" = {

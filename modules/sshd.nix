@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  system,
   ...
 }: let
   cfg = config.casshd;
@@ -20,9 +19,9 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable (
-    if lib.strings.hasSuffix "-linux" system
-    then {
+  config = lib.mkIf cfg.enable (lib.mkMerge [
+    (lib.mkIf (lib.strings.hasSuffix "-linux" pkgs.stdenv.hostPlatform.system)
+    {
       programs.ssh = {
         setXAuthLocation = true;
         enableAskPassword = true;
@@ -40,9 +39,9 @@ in {
           StreamLocalBindUnlink = "yes";
         };
       };
-    }
-    else if lib.strings.hasSuffix "-darwin" system
-    then {
+    })
+    (lib.mkIf (lib.strings.hasSuffix "-darwin" pkgs.stdenv.hostPlatform.system)
+    {
       services.openssh = {
         enable = true;
       };
@@ -52,7 +51,6 @@ in {
       programs.ssh.extraConfig = ''
         XAuthLocation ${pkgs.xorg.xauth}/bin/xauth
       '';
-    }
-    else {}
-  );
+    })
+  ]);
 }

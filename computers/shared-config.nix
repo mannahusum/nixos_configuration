@@ -1,4 +1,5 @@
 ({
+  home-manager,
   modulesPath,
   lib,
   overlays,
@@ -6,6 +7,7 @@
   ...
 }: {
   imports = [
+    home-manager.nixosModules.home-manager
     (modulesPath + "/profiles/base.nix")
     ../modules/gitea.nix
     ../modules/keyboard.nix
@@ -26,6 +28,7 @@
         builtins.elem (lib.getName pkg) [
           "google-chrome"
           "unrar"
+          "makemkv"
         ];
     };
     boot = {
@@ -86,31 +89,8 @@
     cayubikey.enable = true;
     cakeyboard.enable = true;
     time.timeZone = "Europe/Berlin";
-    i18n = {
-      defaultLocale = "de_DE.UTF-8";
-      extraLocaleSettings = {
-        LC_COLLATE = "de_DE.UTF-8";
-        LC_CTYPE = "de_DE.UTF-8";
-      };
-    };
     networking = {
       tempAddresses = "disabled";
-      hosts = {
-        # "192.168.10.252" = [
-        #   "alexandria.windows.catbertsen.de"
-        #   "alexandria.catbertsen.de"
-        #   "alexandria"
-        # ];
-        # "192.168.10.253" = [
-        #   "mannahusum.catbertsen.de"
-        #   "mannahusum"
-        # ];
-        # "192.168.10.254" = [
-        #   "hydra.catbertsen.de"
-        #   "calendar.catbertsen.de"
-        #   "gitea.catbertsen.de"
-        # ];
-      };
     };
     causermount.enable = true;
 

@@ -4,7 +4,7 @@
   nixpkgs,
   overlays,
   pinentry,
-  system,
+  system_type,
   withExtraSocket ? false,
   ...
 }: {
@@ -21,7 +21,8 @@
   ];
 
   nixpkgs = {
-    inherit overlays system;
+    inherit overlays;
+    system = system_type;
     config.allowUnfreePredicate = pkg:
       builtins.elem (nixpkgs.lib.getName pkg) [
         "google-chrome"

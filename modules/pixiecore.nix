@@ -73,7 +73,7 @@ in {
               ipmitool
               multipath-tools
               neovim
-              nixos-anywhere.packages."${system}".nixos-anywhere
+              nixos-anywhere.packages."x86_64-linux".nixos-anywhere
             ];
 
             services = {

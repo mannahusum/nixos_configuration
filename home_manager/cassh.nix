@@ -532,9 +532,9 @@ with lib; let
     "workarm" = {
       hostname = "workarm.itiv.kit.edu";
       hostkeys = [
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDNpzEmSBAA8SmRoxdluO9QxM4Qq6t7u1ORRidz2TTGNBvhgnRxT8rlhmdSVkICFDBWqmezDOuGFHmIFKLBjZreGskazycln8FfELmO1+NOt4TYptWEduWffiYA4dL8ALjOt3lmEOMgps1zNhdOgk3DnqUVp5V/gwPndubawc//sP6ve1pgeKCd2duPe0l4PTRXWkYL+CPIe7fRBIoZdsleqp2623gbfVIQu/p3t11l0aUL301gIlSH5EOd4gy2QQIjuuWqftkD+9dG3CUuW99UJHtuobERYk1R42WgKDWPr+WxLiv3o3sFd7yonaDFl+IdMSGqoYPSSgeZV5V5C95Goadl6jIQEm+Mdnoeo+UvA3WA7YugfGSd5GJRoscvfJiUNBcCVDb2VU00k7Me3DWTM0ESGJ79v4tk9CI43I72quAbfjT9IZE2UTno/9SG4kiFU5m2SHl8xSbumbBnx7CoOWqh1+vM2iskoTIhCZeYMwykChlcEbRxkDzu0/zkURM="
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBElMxYr3LMRJt3r3e962moki4g6MQ2vlPiOmINwojNhrWJIZWULeZUC7GfEz8cf1ALPfXgnlH8z2fN+bn+oiqmc="
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEpn2NxhTfCm18m4ayZZSk3V5xRFyorWb8zJSLwrwE3E"
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBD0sdYgWkABqIj1RLsvU3TZ4exeT+YvWbKK2+XjhfSAtXGQnNo3kXC8PkODmrR6HfdMTHrXumoKZUGc+KfZ150g="
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDmAi3FPsLEmMtN1kl/dJMZAtILMUsT6UCqr+jc6z8Cw4mAcIL+YGY1ivZO0QFkX6/RN9X3usHEcXpVPORoVBz3MMy36pCY3eDcw4nVMo4SiqrwZ04ERKovYBM2jsNNrBVYpQ37qvhfw5dayaTz35uQywRxnYcu7qg5JEVzKl1lo09pO7yAeNzNCcr5OQhoe+mPBFqOg+N63xSoJWrEQ+TFkh4DxItjBL5jm38vqRlS4hpILY3KUxfOpwGzoiHRxTiCFgKn/a60b+Php2K8vZqe1pr48T0srKGDOianRko5GTB1kPDrqKXR/mCWhwyAZNONl+qa+a0OYbaGeWFw0xlH8iahBSJUDqra8+bRANrleq3n+vO4Ezx4XMhyyXe6v3b5aJ0zOJ+QA0kgKjwekXhDQzK1Bhd5dMc3zsGz+hbL/rzzUSqiyAN6X+JQm8o+EJnM1VbXpKnRGfUF5Bo1P9yklk2sVN9ns+I6zbLimhQ/ZcYDdbwZHbk0ADDL/kZ59qXHS+e647MUjFmotufrsuuTuJkA2RO74BPO2EFlWBJ4x7TN3q2hcsimt5P4gh4gqPk89i897Q5tfqazHKYSXaXYrh9L7AdnOJ2kxv13j0VRSB6hJq3tGqybAeQf7/KqJWNwgtZfJQ7siFxkoueXaRGPCyuEOyMsfr5tRUNjDgGhtQ=="
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA7c19fYp3a90ODssk+xhyeA0+WNSATx6huXG0e8BcO0"
       ];
       overrides = {
         user = "root";

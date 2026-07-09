@@ -2,10 +2,11 @@
   config,
   lib,
   pkgs,
-  system,
   ...
 }: let
   cfg = config.cakeyboard;
+  linux = lib.strings.hasSuffix "-linux" pkgs.stdenv.hostPlatform.system;
+  darwin = lib.strings.hasSuffix "-darwin" pkgs.stdenv.hostPlatform.system;
 in
   {
     options.cakeyboard = {
@@ -17,25 +18,11 @@ in
         '';
       };
     };
-  }
-  // (
-    if lib.strings.hasSuffix "-linux" system
-    then {
-      imports = [
-        ./wayland.nix
-      ];
-
-      options.cakeyboard = {
-        enable = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = ''
-            Whether to set keyboard for Christian
-          '';
-        };
-      };
-
-      config = lib.mkIf cfg.enable {
+    imports = [
+      ./wayland.nix
+    ];
+    config = lib.mkIf cfg.enable (lib.mkMerge [
+      (lib.mkIf linux {
         services.xserver.xkb = {
           layout = "de,de,gr";
           model = "pc105";
@@ -50,14 +37,8 @@ in
           XKB_DEFAULT_OPTIONS=",,"
           export XKB_DEFAULT_LAYOUT XKB_DEFAULT_MODEL XKB_DEFAULT_VARIANT XKB_DEFAULT_OPTIONS
         '';
-      };
-    }
-    else {
-      imports = [];
-      config =
-        {
-        }
-        // lib.mkIf cfg.enable {
+      })
+      (lib.mkIf darwin {
           # Basic installation of Neo Layout
           system.systemBuilderCommands = ''
             mkdir -p "''${out}/Library/Keyboard Layouts"
@@ -80,6 +61,6 @@ in
           # services.karabiner-elements = {
           #   enable = true;
           # };
-        };
-    }
-  )
+        })
+    ]);
+  }

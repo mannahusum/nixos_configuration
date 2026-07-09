@@ -5,21 +5,12 @@
   nixpkgs,
   overlays,
   pkgs,
-  system,
   ...
 }: let
   cfg = config.causers;
 in {
-  imports =
-    if lib.strings.hasSuffix "-linux" system
-    then [
-      home-manager.nixosModules.home-manager
-    ]
-    else if lib.strings.hasSuffix "-darwin" system
-    then [
-      home-manager.darwinModules.home-manager
-    ]
-    else [];
+  imports = [
+  ];
 
   options.causers = {
     adminUsers = lib.mkOption {
@@ -113,7 +104,7 @@ in {
     };
   in
     lib.mkMerge [
-      (lib.mkIf (lib.strings.hasSuffix "-linux" system) {
+      (lib.mkIf (lib.strings.hasSuffix "-linux" pkgs.stdenv.hostPlatform.system) {
         users = {
           users = builtins.listToAttrs (
             map (
@@ -160,7 +151,8 @@ in {
         home-manager = {
           users = {
             christian = import ../home_manager/caHomeConfig.nix {
-              inherit config nixpkgs overlays system;
+              inherit config nixpkgs overlays;
+              system_type = pkgs.stdenv.hostPlatform.system;
               pinentry = cfg.defaultPinentry;
               forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
               createForwardPath = true;

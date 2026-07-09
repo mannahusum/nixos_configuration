@@ -20,16 +20,16 @@ in {
     boot.kernelModules = [ "sg" ];
     programs.zsh.enable = true;
 
-    fileSystems."/mnt/dev/sr1" = {
-      device = "/dev/sr1";
-      fsType = "udf,iso9660";
-      options = [ "defaults" "utf8" "noauto" "ro" "user" ];
-    };
-    fileSystems."/mnt/dev/sr0" = {
-      device = "/dev/sr0";
-      fsType = "udf,iso9660";
-      options = [ "defaults" "utf8" "noauto" "ro" "user" ];
-    };
+
+    fileSystems = builtins.listToAttrs (lib.lists.forEach (lib.lists.range 0 10) ( count: {
+      name = "/mnt/dev/sr${builtins.toString count}";
+      value = {
+          device = "/dev/sr${builtins.toString count}";
+          fsType = "udf,iso9660";
+          options = [ "defaults" "utf8" "noauto" "ro" "user" "X-mount.mkdir" ];
+        };
+      }
+    ));
     users.users.arm = {
       home = "/media/arm"; # Home-Verzeichnis
       uid = 1000;
@@ -86,17 +86,25 @@ in {
     systemd.services = {
       "arm@" = {
         serviceConfig = {
+          DeviceAllow = [
+            "/dev/%I rwm"
+          ];
           ReadWritePaths = [
             "/media/arm"
-            "/mnt/dev"
+            "/mnt/dev/%I"
+            config.security.wrapperDir
+            (dirOf config.sops.secrets."ripping/makemkv.key".path)
           ];
-          AssertCapability = [ "CAP_SYS_ADMIN" ];
         };
         environment = {
           ARM_MAKEMKV_PERMA_KEY_FILE = config.sops.secrets."ripping/makemkv.key".path;
         };
       };
       armui = {
+        serviceConfig.ReadWritePaths = [
+          config.security.wrapperDir
+          (dirOf config.sops.secrets."ripping/omdbapi.key".path)
+        ];
         environment = {
           ARM_OMDB_API_KEY_FILE = config.sops.secrets."ripping/omdbapi.key".path;
         };

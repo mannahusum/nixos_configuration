@@ -19,7 +19,7 @@
     nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
 
     automatic-ripping-machine = {
-      url = "github:xieve/automatic-ripping-machine/dev?dir=nixos";
+      url = "git+file:///home/christian/Projekte/NixOS/automatic-ripping-machine?dir=nixos";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -78,6 +78,7 @@
       (import ./packages/linux/overlay.nix)
       (import ./packages/ssh/overlay.nix)
       (import ./packages/darwin/overlay.nix)
+      (import ./packages/ipxe/overlay.nix)
       nixos-luks-yk.overlay
     ];
     mypkgs = system:
@@ -124,6 +125,10 @@
           inherit pkgs;
           tests = import ./functions/tests/ssh.nix {inherit pkgs;};
         };
+      };
+
+      packages = {
+        ipxe_partition = (mypkgs system).ipxe_partition;
       };
 
       devShells.default = let
@@ -188,23 +193,9 @@
             inherit system;
             modules = [
               ./computers/hydra/configuration.nix
-              ./computers/hydra/hardware-configuration.nix
-              ./computers/hydra/sops.nix
-              disko.nixosModules.disko
-              lanzaboote.nixosModules.lanzaboote
-              {
-                boot = {
-                  bootspec.enable = true;
-                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                  lanzaboote = {
-                    enable = true;
-                    pkiBundle = "/etc/secureboot";
-                  };
-                };
-              }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixos-anywhere nixpkgs overlays self sops-nix system;
+              inherit disko home-manager inputs lanzaboote nixos-anywhere nixos-luks-yk nixpkgs overlays self sops-nix;
             };
           };
         alexandria = let
@@ -352,9 +343,12 @@
               #     };
               #   };
               # }
+              {
+                nixpkgs.hostPlatform = system;
+              }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix;
             };
           };
       };
