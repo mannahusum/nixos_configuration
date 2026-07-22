@@ -98,6 +98,7 @@ in {
             MAILADDR christian@wudika.de
           '';
         };
+        zfs.forceImportRoot = true;
       };
 
       services = {

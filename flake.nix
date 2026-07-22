@@ -8,7 +8,7 @@
     # };
     nixos-hardware.url = "github:8bitbuddhist/nixos-hardware?ref=surface-rust-target-spec-fix";
     nixpkgs = {
-      url = "github:nixos/nixpkgs/nixos-25.11";
+      url = "github:nixos/nixpkgs/nixos-26.05";
     };
     nixpkgs-makemkv = {
       url = "github:NixOS/nixpkgs/ed9d88e5ee5dd5aa71c807c6f60c9c5cf58d3676";
@@ -19,7 +19,7 @@
     nix-flake-tests.url = "github:antifuchs/nix-flake-tests";
 
     automatic-ripping-machine = {
-      url = "git+file:///home/christian/Projekte/NixOS/automatic-ripping-machine?dir=nixos";
+      url = "github:xieve/automatic-ripping-machine/76effcc6f1694f9a24b9b8a9565c2d19bb14188b?dir=nixos";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -27,7 +27,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     lanzaboote = {

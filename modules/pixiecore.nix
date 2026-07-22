@@ -111,12 +111,13 @@ in {
                 efi.canTouchEfiVariables = true;
                 systemd-boot.netbootxyz.enable = false;
               };
+              zfs.forceImportRoot = true;
             };
 
             networking = {
               hostName = "installer"; # Define your hostname.
               networkmanager.enable = true;
-              wireless.enable = false;
+              wireless.enable = lib.mkForce false;
             };
 
             time.timeZone = "Europe/Berlin";

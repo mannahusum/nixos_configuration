@@ -2,7 +2,7 @@
   pkgs,
   ...
 }: {
-  home.packages = let
+  home.packages = with pkgs; let
     homePythonPackages = python-packages:
       with python-packages; [
         pathspec
@@ -14,7 +14,7 @@
       ];
 
     homePython3 = python314.withPackages homePythonPackages;
-  in with pkgs; [
+  in [
     adoptopenjdk-icedtea-web
     bashInteractive
     bat # cat clone
@@ -42,7 +42,7 @@
     ncurses
     nix-prefetch-git
     nodejs
-    typcscript
+    typescript
     pandoc
     patchelf
     pciutils

@@ -49,16 +49,10 @@
           command = "${pkgs.sway}/bin/swaymsg output * power off";
         }
       ];
-      events = [
-        {
-          event = "before-sleep";
-          command = "${pkgs.swaylock}/bin/swaylock -f";
-        }
-        {
-          event = "after-resume";
-          command = "${pkgs.sway}/bin/swaymsg output * power on";
-        }
-      ];
+      events = {
+        "before-sleep" = "${pkgs.swaylock}/bin/swaylock -f";
+        "after-resume" = "${pkgs.sway}/bin/swaymsg output * power on";
+      };
     };
 
     wayland.windowManager.sway = {

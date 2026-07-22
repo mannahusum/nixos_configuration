@@ -22,6 +22,7 @@
   ];
 
   config = {
+
     nixpkgs = {
       inherit overlays;
       config.allowUnfreePredicate = pkg:
@@ -81,6 +82,12 @@
       };
       fwupd = {
         enable = true;
+      };
+      resolved.settings.Resolve = {
+        DNSSEC = "true";
+        Domains = ["~."];
+        FallbackDNS = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
+        DNSOverTLS = "true";
       };
     };
 

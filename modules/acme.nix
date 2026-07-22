@@ -49,7 +49,7 @@ in {
           name = "${domain}";
           value = {
             dnsProvider = "route53";
-            credentialsFile = "${cfg.credentialsfile}";
+            environmentFile = "${cfg.credentialsfile}";
             webroot = null;
           };
         })
