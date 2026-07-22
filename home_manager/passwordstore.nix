@@ -44,6 +44,27 @@ in {
             fi
         fi
       '';
+
+      bash.extraProfile.set_proxmox_secrets = ''
+        set_proxmox_secrets() {
+          local array
+          local first
+
+          first=""
+          while read -ra array; do
+            if [[ -z "$first" ]]; then
+              export PROXMOX_TOKEN="''${array[0]}"
+              first="1"
+            else
+              case "''${array[0]}" in
+                user*)
+                  export PROXMOX_USER="''${array[1]}"
+                  ;;
+              esac
+            fi
+          done < <(pass kit.edu/virt1.itiv.kit.edu/TerraformTest 2>/dev/null) 2>&1 >/dev/null
+        }
+      '';
     };
   };
 }

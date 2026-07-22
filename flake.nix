@@ -93,9 +93,9 @@
     flake-utils.lib.eachDefaultSystem (system: {
       homeConfigurations = {
         christian_at_hydra = home-manager.lib.homeManagerConfiguration {
-          inherit nixpkgs overlays system;
+          pkgs = nixpkgs.legacyPackages.${system};
           modules = [
-            ./home-manager/caHomeConfig.nix
+            ./home_manager/caHomeConfig.nix
             {
               programs = {
                 home-manager.enable = true;
@@ -104,14 +104,39 @@
               home = {
                 username = "christian";
                 homeDirectory = "/home/christian";
-                stateVersion = "24.05";
+                stateVersion = "24.11";
               };
             }
           ];
 
           extraSpecialArgs = {
-            inherit inputs;
+            inherit system inputs overlays nixpkgs;
+            pinentry = "bemenu";
             forwardTo = "/home/christian/.forwarded-sockets";
+            createForwardPath = true;
+            withExtraSocket = false;
+          };
+        };
+        to6338 = home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${system};
+          modules = [
+            ./home-manager/caHomeConfig.nix
+            {
+              programs = {
+                home-manager.enable = true;
+                git.enable = true;
+              };
+              home = {
+                username = "to6338";
+                homeDirectory = "/home/to6338";
+                stateVersion = "25.11";
+              };
+            }
+          ];
+
+          extraSpecialArgs = {
+            inherit system inputs overlays nixpkgs;
+            forwardTo = "/home/to6338/.forwarded-sockets";
             createForwardPath = true;
             withExtraSocket = false;
           };

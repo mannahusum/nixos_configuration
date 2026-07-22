@@ -1,5 +1,5 @@
 final: _prev: let
-  version = "20250922";
+  version = "20260716";
   keys_to_file = name: keys:
     builtins.toFile name (
       builtins.concatStringsSep "\n" keys
@@ -7,7 +7,7 @@ final: _prev: let
 
   al_pgp_key = final.fetchurl {
     url = "https://keys.openpgp.org/vks/v1/by-email/christian@wudika.de";
-    hash = "sha256-2PVmc7QA6n2iwxYmrUkhPj4At2vB5BM/FqPQNjc3AI8=";
+    hash = "sha256-lQ5GtUi848zbCG1bd+w5nD4AqSvr4qyXrLz8rv3QQP8=";
   };
 
   al_public_keys_file = with final;
@@ -30,7 +30,10 @@ final: _prev: let
 
         cleanup_on_exit() {
             for tempfile in "''${TO_DELETE[@]}"; do
-            rm -rf "''${tempfile}"
+              if [[ -n "''${tempfile}" ]]; then
+                echo "deleting tempfile ''${tempfile}"
+                rm -rf "''${tempfile}"
+              fi
             done
         }
 
@@ -38,6 +41,7 @@ final: _prev: let
             local filename="''${1}"; shift
             local i
 
+            echo "deleting and forgetting ''${tempfile}"
             rm -rf "''${filename}"
 
             for i in "''${!TO_DELETE[@]}"; do
@@ -63,6 +67,7 @@ final: _prev: let
             gpgdir="$(mktemp -d)"
             TO_DELETE+=("''${gpgdir}")
 
+            touch "''${ssh_keys}"
             gpg --quiet --homedir "''${gpgdir}" --import "''${gpg_public_key}"
             while read -r keyline; do
             gpg --homedir "''${gpgdir}" --export-ssh-key "$(line_to_keyid "''${keyline}")!" >>"''${ssh_keys}"
@@ -73,6 +78,12 @@ final: _prev: let
         main() {
             extract_ssh_public_keys armored_public_key authorized_keys
         }
+
+        # Add current authorized_keys in order to avoid to be locked out
+        cat >authorized_keys <<EOF
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6YIlElgTY8NR9PS6m7umTu23TIWd8LJ1r50wMhVjDHDqsa4SvW4uTjTL3MEi7myNSv5oL6kaUrybigFV2nJt+gUwD+3u18FRD+0zQQEhn4f2PSjgEK+htGMkqRSbvVNdLrjbtf783eTRkUn4ICG/4+kgT1eN7qydBrn/soX2pihVNMOMIUH34DKTXDKKXPhSIoquuI87a+j00mz7Sa0eWycGZfx7bqRf5RJvhfwBg5DMh+isCn3n3ueFuc95GFeF7eXzjtnGux/uxj2wtuJ2u/J8tV2vf/CG6a/xMLSmUXpL7ZemOAeEOuX8bEAFCsN3I6hXMfHxmq9wey/ll2C/V cardno:10_162_754
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzzNzYW3kYH+fHz/rSXD6A6UAd3eCQq3dilaLgPfax5qXBK7i+c+mhVUrWqDCpy7qC7ZIkvEcqDqnGT+cCASzEj1yrY5GFq+/Sw5zKo1wYa70wZUoVccFDxsn/GJ0Lp2HGZITz4/hnRdBE0HFDwIobVmhl5/8jQjGQV2DKMT6tBCljOkn5Fs2YMAu19fhyxnlQcxd5A98QFRJlCOzCt2JRVjiYZptjucNMS3zDZH6ucDtuYlFje9ocQycrFPs5vXKbNe1PjdInfYHPzF94ou5tGkelW+6Q8dpheziioUOarLBN6ABdPKqOcOWiDHe7cgwKtj6m+SF223chW5C8WrbJ cardno:16_049_902
+        EOF
 
         main
       '';

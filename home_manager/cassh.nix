@@ -18,6 +18,17 @@ with lib; let
       };
       gpgSocket = null;
     };
+    "cbm-vm1" = {
+      hostname = "itiv-cbm-vm1.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCpuLQd87mVzqVjIg/6wR6XijAPo4hWWPqo45e3TD/0rHSgWe+4ExZx2mUvcuaZiefewf41b/O40lpoksbqtpXZNaUXl/tLthx+CneZS/tCNiPR0zFJVy58NTNgxSQ+Bf7WvHRG43jVnpwZ0mFlOGcvG/Kld70lRqq21cESrkk70RVAhypzfqENg3sOiAnD3AKfFaz9K1h6DHMT8TDj64ttMdSrYgJnJ/u/UdxyaUDu+ESCGD5uYN74mjtpsxHm+EWvPrMZXNn9lP3xdD0ujnkK8MEB1G8J4iDuKtLUygL4pjwc86zUIEbsMw74DrlN3dvMiPtcYwKA7y9CTqgxtVFbaSax/VT55C/OWwRqGESHrKM6J13HnoNvfzW7ayvXIpLSu/FXSOKj56A9G9rimk6+sBdrouYdS7X8w7Y2ZVKUejeQtD5rpkiRyci3UY4L1RqP8Ts9imDv9rgO7E5qHLF9nylW8I71/7D4n4Op8hisS4yHOQ/PAydrzBZcuQBWLWGKigJkrEv0fu3TINl3CRPMN+FgAHUP3I+wEQVzlPbYnw5T8/3vivzpg0RLEmjXc1bsqTDKxMaIk65LiDFtOUN1XCvZcbH9ebjj7oeJ2mU3xg8U6JjDyeBicoczyNbzXBhRT6/iEtuXBn5oY1o19mb31rcriOq0gOJGI7qJOF2aow=="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPH77EjF3cq/hlkW8bqq/FbOgnu7RlFhNaGUwOn9bbzw"
+      ];
+      gpgSocket = null;
+      overrides = {
+        user = "localadmin";
+      };
+    };
     "docker" = {
       hostname = "docker.itiv.kit.edu";
       hostkeys = [
@@ -39,6 +50,8 @@ with lib; let
       ];
       overrides = {
         user = "root";
+        ServerAliveInterval = 15;
+        ServerAliveCountMax = 3;
       };
       gpgSocket = null;
     };
@@ -277,9 +290,9 @@ with lib; let
     "metiscluster3" = {
       hostname = "metiscluster3.itiv.kit.edu";
       hostkeys = [
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDc7F+TK6VJMt3zHPNeiKEudDjM/dCOQQtJmiTvzJ4xe1FOV/Y63lpdRd+LomRjFyUv3Ly6sAMRHNjS3mNg9xHTFwzKO6Ef/yxljVpSiVVj+8vNfIyQblk6S/lBaPGTsBinO2FvCMMUVuo1uSmnYDhZHUU+oE1Vq1TC+e94Yqx3ynF840cdNermMOwArsoeTddyFFVASZJTenpscpfAl7Eoh3f/rch8Fcg8xHX3nCVOsTV4wnpJmbJCVAhGeWdEBuew1alj6jwesPoNPbcTB41RG73+/wtDoASMPYAliiM9V8chgLztS8oJfFCsaT/a6kDiM2wAXUDwGEviREWO2XYF0lXUki3l7E54u58ljBTKHUKLwz1d6zY3MO7ITVCnNMpnp+mprgt3FzIh51lLS2Ui8oJdWl8iOqlIy+/CuAQ1XAzgDqklFeOOTzC0MuZ3RPZknownFrK7sh5xYyUtavsvPXhBN+Xw1HVA6PM2RNDIM06yMYjnGTAk0bhCUEKtMWM="
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBATk4wwzhIvw5f6AkI8DN/5Ogije3EJA2Y11ZDHOb/FJsiO3kbFn7jn9YzUOBD7oaZYyMxps6jbmezzEhGaycgs="
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDYvg1iCNlw3c8CseYjfsD1JR6yfRG9OS6rdwZbYIugz"
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDUrvKwLB5x7yQVg8VTm6WI1CIIwmw1sxdmzOznV1gnyEYNEa6E6h224DdU3qzZxsJHx2pb2PCs2eH++ckcZ/OYej1TmcXbiLfr95f8SeoVxtSZvBmD80xNjgnupeWYsDtPdZcMnpw6CscmWNeX/vDwilKvVcCEhofbjFwNU8Y5Wg1IUE75xGwC3YpMXQwtcOzRSz9L0P8CfD32/Cft3r3HpF8c4QaVrjhybkL7IyB5V3xQRQtW5DwjpE15P3dcCWlGOUqp+kAFaaKVHJy0MqQnS628r3bPsedzFf+xfs5af2SrYc7CoIQN3rYsMKccZsiVoRuZ7HixvSYX8Id1+/GLfxoUf9JL0Yptaq12+uGWa1oju7b7gKFEkYsd8bu3PgWbA75XPZmAt7lDXCRmePnhPPPMJVX8eWE+aknrHZG4m46Ve3FZzMniyatQ++omJ1I15oddPUGx3qTvSmybw2mAa37ODxRFsCdls6tRgYpKyq2xMUoJ9S1UucWSfT+IUY0="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBIXMOKXlcFpDFo+1+nEUocYZfIvEqrmwGOnZxo2y6yzQqZUmro75JZa/CjzyqEQYuDb9TOQ1vZVnHtpUKUdqpIg="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFiscGp216J9nFzPerEDHQKsUfUCM9ndLiLPObuzvLRJ"
       ];
       overrides = {
         user = "localadmin";
@@ -313,9 +326,9 @@ with lib; let
     "metiscluster6" = {
       hostname = "metiscluster6.itiv.kit.edu";
       hostkeys = [
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFAclohkbuaSdKvdNyC6TVVAhzJon2I1q/WMCXdPZS83TJumxDCyaiO7raUbtLRdQbwwtEuPTPDmtyckDUFuJZhm1fgeaNEjnEeeXG34wM3L0FiuGKojCVHNOgP8gnG0+/aLNK4IbmYcMt8RGaipGbxdvEUdb6vrg+pDE4S9XA12nH8k8t8YamAaSjl4l9sI04D1ODmfRcqIyhuG/xl68U4xxQT36Ykbo8nS04omwGm9jL9Ob3kDbTMDEtODUBXm06iEEBfO1KgMzbal5K26zpJZb8Szt/+FfewWIFPIziUxgJ8U75cMjd4Gf+U+wBVThu5AAWglE3TjDn1n3OuWqcevbKblhOCaP2uwVDPDUIai9pwFJozRC63/KzJwYczY/VmQlg+xz/5GYYcfr/jHESjP5OzlQm0pW4b52NgKjlpnhuxgwnrXUV4So5Kl8HWtPsF5f5gglYxU5dPgJsMBp/eLG+UngC4KC+Fsq4+VO5iQPhnefSN0yKsKbUMBIo/bs="
-        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJN7/60N+4YKv8WRMN5Rajjqid9DKi+iuwGOdijyfz4nig/RNyemnNttjIGL0J3pSMkjOcrYwwvBmzi+bkoMfpA="
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF27rex4CvoV+xoK9nJVz6uM4WuvM9pdCLI5WAkeHyhg"
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDGJUCJbjBkipJO0HgoHmQROIcR5s4x6gTm+S1eLafyjM5oF9lLgDB7mbonAzMByQ/EGHxr+lmbRgmsZFVpqY3f5Hwmnx8VC7+32R3e+HDBsVJDJNOcvKW4FXk1U5i3GyyLvDitzc4hsRYcOh3VCocZzluXA3UI//im8s0PyuPUn+jqwhG2SQwqHAvScftOZYhuUpDQRk9mMTvOHc/Gr1YEUjbYfWQi48JHZfx6V5gCrkkRsjOVQjRxXZug2YSPT6towSvOM0/oWswS15+gii4cyFOyNYimFBNTD8NJpsBGDk60WcsXQfnPPMOQkN9kiKn4GSigyRyIT2KboQyrJVK7Zibwv7+Fxfn8TuRlNFldPPpoDw0DBFdGZfGCCRCCw2uVx3hWbBx0OcPtZrVuXrlt+UaE45eefJSKdF2cZqjZ61KYnNiHq6YbBZERN/ZMtth77Hdin79gCuxJ+OwdZ1p43VlwYODIlYcg+bZdv9VDPFqnatVz4hg5LUGpDWm2Eb0="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMUYvbuRSq2kB17yV9GXye8xZAmi9rNYaudSdSFMypzxWF4sHoZHbNb1RQDNwKgk+NO2nQA3p5oz8Cs3eC8E0QE="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILoSr9ok+qxhd9rcsLfs+RKwAqqxznzW6NjtlGyvdJRd"
       ];
       overrides = {
         user = "localadmin";
@@ -340,6 +353,54 @@ with lib; let
         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDNYJb1aLoCUro+W9b3aiprNgp5ir2ltaJyOWKKOai4FHeG+jF2Zh4tTn1AhRfZMn46jVC1CDZ+r4V6xeEMIXG/UTvwTtLtUdF79MMGCmBPsB2cPFsZr1ZM8PhaBxPE+MfPZ1TR4YXO/3B68gQJ3FwmAYor8Lrid6pLtci2RiSmpnCdtLwsL/+EKuWxFovFgYzcyv9q7zX2Z+L7QChyZ4p+QmHuDgkP8HmKIE79Mk1w+DWEdotzmio134hxvlDwVRmEJZiZacnky1AB47AD5Ni23jC6yZz++yK/uz1VszG6jUQxMWM9NUedybjgldOIFvqDNCO36OGj6slT2qzME0ZmGakp9eQf2YBilWZRxm5yOKH4fZja0+47022j7dPJmPFUtcTlo+vX804eubpqYYQvQxEhcxlPnoaIp1vThcUda16307tB0HQrCy4U0/z8+/u6VdmjcTjn78Xo5xd4g6cieHfDvC7Mj+0kBhcBKGqt6ukq5xOa82qikpriPQQ+ASM="
         "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEyI47xvHUHpXY1pbf2z1otcrC+iO+SDZrI256sNa/tIGmskc5q7VXUkgVg9Fwvz6kjXndSQYI+ObHugq/UkeWA="
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGFAnqeL5sCs9jJIa05KMMQCneWBJbWX966JnCkPTjuW"
+      ];
+      overrides = {
+        user = "localadmin";
+      };
+      gpgSocket = null;
+    };
+    "metiscluster9" = {
+      hostname = "metiscluster9.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCOmueRBHSk5/DRpLhCZjBi7/TB2X22ZoLn663eGwOAxeVEeP5YfVePHSDA+KcRfvH+rPPWyNP8kAaCFoWqKT8SKl9gtDy8AKp0LQhBrxnMAA7/f+BrCxuFm9l/afCjVGr4Ufx4V13zYLDjdHsZcWSV0tn5lcDW+s8xTmVOI4R2jHS2NX2HvmP10EspXUezhyrBLcFw0MjTpL/xQ5CIH42gMB+jGoPbjiHfHULN1Un/3cedOWc5jun3wkklZzi445dqdkgft4ki3e1kDV6CHBJcwsrnUrq+0HSmuU9GZQ/v1jyNBIZZNlLjVXfKjlpdtLCIrr96u4gXJGPoCH76pC+x4P/VvacId6pfDbYJU1HeRlvYvNTphyHX3hlWvnvy+6GcYf5wCxDuX/TC+gZlQvbJIWqJjjohGGyUL3IWDwNZZUdU9o67u/D2i0tC80EXgV6mta+wuIQi3QS8HNwCMR6LvRckMctMHK8xgIpkCGFs1WaMZE1pV8tgWq0G2sSr/+8="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDJ+RQo72jncX/2MUzgtvB/f7Ys9hk8roWFvkBhTuQOpmIaFbfOVxrgPjAtZ/kiXSxUDTLPcFSqmJ98xQujw2d0="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIIgUw4W0JxbFzblr4/BdlmZ9n6YQwFiT2zArg4UH2WZ"
+      ];
+      overrides = {
+        user = "localadmin";
+      };
+      gpgSocket = null;
+    };
+    "metiscluster10" = {
+      hostname = "metiscluster10.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCiPkyG0/x7FPxoh1WWAy1q6p49mVlEJYQBciJJ/0AACxWmyDiCvzMz/RAz+TmVvTy30Zybrwg1d+BUdF9kyvq+owMpC466rZgD1rCc7EKXYekcY7wG3l1zihVCuC2KUtfKIf/btyDQExO3rXIRGzV11zrUpdM8k2sm3XhMWyjrDWz7FalI70Alc23ePPvhNUNqPFNNpk760mrBQ5sPvX3UM7Pcc/6pGuZxT0/yKsAQuIFg01Fa9xXxQHwO7YVqMwSyKc9X8x1Y9qgNv3xIHMag65dKkpvduIElIIUYTePUsMYFSwM9baSXNWgv10ikyhJ4eVowFFZlznAQIHd7punGN1LM4I5W4tNaewPhdGZ1ZewmWQzkfAYPJ3wfNhkaCxaZ096LhBuoE2vADIhg4VJ1lJbi2dx1epw7wGChLTYCOrChn+NZBYvAP6U0PGfazmZy+bZe8okWxIi9FHbeZL5RQrp9j34HReZeSrKx70ngjS6IdwH1Ik2tuu21K/qFtf8="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBDy6bL2PqRt488y0myEUI4dBtY9HGoOYFKbXZlmK+WfyBUG++rga4+Xviyj/4mZJQARXKKH1G2xtNqMX1d5K7zA="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO77FitRtj29mFzWYm9/qE6XsDvf3g8/HYm1sgZkPbF8"
+      ];
+      overrides = {
+        user = "localadmin";
+      };
+      gpgSocket = null;
+    };
+    "metiscluster11" = {
+      hostname = "metiscluster11.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCpJbNnpqYTRlixkM4q/xQOd8zPCPNWf32B2rX+ULcv69+J3gzIVbS6bNOgamPCWabb5g8XynRhBAj01GCYV5qRVriZ6ucC2CR3BHfYqKvSTmWPWD6ctn4Zr7Nwb8+X49G306+zzZFlf0aWehrAs1VuAAXu6Aq6NwNsguISeJ/CTFEfYvyW1ozSgP4v/QA38TJgp+lSFRDdr8zNNUzQO32XDMwuQBHOl5swkIljgbsMltOnNXEnRcvEWOvWp8UlpdphAVwzCQEo5dUz3hxUV4WVpXb4FwW+dkwkBf6TXNOAfkEIj14JDMXbYH3sCjqAEKwVpw0KHC3t6i4eAUV1/8RX7BmZfozbqO+qdzsVgXJymjJxtYEYy0atIfcRQjeUBV1+rzPg23rGiteEOtjEstoQWAByNMI+lsDYFdDvRP693LuxWui3DjniPA/Pk283H9YWp0SWOnaSCndz44ywddw0MREB0qbVu5/JCkHuVl+sADvhBVphoUnyXULNWto+vYE="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOScKnkWEUmIvCPS5KsyRctPCYDwg88Gkwp7K/zd/FZTP+zDK1jriiWm+62EOVMIcLFTZ8TQFZCXSC05WlL76ZM="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBKiWsyQB+BqeW8qUufznM0oUmeggsxLVOpBhMONH0Vq"
+      ];
+      overrides = {
+        user = "localadmin";
+      };
+      gpgSocket = null;
+    };
+    "metiscluster12" = {
+      hostname = "metiscluster12.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7Eo33UzwkcI77Q5603MXA7QU9jw37WaHNadblTSUjTd3igXwEqGTFQZ8rIpiwiEkNDQ3MunfDQx+DcXyBp96JpL3yMwj/lzv+SJg0lGVrdW7sRQfRXmm+LuJj7xiyQnmBLtyYpj2PZXNxRTbVtN6K6cyWyQekFnE8W9bm4tWmyLZwK2ZEjrmDArHszLsGj8b2wXavmHo3+UZuzUk4i+FvcTT8ALgM3g3DAwyjsNIKCBJRa6eWo6zw5TUCr5lVm0yym851mKmo/TF2NGALNMfElbFCvCk17FPSoIrjTT0LqxLMiMFItl92FcbpynM0CAmhc4uoPEKNyZVSZw25Cx13pes1G50fFZDUZ5cVA3h4lrAO6bvDM+INFzB+6lYSM8MQIxjk4kTPGaBZh4XzmcRFzAsfCFvKaCagRn4DLqdUPY8A6L2cZ5U2z4gqordLUv1wNw3nYV5SJmei6UTqJRJcUv1gd0Q+cvjDBwQFR5hwtc9HoNLl6bLvnmdW6eC2gyM="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEB6prQ0YueQ2vottuEaTI12ilgpnjp+4jVjvt+/MAGHQfIGLaR/3mrF9oEDjO/t2Isjd+S6Q+hlgZWzkl9r3ng="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDOTL4OKgaKp9LNFyIRnUQu+8Ol8simD82+Lhex+j8fX"
       ];
       overrides = {
         user = "localadmin";
@@ -423,6 +484,18 @@ with lib; let
         "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG7ydnvXw/+rkgId1LH+SDgl/dYQxQNQ2VV+jESz2mRakPRjUoR0BfnpKnoKu3RLgGNYw93bIpGQLvjt2ZC59D0="
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINXzXJVkgpUyCD/7OQTv9OqiRRs80vbkigXpayQWtGwI"
       ];
+      gpgSocket = null;
+    };
+    "pool-ubuntu2404" = {
+      hostname = "pool-ubuntu2404.itiv.kit.edu";
+      hostkeys = [
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEOKjG4HKacrK+zhW1int/MamMrQCKDMKtRAFTi2FQY9DGkDtL+8paz8aTgLe37hicsCP0wSi4N1HLWX8lIIVKA="
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCsHmme1JZZnKvCxvOV8HiWVVl135xzJhWnsLv3IojNeOD9x6tta2VdDGKzZvsgH0Bt1ndYusaR+8plariyZ9j1+XwNjjUk4FWgcPJEXxUuqSjWrTncSTwh6OOASj8gyska3seuxFD0VL2ZPyNnC/MDozwWqqC7TfseH4YCCxUIt7albl/jHFYRHuPEKe6FcUNUQ2Crf+xFeWZmLED7DY/bL0x6IdqLIIX93llvWsuZpywrFcddQrgwnIbJgbwZaf9DkOh95zVLMArKQQqX8XjoI51rZbO8dK8CTAN54NJzJps9EkcilAv3nb1AenVjvVFJ5/k2K7fDnVCDstFjly4FTvef0vXLKwRm4c2m3dY11qQGTvU74p5SkvdlrpwCmCmtyx/mKlN5vFdCa7xG6w9rh8d7bPiMLuTrRUa+eJx5+cuobfJFz0JTI+iRjkFW4yT1CsZbCzcIIGoRB2sTSRXxh4GolK0mDT6czvhRrj9S88HX+IjP8YnxnXEuovh56dk="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMB5b9Y+pgrkCJb33P7FzA2yZpyjvT9zN1EU+JQA9IQV"
+      ];
+      overrides = {
+        user = "localadmin";
+      };
       gpgSocket = null;
     };
     "runner" = {
@@ -656,9 +729,7 @@ with lib; let
         if (socket == null) || (remoteSocket == null)
         then {}
         else {
-          extraOptions = {
             RemoteForward = "${remoteSocket} ${socket}";
-          };
         }
       )
       // defaults
@@ -722,11 +793,11 @@ in {
     '';
     programs.ssh = {
       extraConfig = ''
-        XAuthLocation ${pkgs.xorg.xauth.out}/bin/xauth
+        XAuthLocation ${pkgs.xauth.out}/bin/xauth
       '';
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks = let
+      settings = let
         toGpgSocket =
           if (cfg.forwardGpgSocket && (cfg.localGpgSocket != null))
           then cfg.localGpgSocket

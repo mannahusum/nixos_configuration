@@ -156,6 +156,8 @@ in {
               pinentry = cfg.defaultPinentry;
               forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
               createForwardPath = true;
+            } // {
+              home.stateVersion = "24.11";
             };
           };
         };

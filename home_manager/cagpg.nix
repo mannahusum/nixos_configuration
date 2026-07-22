@@ -38,8 +38,8 @@ in {
         '';
       };
       pinentry = lib.mkOption {
-        type = lib.types.enum ["bemenu" "gnome3"];
-        default = "bemenu";
+        type = lib.types.enum ["noagent" "bemenu" "gnome3"];
+        default = "noagent";
         example = "gnome3";
         description = ''
           pinentry to be used,
@@ -61,6 +61,19 @@ in {
         package = pkgs.pinentry-gnome3;
         program = "pinentry-gnome3";
       };
+    })
+    (mkIf (cfg.pinentry != "noagent") {
+      services.gpg-agent = {
+        enable = true;
+        enableBashIntegration = true;
+        enableExtraSocket = true;
+        enableScDaemon = true;
+        enableSshSupport = true;
+        grabKeyboardAndMouse = true;
+      };
+    })
+    (mkIf (cfg.pinentry == "noagent") {
+      services.gpg-agent.enable = false;
     })
     {
       home.packages = with pkgs; [

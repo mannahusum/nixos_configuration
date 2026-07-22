@@ -1,9 +1,8 @@
 { 
-  lib,
   pkgs,
   ...
 }: {
-  home = let
+  home.packages = let
     homePythonPackages = python-packages:
       with python-packages; [
         pathspec
@@ -14,64 +13,64 @@
         uv
       ];
 
-    homePython3 = pkgs.python314.withPackages homePythonPackages;
-  in {
-    packages = with pkgs; [
-      adoptopenjdk-icedtea-web
-      bashInteractive
-      bat # cat clone
-      cadaver
-      coreutils-full
-      cyrus_sasl
-      detect-secrets
-      dmidecode
-      enscript
-      texliveFull
-      file
-      fzf
-      home-manager
-      homePython3
-      inetutils
-      ipmitool
-      jq
-      lsof
-      lsscsi
-      man-pages
-      mkpasswd
-      ncdu
-      nix-prefetch-git
-      pandoc
-      patchelf
-      pciutils
-      pdftk
-      psmisc
-      pwgen
-      qrcode
-      ranger
-      ripgrep
-      shellcheck
-      screen
-      sops
-      tcpdump
-
-      tldr
-      units
-      unrar
-      unzip
-      usbutils
-      wipe
-      xorg.xauth
-      yarn
-      yubikey-manager
-      zathura
-    ] ++ [
-      cdparanoia
-      cdrdao
-      cdrkit
-      ddrescue
-      disktype
-      flac
-      makemkv
-    ];
-  };
+    homePython3 = python314.withPackages homePythonPackages;
+  in with pkgs; [
+    adoptopenjdk-icedtea-web
+    bashInteractive
+    bat # cat clone
+    black
+    cadaver
+    coreutils-full
+    cyrus_sasl
+    detect-secrets
+    disktype
+    dmidecode
+    enscript
+    texliveFull
+    file
+    fzf
+    home-manager
+    homePython3
+    inetutils
+    ipmitool
+    jq
+    lsof
+    lsscsi
+    man-pages
+    mkpasswd
+    ncdu
+    ncurses
+    nix-prefetch-git
+    nodejs
+    typcscript
+    pandoc
+    patchelf
+    pciutils
+    pdftk
+    perl
+    psmisc
+    pwgen
+    qrcode
+    ranger
+    ripgrep
+    shellcheck
+    screen
+    sops
+    tcl
+    tclreadline
+    tcpdump
+    tk-8_5
+    tldr
+    units
+    unrar
+    unzip
+    usbutils
+    wipe
+    libxml2
+    xmlstarlet
+    xauth
+    yarn
+    yubikey-manager
+    zathura
+  ];
 }

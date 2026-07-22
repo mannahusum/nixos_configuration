@@ -131,8 +131,10 @@ in {
     programs.neovim = {
       enable = true;
       withPython3 = true;
+      withRuby = true;
       withNodeJs = true;
       defaultEditor = true;
+      # sideloadInitLua = true;
 
       extraPackages = with pkgs; [
         bash
@@ -203,7 +205,7 @@ in {
             let $TODOIST_API_KEY = trim(system("${pkgs.pass.out}/bin/pass todoist.com/ApiToken 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
         endif
         let g:powerShellPath ="${pkgs.powershell.out}/bin/pwsh"
-        let g:bashLSPPath = "${pkgs.nodePackages.bash-language-server.out}/bin/bash-language-server"
+        let g:bashLSPPath = "${pkgs.bash-language-server.out}/bin/bash-language-server"
         let g:vimtex_view_method = "zathura"
         let g:vimtex_view_automatic = 1
         let g:vimtex_compiler_latexmk_engines = {

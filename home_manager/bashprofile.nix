@@ -32,7 +32,6 @@ in {
 
   config = mkIf cfg.enable {
     programs = {
-      eza.enable = true;
       bash = {
         enable = true;
         historyControl = ["ignorespace"];
@@ -44,6 +43,11 @@ in {
       direnv = {
         enable = true;
         nix-direnv.enable = true;
+      };
+
+      dircolors = {
+        enable = true;
+        enableBashIntegration = true;
       };
 
       powerline-go = {
