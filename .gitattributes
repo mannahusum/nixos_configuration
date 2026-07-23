@@ -1,1 +1,1 @@
-computers/*/extra-files/etc/ssh/ssh_host_*_key filter=git-crypt diff=git-crypt
+computers/*/extra-files/etc/ssh/ssh_host_*_key eol=lf filter=git-crypt diff=git-crypt
