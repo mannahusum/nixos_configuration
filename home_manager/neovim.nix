@@ -134,7 +134,7 @@ in {
       withRuby = true;
       withNodeJs = true;
       defaultEditor = true;
-      # sideloadInitLua = true;
+      sideloadInitLua = true;
 
       extraPackages = with pkgs; [
         bash
