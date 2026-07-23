@@ -23,5 +23,8 @@ in {
         email = "christian@wudika.de";
       };
     };
+    home.packages = with pkgs; [
+      git-filter-repo
+    ]
   };
 }
