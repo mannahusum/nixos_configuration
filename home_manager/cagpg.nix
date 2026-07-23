@@ -87,7 +87,6 @@ in {
         };
       };
       services.gpg-agent = {
-        enable = true;
         enableBashIntegration = true;
         enableExtraSocket = true;
         enableScDaemon = true;

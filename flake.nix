@@ -2,10 +2,6 @@
   description = "Machine definition for computers at home";
 
   inputs = {
-    # home-config = {
-    #   url = "path:myhomeconfig.nix";
-    #   flake = false;
-    # };
     nixos-hardware.url = "github:8bitbuddhist/nixos-hardware?ref=surface-rust-target-spec-fix";
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-26.05";
@@ -386,6 +382,24 @@
           inherit home-manager self overlays;
           system = "aarch64-darwin";
         };
+      };
+
+      homeManagerModules.caUserEnvironment = { config, pkgs, lib, ... }: {
+        imports = [
+          ./home_manager/bashprofile.nix
+          ./home_manager/cagpg.nix
+          ./home_manager/cassh.nix
+          ./home_manager/packages.nix
+          ./home_manager/passwordstore.nix
+          ./home_manager/neovim.nix
+        ];
+      };
+
+      overlays = {
+        linux = (import ./packages/linux/overlay.nix);
+        ssh = (import ./packages/ssh/overlay.nix);
+        darwin = (import ./packages/darwin/overlay.nix);
+        ipxe = (import ./packages/ipxe/overlay.nix);
       };
     };
 }
