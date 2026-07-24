@@ -97,6 +97,7 @@ in {
   imports = [
     ./bashprofile.nix
     ./cagpg.nix
+    ./neovim/git.nix
   ];
 
   options = {
@@ -134,14 +135,29 @@ in {
       withRuby = true;
       withNodeJs = true;
       defaultEditor = true;
-      sideloadInitLua = true;
+      # sideloadInitLua = true;
+
+      initLua = lib.mkMerge [
+        # default priority=1000,
+        # package.path at priority=200,
+        # and this has to be earlier
+        (lib.mkOrder 100 ''
+          vim.g.mapleader = "ü"
+          vim.g.maplocalleader = "ö"
+        '')
+      ];
+      extraConfig = ''
+        " German umlaut u
+        let mapleader = nr2char(0x00fc, 1)
+        " German umlaut o
+        let maplocalleader = nr2char(0x00f6, 1)
+      '';
 
       extraPackages = with pkgs; [
         bash
         clang
         direnv
         fd
-        git
         jq
         nixpkgs-fmt
         ripgrep

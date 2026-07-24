@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 with lib; let
@@ -25,6 +26,6 @@ in {
     };
     home.packages = with pkgs; [
       git-filter-repo
-    ]
+    ];
   };
 }
