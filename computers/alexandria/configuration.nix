@@ -1,55 +1,71 @@
 ({
   config,
+  disko,
+  lanzaboote,
   lib,
   modulesPath,
+  nixpkgs,
   nixpkgs-makemkv,
-  overlays,
   pkgs,
   sops-nix,
-  system,
   ...
 }: {
   imports = [
-    sops-nix.nixosModules.sops
-    ./sops.nix
-    (modulesPath + "/profiles/base.nix")
-    ../shared-config.nix
+    disko.nixosModules.disko
+    ./fileshare-classic.nix
+    lanzaboote.nixosModules.lanzaboote
     ../../modules/acme.nix
     ../../modules/backup-client.nix
     ../../modules/keyboard.nix
-    ../../modules/wayland.nix
-    ../../modules/sshd.nix
-    ../../modules/saned.nix
     ../../modules/nginx.nix
-    ../../modules/yubikey.nix
+    (modulesPath + "/installer/scan/not-detected.nix")
+    (modulesPath + "/profiles/base.nix")
+    ../../modules/postfix.nix
+    ../../modules/saned.nix
+    ../../modules/sshd.nix
     ../../modules/users.nix
-    ./fileshare-classic.nix
+    ../../modules/wayland.nix
+    ../../modules/yubikey.nix
+    ../shared-config.nix
+    ./sops.nix
+    sops-nix.nixosModules.sops
   ];
 
-  config = {
-    disko.devices = import ./disko-config.nix {
-      inherit lib;
-    };
-    nixpkgs = {
-      inherit overlays;
-      config.allowUnfreePredicate = pkg:
-        builtins.elem (lib.getName pkg) [
-          "google-chrome"
-        ];
-    };
+  config = let
+    byidpath = name: "/dev/disk/by-id/" + name;
+    systemdrives = map byidpath [
+      "nvme-WD_BLACK_SN850X_2000GB_24196D800798"
+      "nvme-WD_BLACK_SN850X_2000GB_24196D800851"
+    ];
+    storagedrives = map byidpath [
+      "ata-ST14000NM001G-2KJ103_ZL2AV9NN"
+      "ata-ST14000NM001G-2KJ103_ZL2BAQXD"
+      "ata-ST14000NM001G-2KJ103_ZL2DA7SJ"
+    ];
+  in {
     boot = {
+      bootspec.enable = true;
+      loader.systemd-boot.enable = nixpkgs.lib.mkForce false;
+      lanzaboote = {
+        enable = true;
+        pkiBundle = "/etc/secureboot";
+      };
       supportedFilesystems = ["zfs"];
       loader.efi = {
         canTouchEfiVariables = true;
         efiSysMountPoint = "/boot";
       };
       initrd = {
+        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "amdgpu"];
+        kernelModules = ["amdgpu"];
         supportedFilesystems = ["zfs"];
         systemd = {
           enable = true;
           emergencyAccess = true;
         };
       };
+      kernelModules = ["kvm-amd"];
+      extraModulePackages = [];
       kernelParams = [
         "console=ttyS0,115200"
       ];
@@ -60,36 +76,34 @@
         '';
       };
     };
-    nix = {
-      settings = {
-        substituters = [
-          # "https://hydra.catbertsen.de:5000/"
-          # "http://mannahusum.catbertsen.de:5000/"
-          "https://nix-community.cachix.org"
-        ];
-        trusted-public-keys = [
-          "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
-          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        ];
+    cadrives = {
+      enable = true;
+      boot = null;
+      system = systemdrives;
+      storage = storagedrives;
+      swapsize = "172G";
+      l2arcsize = "0";
+      espsize = "1G";
+      homesFor = ["christian" "marianne"];
+    };
+    capostfix = {
+      enable = true;
+      connection = "smtp.protonmail.ch:587";
+      mydomain = "wudika.de";
+    };
+    services.systembus-notify.enable = true;
+    services.smartd = {
+      enable = true;
+      autodetect = false;
+      devices = map (drive: { device = drive; }) (systemdrives ++ storagedrives);
+      notifications.systembus-notify.enable = true;
+      notifications.mail = {
+        enable = true;
+        sender = "alexandria@wudika.de";
+        recipient = "christian@wudika.de";
       };
     };
 
-    # services.jellyfin = {
-    #   enable = true;
-    #   openFirewall = true;
-    # };
-    services.minidlna = {
-      enable = true;
-      settings = {
-        notify_interval = 60;
-        friendly_name = "Alexandria";
-        media_dir = [
-          "V,/media/video"
-        ];
-        inotify = "yes";
-      };
-      openFirewall = true;
-    };
 
     cabackupclient = {
       enable = true;
@@ -100,6 +114,7 @@
       dataSets = ["tank/media"];
     };
     casshd.enable = true;
+    services.xserver.videoDrivers = ["amdgpu"];
     cawayland.enable = true;
     # cayubikey.enable = true;
     cakeyboard.enable = true;
@@ -111,10 +126,8 @@
         LC_CTYPE = "de_DE.UTF-8";
       };
     };
-
     services.resolved = {
       enable = true;
-      llmnr = "resolve";
     };
     systemd.network = {
       enable = true;
@@ -157,16 +170,45 @@
     };
 
     networking = {
+      enableIPv6 = true;
       hostId = "d22d38ba";
       hostName = "alexandria";
-      tempAddresses = "disabled";
       nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
-      enableIPv6 = true;
+      tempAddresses = "disabled";
+      useDHCP = lib.mkDefault true;
+      useHostResolvConf = lib.mkForce false;
+
+      useNetworkd = true;
+    };
+
+    services.minidlna = {
+      enable = true;
+      settings = {
+        notify_interval = 60;
+        friendly_name = "Alexandria";
+        media_dir = [
+          "V,/media/video"
+        ];
+        inotify = "yes";
+      };
+      openFirewall = true;
+    };
+    hardware = {
+      cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+      graphics = {
+        enable = true;
+        extraPackages = with pkgs; [
+          libvdpau-va-gl
+        ];
+        extraPackages32 = with pkgs; [
+          driversi686Linux.libvdpau-va-gl
+        ];
+      };
     };
 
     environment.systemPackages = let
       mkvpkgs = import nixpkgs-makemkv {
-        inherit system;
+        inherit (pkgs.stdenv.hostPlatform) system;
         config.allowUnfreePredicate = pkg:
           builtins.elem (lib.getName pkg) [
             "makemkv"
@@ -174,16 +216,16 @@
       };
     in
       with pkgs; [
+        file
         git
-        mokutil
-        sbctl
-        tpm2-tss
         git-crypt
+        mkvpkgs.makemkv
         neovim
         ripgrep
+        sbctl
+        tpm2-tss
+        vulkan-validation-layers
         xterm # for resize command
-        file
-        mkvpkgs.makemkv
       ];
 
     system.stateVersion = "23.11";

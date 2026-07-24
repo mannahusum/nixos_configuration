@@ -43,6 +43,8 @@
         "aws/secret" = {};
         "aws/hosted_zone/catbertsen.de" = {};
         "aws/hosted_zone/windows.catbertsen.de" = {};
+        "mailserver/user" = {};
+        "mailserver/token" = {};
       };
       templates = {
         "route53CatbertsenCredentials" = {

@@ -1,10 +1,10 @@
 {
   config,
-  inputs,
-  lanzaboote,
   disko,
+  lanzaboote,
   lib,
   modulesPath,
+  nixpkgs,
   pkgs,
   sops-nix,
   ...
@@ -43,7 +43,7 @@
   in {
     boot = {
       bootspec.enable = true;
-      loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
+      loader.systemd-boot.enable = nixpkgs.lib.mkForce false;
       lanzaboote = {
         enable = true;
         pkiBundle = "/etc/secureboot";
@@ -62,7 +62,6 @@
     # (the default) this is the recommended approach. When using systemd-networkd it's
     # still possible to use this option, but it's recommended to use it in conjunction
     # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-    networking.useDHCP = lib.mkDefault true;
     # networking.interfaces.enp2s0.useDHCP = lib.mkDefault true;
     # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
 
@@ -162,12 +161,13 @@
       };
     };
     networking = {
-      firewall.enable = false;
-      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       enableIPv6 = true;
+      firewall.enable = false;
       hostId = "b800626c";
       hostName = "hydra";
+      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       tempAddresses = "disabled";
+      useDHCP = lib.mkDefault true;
       useHostResolvConf = lib.mkForce false;
     };
 

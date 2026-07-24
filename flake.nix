@@ -216,7 +216,7 @@
               ./computers/hydra/configuration.nix
             ];
             specialArgs = {
-              inherit disko home-manager inputs lanzaboote nixos-anywhere nixos-luks-yk nixpkgs overlays self sops-nix;
+              inherit disko home-manager lanzaboote nixos-anywhere nixos-luks-yk nixpkgs overlays self sops-nix;
             };
           };
         alexandria = let
@@ -226,23 +226,9 @@
             inherit system;
             modules = [
               ./computers/alexandria/configuration.nix
-              ./computers/alexandria/hardware-configuration.nix
-              ./computers/alexandria/sops.nix
-              disko.nixosModules.disko
-              lanzaboote.nixosModules.lanzaboote
-              {
-                boot = {
-                  bootspec.enable = true;
-                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                  lanzaboote = {
-                    enable = true;
-                    pkiBundle = "/etc/secureboot";
-                  };
-                };
-              }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+              inherit disko home-manager lanzaboote nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix;
             };
           };
         ulpia = let
@@ -252,22 +238,9 @@
             inherit system;
             modules = [
               ./computers/ulpia/configuration.nix
-              ./computers/ulpia/hardware-configuration.nix
-              ./computers/ulpia/sops.nix
-              disko.nixosModules.disko
-              lanzaboote.nixosModules.lanzaboote
-              {
-                boot = {
-                  bootspec.enable = true;
-                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                  lanzaboote = {
-                    enable = true;
-                  };
-                };
-              }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+              inherit disko home-manager lanzaboote nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix;
             };
           };
         alexandretta = let
@@ -277,24 +250,9 @@
             inherit system;
             modules = [
               ./computers/alexandretta/configuration.nix
-              ./computers/alexandretta/hardware-configuration.nix
-              ./computers/alexandretta/sops.nix
-              disko.nixosModules.disko
-              lanzaboote.nixosModules.lanzaboote
-              automatic-ripping-machine.nixosModules.default
-              {
-                boot = {
-                  # bootspec.enable = true;
-                  # loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                  loader.systemd-boot.enable = true;
-                  lanzaboote = {
-                    enable = false;
-                  };
-                };
-              }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+              inherit automatic-ripping-machine disko home-manager lanzaboote nixpkgs nixpkgs-makemkv overlays sops-nix;
             };
           };
         odysseus = let

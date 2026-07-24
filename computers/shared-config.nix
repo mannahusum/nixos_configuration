@@ -84,10 +84,11 @@
         enable = true;
       };
       resolved.settings.Resolve = {
+        DNSOverTLS = "true";
         DNSSEC = "true";
         Domains = ["~."];
         FallbackDNS = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
-        DNSOverTLS = "true";
+        LLMNR = "true";
       };
     };
 

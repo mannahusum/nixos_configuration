@@ -134,7 +134,7 @@ in {
         dnsResolver = "205.251.193.108:53";
         dnsProvider = "route53";
         # credentialsFile = "/run/windows.catbertsen.de.env";
-        credentialsFile = config.sops.templates."route53WindowsCatbertsenCredentials".path;
+        environmentFile = config.sops.templates."route53WindowsCatbertsenCredentials".path;
         webroot = null;
         postRun = ''
           ${pkgs.coreutils.out}/bin/chmod 600 key.pem
@@ -145,7 +145,7 @@ in {
       "alexandria.catbertsen.de" = {
         dnsResolver = "205.251.194.49:53";
         dnsProvider = "route53";
-        credentialsFile = config.sops.templates."route53CatbertsenCredentials".path;
+        environmentFile = config.sops.templates."route53CatbertsenCredentials".path;
         webroot = null;
         postRun = ''
           ${pkgs.coreutils.out}/bin/chmod 600 key.pem

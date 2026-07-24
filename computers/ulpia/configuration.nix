@@ -1,14 +1,19 @@
 ({
+  config,
+  disko,
+  lanzaboote,
   lib,
   modulesPath,
+  nixpkgs,
   nixpkgs-makemkv,
-  overlays,
   pkgs,
   sops-nix,
-  system,
   ...
 }: {
   imports = [
+    lanzaboote.nixosModules.lanzaboote
+    disko.nixosModules.disko
+    (modulesPath + "/installer/scan/not-detected.nix")
     sops-nix.nixosModules.sops
     ./sops.nix
     (modulesPath + "/profiles/base.nix")
@@ -16,6 +21,7 @@
     ../disko-config.nix
     ../../modules/acme.nix
     ../../modules/keyboard.nix
+    ../../modules/postfix.nix
     ../../modules/wayland.nix
     ../../modules/sshd.nix
     ../../modules/saned.nix
@@ -27,45 +33,41 @@
     # ./smb-fileserver.nix
   ];
 
-  config = {
-    cadrives = {
-      enable = true;
-      boot = "/dev/disk/by-id/usb-Swissbit_USB_Flash_Drive_601924969200008C-0:0";
-      system = [
-        "/dev/disk/by-id/nvme-Lexar_SSD_NM620_2TB_QBS830R004175P1125"
-        "/dev/disk/by-id/nvme-Lexar_SSD_NM620_2TB_QBS830R000758P1125"
-      ];
-      storage = [
-        "/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL28WN0G"
-        "/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL2E4EBQ"
-        "/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL2E4HML"
-        "/dev/disk/by-id/ata-ST14000NM001G-2KJ103_ZL2EFR06"
-      ];
-      swapsize = "172G";
-      l2arcsize = "1024G";
-      espsize = "1G";
-      homesFor = ["christian" "marianne"];
-    };
-    nixpkgs = {
-      inherit overlays;
-      config.allowUnfreePredicate = pkg:
-        builtins.elem (lib.getName pkg) [
-          "google-chrome"
-        ];
-    };
+  config = let
+    byidpath = name: "/dev/disk/by-id/" + name;
+    bootdrive = byidpath "usb-Swissbit_USB_Flash_Drive_601924969200008C-0:0";
+    systemdrives = map byidpath [
+      "nvme-Lexar_SSD_NM620_2TB_QBS830R004175P1125"
+      "nvme-Lexar_SSD_NM620_2TB_QBS830R000758P1125"
+    ];
+    storagedrives = map byidpath [
+      "ata-ST14000NM001G-2KJ103_ZL28WN0G"
+      "ata-ST14000NM001G-2KJ103_ZL2E4EBQ"
+      "ata-ST14000NM001G-2KJ103_ZL2E4HML"
+      "ata-ST14000NM001G-2KJ103_ZL2EFR06"
+    ];
+  in {
     boot = {
+      bootspec.enable = true;
+      loader.systemd-boot.enable = nixpkgs.lib.mkForce false;
+      lanzaboote = {
+        enable = true;
+      };
       supportedFilesystems = ["zfs"];
       loader.efi = {
         canTouchEfiVariables = true;
         efiSysMountPoint = "/boot";
       };
       initrd = {
+        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "ie31200_edac" "intel_pch_thermal"];
         supportedFilesystems = ["zfs"];
         systemd = {
           enable = true;
           emergencyAccess = true;
         };
       };
+      kernelModules = ["kvm-intel"];
+      extraModulePackages = [];
       kernelParams = [
         "console=ttyS0,115200"
       ];
@@ -74,6 +76,32 @@
         mdadmConf = ''
           MAILADDR christian@wudika.de
         '';
+      };
+    };
+    cadrives = {
+      enable = true;
+      boot = bootdrive;
+      system = systemdrives;
+      storage = storagedrives;
+      swapsize = "172G";
+      l2arcsize = "1024G";
+      espsize = "1G";
+      homesFor = ["christian" "marianne"];
+    };
+    capostfix = {
+      enable = true;
+      connection = "smtp.protonmail.ch:587";
+      mydomain = "catbertsen.de";
+    };
+    services.smartd = {
+      enable = true;
+      autodetect = false;
+      devices = map (drive: { device = drive; }) (systemdrives ++ storagedrives);
+      notifications.systembus-notify.enable = true;
+      notifications.mail = {
+        enable = true;
+        sender = "ulpia@catbertsen.de";
+        recipient = "christian@wudika.de";
       };
     };
     nix = {
@@ -187,11 +215,23 @@
     # };
 
     networking = {
+      enableIPv6 = true;
       hostId = "d22d38ba";
       hostName = "ulpia";
+      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       tempAddresses = "disabled";
+      useDHCP = lib.mkDefault true;
+      useHostResolvConf = lib.mkForce false;
+
+      useNetworkd = true;
     };
 
+  hardware = {
+    cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+    graphics = {
+      enable = true;
+    };
+  };
     services.zfs.autoSnapshot = {
       enable = true;
       flags = "-k -p -u";
@@ -199,7 +239,7 @@
 
     environment.systemPackages = let
       mkvpkgs = import nixpkgs-makemkv {
-        inherit system;
+        inherit (pkgs.stdenv.hostPlatform) system;
         config.allowUnfreePredicate = pkg:
           builtins.elem (lib.getName pkg) [
             "makemkv"

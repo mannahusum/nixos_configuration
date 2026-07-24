@@ -1,23 +1,26 @@
 ({
+  config,
+  disko,
+  lanzaboote,
   lib,
   modulesPath,
+  # nixpkgs,
   nixpkgs-makemkv,
   pkgs,
   sops-nix,
-  system,
   ...
 }: {
   imports = [
-    sops-nix.nixosModules.sops
-    ./sops.nix
-    (modulesPath + "/profiles/base.nix")
-    ../shared-config.nix
     ../disko-config.nix
+    disko.nixosModules.disko
+    lanzaboote.nixosModules.lanzaboote
     ../../modules/acme.nix
-    ../../modules/arm.nix
+    # ../../modules/arm.nix
     ../../modules/backup-server.nix
     ../../modules/keyboard.nix
     ../../modules/nginx.nix
+    (modulesPath + "/installer/scan/not-detected.nix")
+    (modulesPath + "/profiles/base.nix")
     ../../modules/postfix.nix
     ../../modules/saned.nix
     ../../modules/serial-console.nix
@@ -26,6 +29,9 @@
     ../../modules/users.nix
     ../../modules/wayland.nix
     ../../modules/yubikey.nix
+    ../shared-config.nix
+    ./sops.nix
+    sops-nix.nixosModules.sops
   ];
 
   config = let
@@ -35,24 +41,22 @@
     storagedrives = map byidpath ["ata-ST14000NM001G-2KJ103_ZL287GM9"];
     localdrives = systemdrives++storagedrives;
   in {
-    caarm.enable = true;
-    cabackupserver = {
-      enable = true;
-      username = "alexandria-backup";
-      sshkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIENuJozoOGUX38alQSsfLhXGUQ/bj+LMBYtz4AU4mPJM syncoid@alexandria";
+    boot = {
+      # bootspec.enable = true;
+      # loader.systemd-boot.enable = nixpkgs.lib.mkForce false;
+      loader.systemd-boot.enable = true;
+      lanzaboote = {
+        enable = false;
+      };
+      initrd = {
+        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "intel_pch_thermal"];
+        systemd.enable = true;
+      };
+      kernelModules = ["kvm-intel"];
+      extraModulePackages = [];
     };
-    cakeyboard.enable = true;
-    capostfix = {
-      enable = true;
-      connection = "smtp.protonmail.ch:587";
-      mydomain = "catbertsen.de";
-    };
+    # caarm.enable = true;
     caserialconsole.enable = true;
-    casshd.enable = true;
-    causermount.enable = true;
-    cawayland.enable = true;
-    # cayubikey.enable = true;
-
     cadrives = {
       enable = true;
       boot = bootdrive;
@@ -62,6 +66,11 @@
       l2arcsize = "512G";
       espsize = "1G";
       homesFor = ["christian" "marianne"];
+    };
+    capostfix = {
+      enable = true;
+      connection = "smtp.protonmail.ch:587";
+      mydomain = "catbertsen.de";
     };
     services.systembus-notify.enable = true;
     services.smartd = {
@@ -75,6 +84,16 @@
         recipient = "christian@wudika.de";
       };
     };
+    cabackupserver = {
+      enable = true;
+      username = "alexandria-backup";
+      sshkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIENuJozoOGUX38alQSsfLhXGUQ/bj+LMBYtz4AU4mPJM syncoid@alexandria";
+    };
+    casshd.enable = true;
+    cawayland.enable = true;
+    # cayubikey.enable = true;
+    cakeyboard.enable = true;
+    causermount.enable = true;
     time.timeZone = "Europe/Berlin";
     i18n = {
       defaultLocale = "de_DE.UTF-8";
@@ -82,6 +101,9 @@
         LC_COLLATE = "de_DE.UTF-8";
         LC_CTYPE = "de_DE.UTF-8";
       };
+    };
+    services.resolved = {
+      enable = true;
     };
     systemd.network = {
       enable = true;
@@ -133,9 +155,14 @@
     };
 
     networking = {
+      enableIPv6 = true;
       hostId = "16c516f2";
       hostName = "alexandretta";
+      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       tempAddresses = "disabled";
+      useDHCP = lib.mkDefault true;
+      useHostResolvConf = lib.mkForce false;
+      useNetworkd = true;
     };
 
     services = {
@@ -157,10 +184,37 @@
         openFirewall = true;
       };
     };
+    hardware = {
+      cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+      graphics = {
+        enable = true;
+      };
+      rasdaemon = {
+        enable = true;
+        mainboard = ''
+          vendor = Intel Corporation
+          model = S1200SP
+        '';
+        config = ''
+          PAGE_CE_REFRESH_CYCLE="24H"
+          PAGE_CE_THRESHOLD="50"
+          PAGE_CE_ACTION="soft"
+        '';
+        extraModules = ["ie31200_edac"];
+      };
+    };
 
+    programs.nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+        ncurses5
+        gccNGPackages_15.libstdcxx
+        openipmi
+      ];
+    };
     environment.systemPackages = let
       mkvpkgs = import nixpkgs-makemkv {
-        inherit system;
+        inherit (pkgs.stdenv.hostPlatform) system;
         config.allowUnfreePredicate = pkg:
           builtins.elem (lib.getName pkg) [
             "makemkv"
@@ -185,13 +239,5 @@
       ];
 
     system.stateVersion = "25.11";
-    programs.nix-ld = {
-      enable = true;
-      libraries = with pkgs; [
-        ncurses5
-        gccNGPackages_15.libstdcxx
-        openipmi
-      ];
-    };
   };
 })
