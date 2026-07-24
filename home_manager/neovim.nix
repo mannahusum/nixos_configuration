@@ -98,6 +98,7 @@ in {
     ./bashprofile.nix
     ./cagpg.nix
     ./neovim/git.nix
+    ./neovim/integration.nix
   ];
 
   options = {
