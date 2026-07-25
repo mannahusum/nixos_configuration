@@ -17,7 +17,6 @@
     ./sops.nix
     (modulesPath + "/profiles/base.nix")
     ../shared-config.nix
-    ../disko-config.nix
     ../../modules/acme.nix
     ../../modules/gitea.nix
     ../../modules/keyboard.nix
@@ -48,7 +47,6 @@
         enable = true;
         pkiBundle = "/etc/secureboot";
       };
-
       initrd = {
         availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "amdgpu"];
         kernelModules = ["amdgpu"];
@@ -150,6 +148,9 @@
       resolved = {
         enable = true;
       };
+      printing = {
+        enable = true;
+      };
     };
 
     time.timeZone = "Europe/Berlin";
@@ -171,9 +172,6 @@
       useHostResolvConf = lib.mkForce false;
     };
 
-    services.printing = {
-      enable = true;
-    };
     hardware = {
       cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
       graphics = {

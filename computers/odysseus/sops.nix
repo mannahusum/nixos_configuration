@@ -39,6 +39,8 @@
           group = "root";
           mode = "0600";
         };
+        "mailserver/user" = {};
+        "mailserver/token" = {};
       };
     };
     systemd.tmpfiles.rules = [

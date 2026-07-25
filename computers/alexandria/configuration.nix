@@ -12,6 +12,7 @@
 }: {
   imports = [
     disko.nixosModules.disko
+    ../disko-config.nix
     ./fileshare-classic.nix
     lanzaboote.nixosModules.lanzaboote
     ../../modules/acme.nix
@@ -91,19 +92,6 @@
       connection = "smtp.protonmail.ch:587";
       mydomain = "wudika.de";
     };
-    services.systembus-notify.enable = true;
-    services.smartd = {
-      enable = true;
-      autodetect = false;
-      devices = map (drive: { device = drive; }) (systemdrives ++ storagedrives);
-      notifications.systembus-notify.enable = true;
-      notifications.mail = {
-        enable = true;
-        sender = "alexandria@wudika.de";
-        recipient = "christian@wudika.de";
-      };
-    };
-
 
     cabackupclient = {
       enable = true;
@@ -114,7 +102,6 @@
       dataSets = ["tank/media"];
     };
     casshd.enable = true;
-    services.xserver.videoDrivers = ["amdgpu"];
     cawayland.enable = true;
     # cayubikey.enable = true;
     cakeyboard.enable = true;
@@ -126,8 +113,25 @@
         LC_CTYPE = "de_DE.UTF-8";
       };
     };
-    services.resolved = {
-      enable = true;
+
+    services = {
+      systembus-notify.enable = true;
+      smartd = {
+        enable = true;
+        autodetect = false;
+        devices = map (drive: { device = drive; }) (systemdrives ++ storagedrives);
+        notifications.systembus-notify.enable = true;
+        notifications.mail = {
+          enable = true;
+          sender = "alexandria@wudika.de";
+          recipient = "christian@wudika.de";
+        };
+      };
+
+      xserver.videoDrivers = ["amdgpu"];
+      resolved = {
+        enable = true;
+      };
     };
     systemd.network = {
       enable = true;

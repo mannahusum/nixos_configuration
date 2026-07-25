@@ -2,7 +2,7 @@
   description = "Machine definition for computers at home";
 
   inputs = {
-    nixos-hardware.url = "github:8bitbuddhist/nixos-hardware?ref=surface-rust-target-spec-fix";
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-26.05";
     };
@@ -262,21 +262,9 @@
             inherit system;
             modules = [
               ./computers/odysseus/configuration.nix
-              nixos-hardware.nixosModules.microsoft-surface-pro-intel
-              disko.nixosModules.disko
-              lanzaboote.nixosModules.lanzaboote
-              {
-                boot = {
-                  bootspec.enable = true;
-                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                  lanzaboote = {
-                    enable = true;
-                  };
-                };
-              }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+              inherit automatic-ripping-machine disko home-manager lanzaboote nixpkgs nixos-hardware overlays sops-nix;
             };
           };
         ulysses = let
@@ -286,21 +274,10 @@
             inherit system;
             modules = [
               ./computers/ulysses/configuration.nix
-              nixos-hardware.nixosModules.microsoft-surface-pro-intel
-              disko.nixosModules.disko
-              lanzaboote.nixosModules.lanzaboote
-              {
-                boot = {
-                  bootspec.enable = true;
-                  loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce false;
-                  lanzaboote = {
-                    enable = true;
-                  };
-                };
-              }
+
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix system;
+              inherit automatic-ripping-machine disko home-manager lanzaboote nixpkgs nixos-hardware overlays sops-nix;
             };
           };
         axum = let
