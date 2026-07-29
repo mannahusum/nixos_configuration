@@ -97,8 +97,11 @@ in {
   imports = [
     ./bashprofile.nix
     ./cagpg.nix
+    ./neovim/functionality.nix
     ./neovim/git.nix
     ./neovim/integration.nix
+    ./neovim/ui.nix
+    ./neovim/ai.nix
   ];
 
   options = {
@@ -143,6 +146,7 @@ in {
         # package.path at priority=200,
         # and this has to be earlier
         (lib.mkOrder 100 ''
+          vim.cmd.source(vim.fn.expand('~/.secret_vimrc'))
           vim.g.mapleader = "ü"
           vim.g.maplocalleader = "ö"
         '')
@@ -220,6 +224,7 @@ in {
             \ 'gitlab.itiv.kit.edu': trim(system("${pkgs.pass.out}/bin/pass kit.edu/gitlab.itiv.kit.edu/vimcanixos 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
             \}
             let $TODOIST_API_KEY = trim(system("${pkgs.pass.out}/bin/pass todoist.com/ApiToken 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
+            let $KIT_TOOLBOX_API_KEY = trim(system("${pkgs.pass.out}/bin/pass kit.edu/ki-toolbox.scc.kit.edu/API-Key 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
         endif
         let g:powerShellPath ="${pkgs.powershell.out}/bin/pwsh"
         let g:bashLSPPath = "${pkgs.bash-language-server.out}/bin/bash-language-server"

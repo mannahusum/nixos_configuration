@@ -9,6 +9,27 @@
     plugins = with pkgs.vimPlugins; [
       {
         type = "viml";
+        plugin = vim-gist;
+        config = ''
+          let g:gist_detect_filetype = 1
+          let g:gist_show_privates = 1
+          let g:gist_post_private = 1
+        '';
+      }
+      vim-gist
+      vim-merginal
+      vimagit
+      vim-rhubarb
+      fugitive-gitlab-vim
+      {
+        type = "viml";
+        plugin = gv-vim;
+        config = ''
+          nnoremap <leader>gv :GV<CR>
+        '';
+      }
+      {
+        type = "viml";
         plugin = vim-fugitive;
         config = ''
           nnoremap <leader>gc :Git commit<CR>
