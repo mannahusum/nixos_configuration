@@ -41,6 +41,18 @@ with lib; let
         user = "core";
       };
     };
+    "docker-stud" = {
+      hostname = "docker-stud.itiv.kit.edu";
+      hostkeys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILZrJ/KCI76eVZ/LSDpkG7mv59ExStw0GO2S+P1Rr/wP"
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDGDAh2/VV6b5l4N1iLloTxoVNTO5d4i+7W+0aep1NaQq0ch1N/Cx/BQ4Fhghlp1AJPmpNSncEfjq80VzMhqVV1H1z90nx8mN5qIxgCPkSCOWTrEiw16uhJC3/FCLUlWBcMqEhs2BOqaj2maek3irVFft+8KTEvT0z1EClxpotaOQaJIiIAWW93tEiQh1Fk+4kiiJ9a5y2EpLCnooISBdVBE3IPclNWCHFc/aQ7yO7FDLwu+LgcYOe9oTK0V1JnXc8oIj7LrnhoCpFN7ZGvBcJl7UNKZ7WVqzOKrwmnICR3mej/+BlKWtX+9B0qR46FJzdMXg6wKjsgKJksxhuj3kwdwguFblNraIx3ty34nflWNacpuD9d+bBcCV1G9+oHgw2A8OTdIXXGC2aBsIejjl3VOGr2b0fIp75Zd6I6NnU2VFgqBtCJwm8Di5/ss/V6vUQXJI2lR0SgfTop5Ysf5kqcFBkBL0KzuhHswAg/t/qYGZdAUBLqGcu23e/JVPF4jGM="
+        "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBuYF+WoE/4rCGQl+nUcMvhb3yBLF8klRsx+kpkqFaw9FDt1y2OT9N/PIN8wzFVrNCFKzme7aEgxu3k8I266VOQ="
+      ];
+      gpgSocket = null;
+      overrides = {
+        user = "core";
+      };
+    };
     "gitlab" = {
       hostname = "gitlab.itiv.kit.edu";
       hostkeys = [
