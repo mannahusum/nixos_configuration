@@ -1,0 +1,69 @@
+{ pkgs, ... }:
+{
+  programs.neovim = {
+
+    extraPackages = with pkgs; [
+      tree-sitter
+    ];
+    plugins = with pkgs.vimPlugins; [
+      (nvim-treesitter.withPlugins (p: [
+        p.bash
+        p.c
+        p.cmake
+        p.comment
+        p.cpp
+        p.css
+        p.csv
+        p.d
+        p.devicetree
+        p.diff
+        p.dockerfile
+        p.git-config
+        p.gitattributes
+        p.gitcommit
+        p.gitignore
+        p.hcl
+        p.html
+        p.htmldjango
+        p.http
+        p.ini
+        p.javascript
+        p.jinja
+        p.jq
+        p.json
+        p.latex
+        p.lua
+        p.luadoc
+        p.make
+        p.markdown
+        p.markdown_inline
+        p.muttrc
+        p.nginx
+        p.nix
+        p.passwd
+        p.powershell
+        p.printf
+        p.python
+        p.readline
+        p.regex
+        p.robots_txt
+        p.scss
+        p.sql
+        p.ssh_config
+        p.svelte
+        p.tcl
+        p.toml
+        p.tsx
+        p.typst
+        p.udev
+        p.vhdl
+        p.vim
+        p.vimdoc
+        p.vue
+        p.xml
+        p.yaml
+        p.zathurarc
+      ]))
+    ];
+  };
+}

@@ -1,12 +1,40 @@
 { pkgs, ... }:
 {
+  imports = [
+    ./treesitter.nix
+  ];
+
   programs.neovim = {
 
     extraPackages = with pkgs; [
+      trash-cli
+      kitty
+      imagemagick
+      ghostscript
+      mermaid-cli
+      lazygit
+      fd
+      sqlite
+    ];
+
+    extraLuaPackages = ps: with ps; [
+      ljsyscall
     ];
 
     plugins = with pkgs.vimPlugins; [
       vim-airline-themes
+      {
+        type = "lua";
+        plugin = snacks-nvim;
+        config = ''
+          require("snacks").setup({
+            registers = { enabled = true, },
+            notifier = { enabled = true, },
+            input = { enabled = true },
+            picker = { enabled = true },
+          })
+        '';
+      }
       {
         type = "viml";
         plugin = vim-airline;
@@ -49,6 +77,8 @@
         '';
       }
       fidget-nvim
+
+      markdown-preview-nvim
     ];
   };
 }

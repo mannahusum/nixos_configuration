@@ -101,7 +101,8 @@ in {
     ./neovim/git.nix
     ./neovim/integration.nix
     ./neovim/ui.nix
-    ./neovim/ai.nix
+    ./neovim/completion.nix
+    # ./neovim/ai.nix
   ];
 
   options = {
@@ -135,8 +136,10 @@ in {
 
     programs.neovim = {
       enable = true;
-      withPython3 = true;
-      withRuby = true;
+      # withPython3 = true;
+      withPython3 = false;
+      # withRuby = true;
+      withRuby = false;
       withNodeJs = true;
       defaultEditor = true;
       # sideloadInitLua = true;
@@ -156,39 +159,64 @@ in {
         let mapleader = nr2char(0x00fc, 1)
         " German umlaut o
         let maplocalleader = nr2char(0x00f6, 1)
+
+        set sw=2 ts=2 expandtab
       '';
 
       extraPackages = with pkgs; [
-        bash
-        clang
-        direnv
-        fd
-        jq
-        nixpkgs-fmt
-        ripgrep
-        texliveFull
-        tree-sitter
-        xdotool
-        zathura
+        curl
+        # bash
+        # clang
+        # direnv
+        # fd
+        # jq
+        # nixpkgs-fmt
+        # ripgrep
+        # texliveFull
+        # tree-sitter
+        # xdotool
+        # zathura
       ];
 
       extraLuaPackages = ps:
         with ps; [
-          lua-curl
-          mimetypes
-          nvim-nio
-          xml2lua
+          lua
+          # lua-curl
+          # mimetypes
+          # nvim-nio
+          # xml2lua
+          luarocks
         ];
 
       extraPython3Packages = ps:
         with ps; [
-          black
-          msgpack
+          # black
+          # msgpack
           pynvim
-          python-slugify
-          rope
-          simple-websocket-server
+          # python-slugify
+          # rope
+          # simple-websocket-server
         ];
+      plugins = with pkgs.vimPlugins; [
+        {
+          type = "lua";
+          plugin = rocks-nvim;
+          config = ''
+          '';
+        }
+        # {
+        #   type = "lua";
+        #   plugin = lazy-nvim;
+        #   config = ''
+        #     require("lazy").setup({
+        #       spec = {},
+        #       rocks = {
+        #         enabled = false,
+        #       },
+        #     })
+        #   '';
+        # }
+      ];
     };
 
     xdg.configFile."neovide/config.toml" = {
@@ -215,14 +243,16 @@ in {
         if v:shell_error != 0
             echom "Can't decrypt passwords. Keys won't be available"
         else
+            let s:github_token = trim(system("${pkgs.pass.out}/bin/pass github/nvim 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
             let g:SimplenoteUsername = trim(system("${pkgs.pass.out}/bin/pass simplenote.com 2>/dev/null | ${pkgs.gnugrep.out}/bin/grep user: | cut -b 6-"))
             let g:SimplenotePassword = trim(system("${pkgs.pass.out}/bin/pass simplenote.com 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
 
-            let g:github_user = trim(system("${pkgs.pass.out}/bin/pass github/gist 2>/dev/null | ${pkgs.gnugrep.out}/bin/grep user: | cut -b 6-"))
-            let g:gist_token = trim(system("${pkgs.pass.out}/bin/pass github/gist 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
+            let g:github_user = trim(system("${pkgs.pass.out}/bin/pass github/nvim 2>/dev/null | ${pkgs.gnugrep.out}/bin/grep user: | cut -b 6-"))
+            let g:gist_token = s:github_token
             let g:gitlab_api_keys = {
             \ 'gitlab.itiv.kit.edu': trim(system("${pkgs.pass.out}/bin/pass kit.edu/gitlab.itiv.kit.edu/vimcanixos 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
             \}
+            let $GH_TOKEN = s:github_token
             let $TODOIST_API_KEY = trim(system("${pkgs.pass.out}/bin/pass todoist.com/ApiToken 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
             let $KIT_TOOLBOX_API_KEY = trim(system("${pkgs.pass.out}/bin/pass kit.edu/ki-toolbox.scc.kit.edu/API-Key 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
         endif

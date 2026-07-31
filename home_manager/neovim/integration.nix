@@ -5,14 +5,14 @@
       fzf
       git
       ripgrep
-      tree-sitter
       fd
       bat
       viu
       chafa
       ueberzugpp
-      luarocks
-      lua
+    ];
+
+    extraLuaPackages = ps: with ps; [
     ];
 
     plugins = with pkgs.vimPlugins; [
@@ -41,61 +41,7 @@
       direnv-vim
       vim-dispatch
       vim-dispatch-neovim
-      (nvim-treesitter.withPlugins (p: [
-        p.bash
-        p.c
-        p.cmake
-        p.comment
-        p.cpp
-        p.css
-        p.csv
-        p.d
-        p.devicetree
-        p.diff
-        p.dockerfile
-        p.git-config
-        p.gitattributes
-        p.gitcommit
-        p.gitignore
-        p.hcl
-        p.html
-        p.htmldjango
-        p.http
-        p.ini
-        p.jinja
-        p.jq
-        p.json
-        p.latex
-        p.lua
-        p.luadoc
-        p.make
-        p.markdown
-        p.markdown_inline
-        p.muttrc
-        p.nginx
-        p.nix
-        p.passwd
-        p.powershell
-        p.printf
-        p.python
-        p.readline
-        p.regex
-        p.robots_txt
-        p.sql
-        p.ssh_config
-        p.tcl
-        p.toml
-        p.tsx
-        p.udev
-        p.vhdl
-        p.vim
-        p.vimdoc
-        p.xml
-        p.yaml
-        p.zathurarc
-      ]))
-      rocks-nvim
-      rest-nvim
+      # rest-nvim
       fzf-lua
       {
         type = "lua";
@@ -111,6 +57,9 @@
           require('nvim-web-devicons').setup()
         '';
       }
+      vim-scriptease
+      vim-characterize
+      vim-obsession
     ];
   };
 }

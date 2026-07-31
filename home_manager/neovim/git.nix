@@ -4,6 +4,7 @@
 
     extraPackages = with pkgs; [
       git
+      lazygit
     ];
 
     plugins = with pkgs.vimPlugins; [
@@ -17,7 +18,13 @@
         '';
       }
       vim-gist
-      vim-merginal
+      {
+        type = "viml";
+        plugin = vim-merginal;
+        config = ''
+          nnoremap <leader>gb :MerginalToggle<CR>
+        '';
+      }
       vimagit
       vim-rhubarb
       fugitive-gitlab-vim
@@ -50,6 +57,7 @@
           nnoremap <leader>gU :Git -c push.default=current push<CR>
         '';
       }
+      lazygit-nvim
     ];
   };
 }
