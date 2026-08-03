@@ -14,6 +14,9 @@
         plugin = blink-cmp;
         config = ''
           require('blink-cmp').setup({
+            keymap = {
+              preset = 'default',
+            },
             sources = {
               default = { "lsp", "path", "buffer", "emoji", "dictionary", "git" },
               providers = {

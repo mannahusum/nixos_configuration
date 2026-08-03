@@ -102,7 +102,7 @@ in {
     ./neovim/integration.nix
     ./neovim/ui.nix
     ./neovim/completion.nix
-    # ./neovim/ai.nix
+    ./neovim/ai.nix
   ];
 
   options = {
@@ -136,8 +136,7 @@ in {
 
     programs.neovim = {
       enable = true;
-      # withPython3 = true;
-      withPython3 = false;
+      withPython3 = true;
       # withRuby = true;
       withRuby = false;
       withNodeJs = true;
@@ -153,6 +152,9 @@ in {
           vim.g.mapleader = "ü"
           vim.g.maplocalleader = "ö"
         '')
+        ''
+          vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { silent = true})
+        ''
       ];
       extraConfig = ''
         " German umlaut u
@@ -254,7 +256,8 @@ in {
             \}
             let $GH_TOKEN = s:github_token
             let $TODOIST_API_KEY = trim(system("${pkgs.pass.out}/bin/pass todoist.com/ApiToken 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
-            let $KIT_TOOLBOX_API_KEY = trim(system("${pkgs.pass.out}/bin/pass kit.edu/ki-toolbox.scc.kit.edu/API-Key 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
+            let $AIDER_OPENAI_API_KEY = trim(system("${pkgs.pass.out}/bin/pass kit.edu/ki-toolbox.scc.kit.edu/API-Key 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
+            let $AIDER_OPENAI_API_BASE = "https://ki-toolbox.scc.kit.edu/api/v1"
         endif
         let g:powerShellPath ="${pkgs.powershell.out}/bin/pwsh"
         let g:bashLSPPath = "${pkgs.bash-language-server.out}/bin/bash-language-server"
