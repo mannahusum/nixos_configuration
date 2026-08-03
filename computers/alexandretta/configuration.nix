@@ -49,11 +49,11 @@
         enable = false;
       };
       initrd = {
-        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "intel_pch_thermal"];
+        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "intel_pch_thermal" "nvidia"];
         systemd.enable = true;
       };
       kernelModules = ["kvm-intel"];
-      extraModulePackages = [];
+      # extraModulePackages = [ config.boot.kernelModules.nvidia ];
     };
     # caarm.enable = true;
     caserialconsole.enable = true;
@@ -183,6 +183,7 @@
         };
         openFirewall = true;
       };
+      xserver.videoDrivers = [ "nvidia" ];
     };
     hardware = {
       cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
@@ -202,6 +203,7 @@
         '';
         extraModules = ["ie31200_edac"];
       };
+      nvidia.open = true;
     };
 
     programs.nix-ld = {

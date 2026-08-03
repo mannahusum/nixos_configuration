@@ -30,6 +30,8 @@
           "google-chrome"
           "unrar"
           "makemkv"
+          "nvidia-settings"
+          "nvidia-x11"
         ];
     };
     boot = {
