@@ -17,18 +17,10 @@
     ../../modules/acme.nix
     ../../modules/arm.nix
     ../../modules/backup-server.nix
-    ../../modules/keyboard.nix
-    ../../modules/nginx.nix
+    ../../modules/postfix.nix
+    ../../modules/serial-console.nix
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/base.nix")
-    ../../modules/postfix.nix
-    ../../modules/saned.nix
-    ../../modules/serial-console.nix
-    ../../modules/sshd.nix
-    ../../modules/usermount.nix
-    ../../modules/users.nix
-    ../../modules/wayland.nix
-    ../../modules/yubikey.nix
     ../shared-config.nix
     ./sops.nix
     sops-nix.nixosModules.sops
@@ -50,7 +42,6 @@
       };
       initrd = {
         availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "intel_pch_thermal" "nvidia"];
-        systemd.enable = true;
       };
       kernelModules = ["kvm-intel"];
       # extraModulePackages = [ config.boot.kernelModules.nvidia ];
@@ -77,7 +68,6 @@
       username = "alexandria-backup";
       sshkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIENuJozoOGUX38alQSsfLhXGUQ/bj+LMBYtz4AU4mPJM syncoid@alexandria";
     };
-    casshd.enable = true;
     cawayland = {
       enable = true;
       graphicsSettings = ''
@@ -85,16 +75,7 @@
       '';
     };
     # cayubikey.enable = true;
-    cakeyboard.enable = true;
-    causermount.enable = true;
-    time.timeZone = "Europe/Berlin";
-    i18n = {
-      defaultLocale = "de_DE.UTF-8";
-      extraLocaleSettings = {
-        LC_COLLATE = "de_DE.UTF-8";
-        LC_CTYPE = "de_DE.UTF-8";
-      };
-    };
+
     systemd.network = {
       enable = true;
       links = {
@@ -145,13 +126,9 @@
     };
 
     networking = {
-      enableIPv6 = true;
       hostId = "16c516f2";
       hostName = "alexandretta";
-      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
-      tempAddresses = "disabled";
       useDHCP = lib.mkDefault true;
-      useHostResolvConf = lib.mkForce false;
       useNetworkd = true;
     };
 
@@ -168,11 +145,7 @@
           recipient = "christian@wudika.de";
         };
       };
-      resolved = {
-        enable = true;
-      };
       fwupd = {
-        enable = true;
         extraRemotes = ["lvfs-testing"];
         uefiCapsuleSettings.DisableCapsuleUpdateOnDisk = true;
       };
@@ -192,9 +165,6 @@
     };
     hardware = {
       cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-      graphics = {
-        enable = true;
-      };
       rasdaemon = {
         enable = true;
         mainboard = ''
@@ -231,18 +201,10 @@
       with pkgs; [
         efitools
         fdupes
-        file
-        git
-        git-crypt
         ipmitool
         mkvpkgs.makemkv
-        neovim
         rasdaemon
-        ripgrep
-        sbctl
         sbsigntool
-        tpm2-tss
-        xterm # for resize command
       ];
 
     system.stateVersion = "25.11";

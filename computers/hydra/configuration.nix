@@ -15,23 +15,12 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     sops-nix.nixosModules.sops
     ./sops.nix
-    (modulesPath + "/profiles/base.nix")
     ../disko-config.nix
     ../shared-config.nix
     ../../modules/acme.nix
-    ../../modules/gitea.nix
-    ../../modules/keyboard.nix
-    ../../modules/nginx.nix
     ../../modules/pixiecore.nix
     ../../modules/postfix.nix
-    ../../modules/saned.nix
     ../../modules/serial-console.nix
-    ../../modules/sshd.nix
-    ../../modules/usermount.nix
-    ../../modules/users.nix
-    ../../modules/wayland.nix
-    ../../modules/xandikos.nix
-    ../../modules/yubikey.nix
   ];
 
   options.hydra = {
@@ -51,18 +40,10 @@
       initrd = {
         availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "amdgpu"];
         kernelModules = ["amdgpu"];
-        systemd.enable = true;
       };
       kernelModules = ["kvm-amd"];
       extraModulePackages = [];
     };
-
-    # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-    # (the default) this is the recommended approach. When using systemd-networkd it's
-    # still possible to use this option, but it's recommended to use it in conjunction
-    # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-    # networking.interfaces.enp2s0.useDHCP = lib.mkDefault true;
-    # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
 
     caacme = {
       enable = true;
@@ -72,7 +53,6 @@
       enable = true;
       domain = "gitea.catbertsen.de";
     };
-    cakeyboard.enable = true;
     canginx.enable = true;
     capixiecore.enable = true;
     capostfix = {
@@ -82,15 +62,11 @@
     };
     casaned.enable = true;
     caserialconsole.enable = true;
-    casshd.enable = true;
-    causermount.enable = true;
-    cawayland.enable = true;
     caxandikos = {
       enable = true;
       domain = "calendar.catbertsen.de";
       passwordfile = config.sops.templates."xandikosBasicAuth".path;
     };
-    cayubikey.enable = true;
 
     cadrives = {
       enable = true;
@@ -135,49 +111,22 @@
         enable = true;
         domain = "catbertsen.de";
       };
-      avahi = {
-        enable = true;
-        nssmdns4 = true;
-        nssmdns6 = true;
-        publish = {
-          enable = true;
-          userServices = true;
-          hinfo = true;
-        };
-        ipv6 = true;
-      };
       pcscd.enable = true;
-      resolved = {
-        enable = true;
-      };
       printing = {
         enable = true;
       };
     };
 
-    time.timeZone = "Europe/Berlin";
-    i18n = {
-      defaultLocale = "de_DE.UTF-8";
-      extraLocaleSettings = {
-        LC_COLLATE = "de_DE.UTF-8";
-        LC_CTYPE = "de_DE.UTF-8";
-      };
-    };
     networking = {
-      enableIPv6 = true;
       firewall.enable = false;
       hostId = "b800626c";
       hostName = "hydra";
-      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
-      tempAddresses = "disabled";
       useDHCP = lib.mkDefault true;
-      useHostResolvConf = lib.mkForce false;
     };
 
     hardware = {
       cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
       graphics = {
-        enable = true;
         extraPackages = with pkgs; [
           libvdpau-va-gl
         ];
@@ -199,18 +148,10 @@
     };
     environment = {
       systemPackages = with pkgs; [
-        file
-        git
-        git-crypt
         lm_sensors
         mokutil
-        neovim
-        ripgrep
-        sbctl
         sbsigntool
-        tpm2-tss
         vulkan-validation-layers
-        xterm # for resize command
       ];
       variables = {
         WLR_RENDERER = "vulkan";

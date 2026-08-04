@@ -13,14 +13,8 @@
     disko.nixosModules.disko
     ../disko-config.nix
     lanzaboote.nixosModules.lanzaboote
-    ../../modules/keyboard.nix
     (modulesPath + "/profiles/base.nix")
     ../../modules/postfix.nix
-    ../../modules/sshd.nix
-    ../../modules/usermount.nix
-    ../../modules/users.nix
-    ../../modules/wayland.nix
-    ../../modules/yubikey.nix
     nixos-hardware.nixosModules.microsoft-surface-pro-intel
     ../shared-config.nix
     ./sops.nix
@@ -33,24 +27,6 @@
       loader.systemd-boot.enable = nixpkgs.lib.mkForce false;
       lanzaboote = {
         enable = true;
-      };
-      supportedFilesystems = ["zfs"];
-      loader.efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot";
-      };
-      initrd = {
-        supportedFilesystems = ["zfs"];
-        systemd = {
-          enable = true;
-          emergencyAccess = true;
-        };
-      };
-      swraid = {
-        enable = true;
-        mdadmConf = ''
-          MAILADDR christian@wudika.de
-        '';
       };
     };
     cadrives = {
@@ -67,47 +43,19 @@
       mydomain = "wudika.de";
     };
 
-    casshd.enable = true;
     cawayland = {
       enable = true;
       displayManager = "gdm";
     };
-    causermount.enable = true;
-    cayubikey.enable = true;
-    cakeyboard.enable = true;
-    time.timeZone = "Europe/Berlin";
-    i18n = {
-      defaultLocale = "de_DE.UTF-8";
-      extraLocaleSettings = {
-        LC_COLLATE = "de_DE.UTF-8";
-        LC_CTYPE = "de_DE.UTF-8";
-      };
-    };
+
     services = {
-      avahi = {
-        enable = true;
-        nssmdns4 = true;
-        nssmdns6 = true;
-        publish = {
-          enable = true;
-          userServices = true;
-          hinfo = true;
-        };
-        ipv6 = true;
-      };
       pcscd.enable = true;
-      resolved = {
-        enable = true;
-      };
     };
     networking = {
-      enableIPv6 = true;
       firewall.enable = false;
       hostId = "31c099d4";
       hostName = "odysseus";
-      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       networkmanager.enable = true;
-      useHostResolvConf = lib.mkForce false;
     };
 
     hardware = {
@@ -137,15 +85,7 @@
     };
 
     environment.systemPackages = with pkgs; [
-      git
       mokutil
-      sbctl
-      tpm2-tss
-      git-crypt
-      neovim
-      ripgrep
-      xterm # for resize command
-      file
     ];
     # environment.etc."sway/config.d/monitors.conf".text = ''
     #   output "DP-1" mode 3840x2160@30Hz pos 0 0
