@@ -9,13 +9,14 @@
   memSize ? 1024,
   format ? "raw",
   ipxe ? pkgs.ipxe,
-  name ? "ipxe_partition"
+  name ? "ipxe_partition",
 }: let
   format' = format;
-in
-let
-
-  format = if format' == "qcow2-compressed" then "qcow2" else format';
+in let
+  format =
+    if format' == "qcow2-compressed"
+    then "qcow2"
+    else format';
 
   compress = lib.optionalString (format' == "qcow2-compressed") "-c";
 
@@ -27,15 +28,17 @@ let
       vpc = "vhd";
       raw = "img";
     }
-    .${format} or format;
+    .${
+      format
+    } or format;
 
   binPath = lib.makeBinPath (
     with pkgs;
-    [
-      util-linux
-      gptfdisk
-    ]
-    ++ stdenv.initialPath
+      [
+        util-linux
+        gptfdisk
+      ]
+      ++ stdenv.initialPath
   );
 
   prepareImage = ''
@@ -82,14 +85,13 @@ let
 
   moveOrConvertImage = ''
     ${
-      if format == "raw" then
-        ''
-          mv $diskImage $out/${filename}
-        ''
-      else
-        ''
-          ${pkgs.qemu-utils}/bin/qemu-img convert -f raw -O ${format} ${compress} $diskImage $out/${filename}
-        ''
+      if format == "raw"
+      then ''
+        mv $diskImage $out/${filename}
+      ''
+      else ''
+        ${pkgs.qemu-utils}/bin/qemu-img convert -f raw -O ${format} ${compress} $diskImage $out/${filename}
+      ''
     }
     diskImage=$out/${filename}
   '';
@@ -104,21 +106,23 @@ let
     mkdir -p $out/nix-support
     echo "file ${format}-image $out/${filename}" >> $out/nix-support/hydra-build-products
   '';
-
-in pkgs.vmTools.runInLinuxVM (
-  pkgs.runCommand name
+in
+  pkgs.vmTools.runInLinuxVM (
+    pkgs.runCommand name
     {
       preVM = prepareImage + createEFIVars;
-      buildInputs = [
-        ipxe
-      ] ++ (with pkgs; [
-        util-linux
-        e2fsprogs
-        dosfstools
-      ]);
+      buildInputs =
+        [
+          ipxe
+        ]
+        ++ (with pkgs; [
+          util-linux
+          e2fsprogs
+          dosfstools
+        ]);
       postVM = moveOrConvertImage + createHydraBuildProducts;
       QEMU_OPTS = lib.concatStringsSep " " (
-        [ "-drive if=pflash,format=raw,unit=0,readonly=on,file=${efiFirmware}" ]
+        ["-drive if=pflash,format=raw,unit=0,readonly=on,file=${efiFirmware}"]
         ++ [
           "-drive if=pflash,format=raw,unit=1,file=$efiVars"
         ]
@@ -128,21 +132,21 @@ in pkgs.vmTools.runInLinuxVM (
           "-global"
           "driver=cfi.pflash01,property=secure,value=on"
         ]
-        );
-        inherit memSize;
-      }
-      ''
-        export PATH=${binPath}:$PATH
+      );
+      inherit memSize;
+    }
+    ''
+      export PATH=${binPath}:$PATH
 
-        disk=/dev/vda
+      disk=/dev/vda
 
-        mkfs.vfat -n "ESP" -F 32 "''${disk}1"
+      mkfs.vfat -n "ESP" -F 32 "''${disk}1"
 
-        mountpoint=/mnt
-        mkdir "''${mountpoint}"
-        mount "''${disk}1" "''${mountpoint}"
-        mkdir -p "''${mountpoint}/EFI/BOOT"
-        cp "${ipxe}/ipxe.efi" "''${mountpoint}/EFI/BOOT/BOOTX64.h"
-        umount "''${mountpoint}"
-      ''
-      )
+      mountpoint=/mnt
+      mkdir "''${mountpoint}"
+      mount "''${disk}1" "''${mountpoint}"
+      mkdir -p "''${mountpoint}/EFI/BOOT"
+      cp "${ipxe}/ipxe.efi" "''${mountpoint}/EFI/BOOT/BOOTX64.h"
+      umount "''${mountpoint}"
+    ''
+  )

@@ -1,4 +1,3 @@
 final: _prev: {
-  disktype = final.callPackage ./disktype.nix { };
+  disktype = final.callPackage ./disktype.nix {};
 }
-

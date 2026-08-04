@@ -1,7 +1,5 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   programs.neovim = {
-
     plugins = with pkgs.vimPlugins; [
       SudoEdit-vim
       {
@@ -73,4 +71,3 @@
     ];
   };
 }
-

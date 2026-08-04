@@ -107,7 +107,7 @@
     services.smartd = {
       enable = true;
       autodetect = false;
-      devices = map (drive: { device = drive; }) localdrives;
+      devices = map (drive: {device = drive;}) localdrives;
       notifications.systembus-notify.enable = true;
       notifications.mail = {
         enable = true;

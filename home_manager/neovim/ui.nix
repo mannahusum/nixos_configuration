@@ -1,11 +1,9 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   imports = [
     ./treesitter.nix
   ];
 
   programs.neovim = {
-
     extraPackages = with pkgs; [
       trash-cli
       kitty
@@ -17,9 +15,10 @@
       sqlite
     ];
 
-    extraLuaPackages = ps: with ps; [
-      ljsyscall
-    ];
+    extraLuaPackages = ps:
+      with ps; [
+        ljsyscall
+      ];
 
     plugins = with pkgs.vimPlugins; [
       vim-airline-themes

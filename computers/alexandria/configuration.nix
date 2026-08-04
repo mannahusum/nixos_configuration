@@ -119,7 +119,7 @@
       smartd = {
         enable = true;
         autodetect = false;
-        devices = map (drive: { device = drive; }) (systemdrives ++ storagedrives);
+        devices = map (drive: {device = drive;}) (systemdrives ++ storagedrives);
         notifications.systembus-notify.enable = true;
         notifications.mail = {
           enable = true;

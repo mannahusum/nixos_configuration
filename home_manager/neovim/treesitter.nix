@@ -1,7 +1,5 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   programs.neovim = {
-
     extraPackages = with pkgs; [
       tree-sitter
     ];

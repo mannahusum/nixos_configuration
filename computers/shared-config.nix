@@ -22,7 +22,6 @@
   ];
 
   config = {
-
     nixpkgs = {
       inherit overlays;
       config.allowUnfreePredicate = pkg:

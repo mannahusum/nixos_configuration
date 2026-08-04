@@ -150,15 +150,17 @@ in {
 
         home-manager = {
           users = {
-            christian = import ../home_manager/caHomeConfig.nix {
-              inherit config nixpkgs overlays;
-              system_type = pkgs.stdenv.hostPlatform.system;
-              pinentry = cfg.defaultPinentry;
-              forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
-              createForwardPath = true;
-            } // {
-              home.stateVersion = "24.11";
-            };
+            christian =
+              import ../home_manager/caHomeConfig.nix {
+                inherit config nixpkgs overlays;
+                system_type = pkgs.stdenv.hostPlatform.system;
+                pinentry = cfg.defaultPinentry;
+                forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
+                createForwardPath = true;
+              }
+              // {
+                home.stateVersion = "24.11";
+              };
           };
         };
 

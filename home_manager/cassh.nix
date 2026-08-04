@@ -619,7 +619,7 @@ with lib; let
       hostkeys = [
         "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBD0sdYgWkABqIj1RLsvU3TZ4exeT+YvWbKK2+XjhfSAtXGQnNo3kXC8PkODmrR6HfdMTHrXumoKZUGc+KfZ150g="
         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDmAi3FPsLEmMtN1kl/dJMZAtILMUsT6UCqr+jc6z8Cw4mAcIL+YGY1ivZO0QFkX6/RN9X3usHEcXpVPORoVBz3MMy36pCY3eDcw4nVMo4SiqrwZ04ERKovYBM2jsNNrBVYpQ37qvhfw5dayaTz35uQywRxnYcu7qg5JEVzKl1lo09pO7yAeNzNCcr5OQhoe+mPBFqOg+N63xSoJWrEQ+TFkh4DxItjBL5jm38vqRlS4hpILY3KUxfOpwGzoiHRxTiCFgKn/a60b+Php2K8vZqe1pr48T0srKGDOianRko5GTB1kPDrqKXR/mCWhwyAZNONl+qa+a0OYbaGeWFw0xlH8iahBSJUDqra8+bRANrleq3n+vO4Ezx4XMhyyXe6v3b5aJ0zOJ+QA0kgKjwekXhDQzK1Bhd5dMc3zsGz+hbL/rzzUSqiyAN6X+JQm8o+EJnM1VbXpKnRGfUF5Bo1P9yklk2sVN9ns+I6zbLimhQ/ZcYDdbwZHbk0ADDL/kZ59qXHS+e647MUjFmotufrsuuTuJkA2RO74BPO2EFlWBJ4x7TN3q2hcsimt5P4gh4gqPk89i897Q5tfqazHKYSXaXYrh9L7AdnOJ2kxv13j0VRSB6hJq3tGqybAeQf7/KqJWNwgtZfJQ7siFxkoueXaRGPCyuEOyMsfr5tRUNjDgGhtQ=="
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA7c19fYp3a90ODssk+xhyeA0+WNSATx6huXG0e8BcO0"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA7c19fYp3a90ODssk+xhyeA0+WNSATx6huXG0e8BcO0"
       ];
       overrides = {
         user = "root";
@@ -741,7 +741,7 @@ with lib; let
         if (socket == null) || (remoteSocket == null)
         then {}
         else {
-            RemoteForward = "${remoteSocket} ${socket}";
+          RemoteForward = "${remoteSocket} ${socket}";
         }
       )
       // defaults

@@ -96,7 +96,7 @@
     services.smartd = {
       enable = true;
       autodetect = false;
-      devices = map (drive: { device = drive; }) (systemdrives ++ storagedrives);
+      devices = map (drive: {device = drive;}) (systemdrives ++ storagedrives);
       notifications.systembus-notify.enable = true;
       notifications.mail = {
         enable = true;
@@ -226,12 +226,12 @@
       useNetworkd = true;
     };
 
-  hardware = {
-    cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-    graphics = {
-      enable = true;
+    hardware = {
+      cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+      graphics = {
+        enable = true;
+      };
     };
-  };
     services.zfs.autoSnapshot = {
       enable = true;
       flags = "-k -p -u";

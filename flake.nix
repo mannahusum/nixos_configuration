@@ -274,7 +274,6 @@
             inherit system;
             modules = [
               ./computers/ulysses/configuration.nix
-
             ];
             specialArgs = {
               inherit automatic-ripping-machine disko home-manager lanzaboote nixpkgs nixos-hardware overlays sops-nix;
@@ -319,7 +318,12 @@
         };
       };
 
-      homeManagerModules.caUserEnvironment = { config, pkgs, lib, ... }: {
+      homeManagerModules.caUserEnvironment = {
+        config,
+        pkgs,
+        lib,
+        ...
+      }: {
         imports = [
           ./home_manager/bashprofile.nix
           ./home_manager/cagpg.nix
@@ -331,10 +335,10 @@
       };
 
       overlays = {
-        linux = (import ./packages/linux/overlay.nix);
-        ssh = (import ./packages/ssh/overlay.nix);
-        darwin = (import ./packages/darwin/overlay.nix);
-        ipxe = (import ./packages/ipxe/overlay.nix);
+        linux = import ./packages/linux/overlay.nix;
+        ssh = import ./packages/ssh/overlay.nix;
+        darwin = import ./packages/darwin/overlay.nix;
+        ipxe = import ./packages/ipxe/overlay.nix;
       };
     };
 }

@@ -107,7 +107,7 @@ in {
           zed = {
             enableMail = true;
             settings = {
-              ZED_EMAIL_ADDR = [ "christian@wudika.de" ];
+              ZED_EMAIL_ADDR = ["christian@wudika.de"];
               ZED_NOTIFY_VERBOSE = true;
             };
           };

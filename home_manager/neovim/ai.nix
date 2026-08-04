@@ -1,13 +1,13 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   programs.neovim = {
     extraPackages = with pkgs; [
       aider-chat-full
     ];
 
-    extraPython3Packages = ps: with ps; [
-      botocore
-    ];
+    extraPython3Packages = ps:
+      with ps; [
+        botocore
+      ];
 
     plugins = with pkgs.vimPlugins; [
       {
@@ -45,5 +45,3 @@
     ];
   };
 }
-
-

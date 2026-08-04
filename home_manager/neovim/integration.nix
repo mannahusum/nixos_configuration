@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   programs.neovim = {
     extraPackages = with pkgs; [
       fzf
@@ -12,8 +11,9 @@
       ueberzugpp
     ];
 
-    extraLuaPackages = ps: with ps; [
-    ];
+    extraLuaPackages = ps:
+      with ps; [
+      ];
 
     plugins = with pkgs.vimPlugins; [
       {
@@ -63,4 +63,3 @@
     ];
   };
 }
-

@@ -22,16 +22,16 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    boot.kernelModules = [ "sg" ];
+    boot.kernelModules = ["sg"];
     programs.zsh.enable = true;
 
-
-    fileSystems = builtins.listToAttrs (lib.lists.forEach (lib.lists.range 0 10) ( count: {
-      name = "/mnt/dev/sr${builtins.toString count}";
-      value = {
+    fileSystems = builtins.listToAttrs (lib.lists.forEach (lib.lists.range 0 10) (
+      count: {
+        name = "/mnt/dev/sr${builtins.toString count}";
+        value = {
           device = "/dev/sr${builtins.toString count}";
           fsType = "udf,iso9660";
-          options = [ "defaults" "utf8" "noauto" "ro" "user" "X-mount.mkdir" ];
+          options = ["defaults" "utf8" "noauto" "ro" "user" "X-mount.mkdir"];
         };
       }
     ));
@@ -51,7 +51,7 @@ in {
       settings = {
         ALLOW_DUPLICATES = true;
         ARM_CHECK_UDF = false;
-        ARM_NAME =  "Alexandretta";
+        ARM_NAME = "Alexandretta";
         AUTO_EJECT = true;
         COMPLETED_PATH = "${baseFolder}/completed/";
         DATE_FORMAT = "%Y-%m-%d %H:%M:%S";
