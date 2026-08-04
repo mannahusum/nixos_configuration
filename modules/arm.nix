@@ -1,11 +1,16 @@
 {
   config,
   lib,
+  automatic-ripping-machine,
   ...
 }: let
   cfg = config.caarm;
   baseFolder = "/media/arm/media";
 in {
+  imports = [
+    automatic-ripping-machine.nixosModules.automatic-ripping-machine
+  ];
+
   options.caarm = {
     enable = lib.mkOption {
       type = lib.types.bool;
@@ -39,7 +44,7 @@ in {
 
     services.automatic-ripping-machine = {
       enable = true;
-      enableTranscoding = false;
+      enableTranscoding = true;
       appriseSettings = {
         NTFY_TOPIC = "ootu1ipiexodohphu6zoo7Aedeifooseayozoa3the4thar1zoh1vahKimohH8ee";
       };

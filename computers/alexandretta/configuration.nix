@@ -15,7 +15,7 @@
     disko.nixosModules.disko
     lanzaboote.nixosModules.lanzaboote
     ../../modules/acme.nix
-    # ../../modules/arm.nix
+    ../../modules/arm.nix
     ../../modules/backup-server.nix
     ../../modules/keyboard.nix
     ../../modules/nginx.nix
@@ -55,7 +55,7 @@
       kernelModules = ["kvm-intel"];
       # extraModulePackages = [ config.boot.kernelModules.nvidia ];
     };
-    # caarm.enable = true;
+    caarm.enable = true;
     caserialconsole.enable = true;
     cadrives = {
       enable = true;
@@ -90,7 +90,12 @@
       sshkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIENuJozoOGUX38alQSsfLhXGUQ/bj+LMBYtz4AU4mPJM syncoid@alexandria";
     };
     casshd.enable = true;
-    cawayland.enable = true;
+    cawayland = {
+      enable = true;
+      graphicsSettings = ''
+        export WLR_DRM_DEVICES="/dev/dri/$(${pkgs.intel-gpu-tools}/bin/lsgpu | grep 102b:0522 | head -n 1 | cut -d' ' -f1)"
+      '';
+    };
     # cayubikey.enable = true;
     cakeyboard.enable = true;
     causermount.enable = true;

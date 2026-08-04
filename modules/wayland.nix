@@ -74,6 +74,13 @@ in {
         Keyboard settings used for wayland sessions, e.g. greetd
       '';
     };
+    graphicsSettings = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = ''
+        Graphics settings used for wayland sessions, e.g. a dedicate graphics card
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable (let
@@ -109,6 +116,7 @@ in {
     '';
     myswaycommand = pkgs.writeShellScriptBin "mysway" ''
       ${cfg.keyboardSettings}
+      ${cfg.graphicsSettings}
       ${pkgs.sway.out}/bin/sway --config ${myswayconfig} --unsupported-gpu
       ${pkgs.coreutils.out}/bin/sleep 60
     '';
