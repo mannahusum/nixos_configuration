@@ -84,12 +84,15 @@
       fwupd = {
         enable = true;
       };
-      resolved.settings.Resolve = {
-        DNSOverTLS = "true";
-        DNSSEC = "true";
-        Domains = ["~."];
-        FallbackDNS = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
-        LLMNR = "true";
+      resolved = {
+        enable = true;
+        settings.Resolve = {
+          DNSOverTLS = "true";
+          DNSSEC = "true";
+          Domains = ["~."];
+          FallbackDNS = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
+          LLMNR = "true";
+        };
       };
     };
 
@@ -98,10 +101,22 @@
     cayubikey.enable = true;
     cakeyboard.enable = true;
     time.timeZone = "Europe/Berlin";
+    i18n = {
+      defaultLocale = "de_DE.UTF-8";
+      extraLocaleSettings = {
+        LC_COLLATE = "de_DE.UTF-8";
+        LC_CTYPE = "de_DE.UTF-8";
+      };
+    };
     networking = {
+      enableIPv6 = true;
       tempAddresses = "disabled";
+      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
+      useHostResolvConf = lib.mkForce false;
     };
     causermount.enable = true;
+
+    hardware.graphics.enable = true;
 
     programs = {
       bat.enable = true;
