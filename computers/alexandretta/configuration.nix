@@ -4,7 +4,6 @@
   lanzaboote,
   lib,
   modulesPath,
-  # nixpkgs,
   nixpkgs-makemkv,
   pkgs,
   sops-nix,
@@ -74,7 +73,6 @@
         export WLR_DRM_DEVICES="/dev/dri/$(${pkgs.intel-gpu-tools}/bin/lsgpu | grep 102b:0522 | head -n 1 | cut -d' ' -f1)"
       '';
     };
-    # cayubikey.enable = true;
 
     systemd.network = {
       enable = true;

@@ -1,7 +1,6 @@
 {
   disko,
   lanzaboote,
-  lib,
   modulesPath,
   nixos-hardware,
   nixpkgs,

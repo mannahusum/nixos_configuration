@@ -2,7 +2,6 @@
   config,
   disko,
   lanzaboote,
-  lib,
   modulesPath,
   nixpkgs,
   pkgs,
@@ -121,11 +120,11 @@
       firewall.enable = false;
       hostId = "b800626c";
       hostName = "hydra";
-      useDHCP = lib.mkDefault true;
+      useDHCP = nixpkgs.lib.mkDefault true;
     };
 
     hardware = {
-      cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+      cpu.amd.updateMicrocode = nixpkgs.lib.mkDefault config.hardware.enableRedistributableFirmware;
       graphics = {
         extraPackages = with pkgs; [
           libvdpau-va-gl
