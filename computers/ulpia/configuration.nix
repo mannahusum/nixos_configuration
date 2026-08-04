@@ -93,17 +93,6 @@
       connection = "smtp.protonmail.ch:587";
       mydomain = "catbertsen.de";
     };
-    services.smartd = {
-      enable = true;
-      autodetect = false;
-      devices = map (drive: {device = drive;}) (systemdrives ++ storagedrives);
-      notifications.systembus-notify.enable = true;
-      notifications.mail = {
-        enable = true;
-        sender = "ulpia@catbertsen.de";
-        recipient = "christian@wudika.de";
-      };
-    };
     nix = {
       settings = {
         substituters = [
@@ -116,18 +105,6 @@
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         ];
       };
-    };
-    services.minidlna = {
-      enable = true;
-      settings = {
-        notify_interval = 60;
-        friendly_name = "Ulpia";
-        media_dir = [
-          "V,/media/video"
-        ];
-        inotify = "yes";
-      };
-      openFirewall = true;
     };
     casshd.enable = true;
     cawayland.enable = true;
@@ -232,9 +209,34 @@
         enable = true;
       };
     };
-    services.zfs.autoSnapshot = {
-      enable = true;
-      flags = "-k -p -u";
+    services = {
+      smartd = {
+        enable = true;
+        autodetect = false;
+        devices = map (drive: {device = drive;}) (systemdrives ++ storagedrives);
+        notifications.systembus-notify.enable = true;
+        notifications.mail = {
+          enable = true;
+          sender = "ulpia@catbertsen.de";
+          recipient = "christian@wudika.de";
+        };
+      };
+      minidlna = {
+        enable = true;
+        settings = {
+          notify_interval = 60;
+          friendly_name = "Ulpia";
+          media_dir = [
+            "V,/media/video"
+          ];
+          inotify = "yes";
+        };
+        openFirewall = true;
+      };
+      zfs.autoSnapshot = {
+        enable = true;
+        flags = "-k -p -u";
+      };
     };
 
     environment.systemPackages = let

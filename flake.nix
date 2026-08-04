@@ -149,7 +149,7 @@
       };
 
       packages = {
-        ipxe_partition = (mypkgs system).ipxe_partition;
+        inherit (mypkgs system) ipxe_partition;
       };
 
       devShells.default = let
@@ -319,9 +319,6 @@
       };
 
       homeManagerModules.caUserEnvironment = {
-        config,
-        pkgs,
-        lib,
         ...
       }: {
         imports = [

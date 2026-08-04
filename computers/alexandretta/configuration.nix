@@ -72,18 +72,6 @@
       connection = "smtp.protonmail.ch:587";
       mydomain = "catbertsen.de";
     };
-    services.systembus-notify.enable = true;
-    services.smartd = {
-      enable = true;
-      autodetect = false;
-      devices = map (drive: {device = drive;}) localdrives;
-      notifications.systembus-notify.enable = true;
-      notifications.mail = {
-        enable = true;
-        sender = "alexandria@catbertsen.de";
-        recipient = "christian@wudika.de";
-      };
-    };
     cabackupserver = {
       enable = true;
       username = "alexandria-backup";
@@ -106,9 +94,6 @@
         LC_COLLATE = "de_DE.UTF-8";
         LC_CTYPE = "de_DE.UTF-8";
       };
-    };
-    services.resolved = {
-      enable = true;
     };
     systemd.network = {
       enable = true;
@@ -171,6 +156,21 @@
     };
 
     services = {
+      systembus-notify.enable = true;
+      smartd = {
+        enable = true;
+        autodetect = false;
+        devices = map (drive: {device = drive;}) localdrives;
+        notifications.systembus-notify.enable = true;
+        notifications.mail = {
+          enable = true;
+          sender = "alexandria@catbertsen.de";
+          recipient = "christian@wudika.de";
+        };
+      };
+      resolved = {
+        enable = true;
+      };
       fwupd = {
         enable = true;
         extraRemotes = ["lvfs-testing"];

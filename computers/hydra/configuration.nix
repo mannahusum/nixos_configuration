@@ -16,6 +16,7 @@
     sops-nix.nixosModules.sops
     ./sops.nix
     (modulesPath + "/profiles/base.nix")
+    ../disko-config.nix
     ../shared-config.nix
     ../../modules/acme.nix
     ../../modules/gitea.nix
@@ -63,8 +64,6 @@
     # networking.interfaces.enp2s0.useDHCP = lib.mkDefault true;
     # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
 
-    services.xserver.videoDrivers = ["amdgpu"];
-
     caacme = {
       enable = true;
       credentialsfile = config.sops.templates."route53Credentials".path;
@@ -103,16 +102,19 @@
       espsize = "1G";
       homesFor = ["christian" "marianne"];
     };
-    services.systembus-notify.enable = true;
-    services.smartd = {
-      enable = true;
-      autodetect = false;
-      devices = map (drive: {device = drive;}) localdrives;
-      notifications.systembus-notify.enable = true;
-      notifications.mail = {
+    services = {
+      xserver.videoDrivers = ["amdgpu"];
+      systembus-notify.enable = true;
+      smartd = {
         enable = true;
-        sender = "hydra@catbertsen.de";
-        recipient = "christian@wudika.de";
+        autodetect = false;
+        devices = map (drive: {device = drive;}) localdrives;
+        notifications.systembus-notify.enable = true;
+        notifications.mail = {
+          enable = true;
+          sender = "hydra@catbertsen.de";
+          recipient = "christian@wudika.de";
+        };
       };
     };
     nix.buildMachines = [
