@@ -27,7 +27,7 @@
     ../../modules/saned.nix
     ../../modules/nginx.nix
     ../../modules/yubikey.nix
-    ../../modules/system_administration/debug.nix
+    # ../../modules/system_administration/debug.nix
     ../../modules/users.nix
     ./fileshare-classic.nix
     # ./smb-fileserver.nix
