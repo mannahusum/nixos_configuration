@@ -9,6 +9,7 @@
         pyaudio
         pyserial
         setuptools
+        torch
         urllib3
         uv
       ];
