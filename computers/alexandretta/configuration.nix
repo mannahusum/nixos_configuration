@@ -161,6 +161,9 @@
       };
       xserver.videoDrivers = ["nvidia"];
     };
+    systemd.services.rasdaemon.path = with pkgs; [
+      ipmitool
+    ];
     hardware = {
       cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
       rasdaemon = {
@@ -201,6 +204,7 @@
         fdupes
         ipmitool
         mkvpkgs.makemkv
+        # makemkv
         rasdaemon
         sbsigntool
       ];
