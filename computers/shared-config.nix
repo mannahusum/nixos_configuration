@@ -160,6 +160,7 @@
       psmisc
       ripgrep
       sbctl
+      tpm2-tools
       tpm2-tss
       xterm # for resize command
     ];
