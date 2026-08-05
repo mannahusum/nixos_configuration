@@ -33,6 +33,7 @@
       bootspec.enable = true;
       loader.systemd-boot.enable = nixpkgs.lib.mkForce false;
       lanzaboote = {
+        configurationLimit = 10;
         enable = true;
         pkiBundle = "/etc/secureboot";
       };
