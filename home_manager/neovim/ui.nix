@@ -30,7 +30,12 @@
             registers = { enabled = true, },
             notifier = { enabled = true, },
             input = { enabled = true },
-            picker = { enabled = true },
+            picker = {
+              enabled = true,
+              db = {
+                sqlite3_path = '${pkgs.sqlite.out}/lib/libsqlite3.so',
+              },
+            },
           })
         '';
       }
