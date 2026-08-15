@@ -6,8 +6,9 @@
   pinentry,
   system_type,
   withExtraSocket ? false,
+  filebotLicense ? null,
   ...
-}: {
+}: ({
   imports = [
     ./bashprofile.nix
     ./cagit.nix
@@ -48,4 +49,6 @@
       enable = true;
     };
   };
-}
+} // nixpkgs.lib.mkIf (filebotLicense != null) {
+  xdg.dataFile.".local/share/filebot/data/.license".source = filebotLicense;
+})

@@ -5,7 +5,6 @@
   lib,
   modulesPath,
   nixpkgs,
-  nixpkgs-makemkv,
   pkgs,
   sops-nix,
   ...
@@ -16,7 +15,10 @@
     ./fileshare-classic.nix
     lanzaboote.nixosModules.lanzaboote
     ../../modules/acme.nix
+    ../../modules/arm.nix
     ../../modules/backup-client.nix
+    ../../modules/dlna.nix
+    ../../modules/postfix.nix
     ../../modules/keyboard.nix
     ../../modules/nginx.nix
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -34,6 +36,7 @@
 
   config = let
     byidpath = name: "/dev/disk/by-id/" + name;
+    bootdrive = byidpath "usb-Swissbit_USB_Flash_Drive_601924969200009D-0:0";
     systemdrives = map byidpath [
       "nvme-WD_BLACK_SN850X_2000GB_24196D800798"
       "nvme-WD_BLACK_SN850X_2000GB_24196D800851"
@@ -49,7 +52,6 @@
       loader.systemd-boot.enable = nixpkgs.lib.mkForce false;
       lanzaboote = {
         enable = true;
-        pkiBundle = "/etc/secureboot";
       };
       supportedFilesystems = ["zfs"];
       loader.efi = {
@@ -57,16 +59,15 @@
         efiSysMountPoint = "/boot";
       };
       initrd = {
-        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "amdgpu"];
-        kernelModules = ["amdgpu"];
+        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "ie31200_edac" "intel_pch_thermal" "nvidia"];
         supportedFilesystems = ["zfs"];
         systemd = {
           enable = true;
           emergencyAccess = true;
         };
       };
-      kernelModules = ["kvm-amd"];
-      extraModulePackages = [];
+      kernelModules = ["kvm-intel"];
+
       kernelParams = [
         "console=ttyS0,115200"
       ];
@@ -77,13 +78,17 @@
         '';
       };
     };
+    caarm = {
+      enable = true;
+      name = "Alexandria";
+    };
     cadrives = {
       enable = true;
-      boot = null;
+      boot = bootdrive;
       system = systemdrives;
       storage = storagedrives;
       swapsize = "172G";
-      l2arcsize = "0";
+      l2arcsize = "1024G";
       espsize = "1G";
       homesFor = ["christian" "marianne"];
     };
@@ -93,52 +98,23 @@
       mydomain = "wudika.de";
     };
 
-    cabackupclient = {
+    cawayland = {
       enable = true;
-      serverAddress = "alexandretta.local";
-      serverHostkey = ../alexandretta/extra-files/etc/ssh/ssh_host_ed25519_key.pub;
-      remoteUser = "${config.networking.hostName}-backup";
-      remotePath = "tank/backup/alexandria";
-      dataSets = ["tank/media"];
-    };
-    casshd.enable = true;
-    cawayland.enable = true;
-    # cayubikey.enable = true;
-    cakeyboard.enable = true;
-    time.timeZone = "Europe/Berlin";
-    i18n = {
-      defaultLocale = "de_DE.UTF-8";
-      extraLocaleSettings = {
-        LC_COLLATE = "de_DE.UTF-8";
-        LC_CTYPE = "de_DE.UTF-8";
-      };
+      graphicsSettings = ''
+        export WLR_DRM_DEVICES="/dev/dri/$(${pkgs.intel-gpu-tools}/bin/lsgpu | grep 102b:0522 | head -n 1 | cut -d' ' -f1)"
+      '';
     };
 
-    services = {
-      systembus-notify.enable = true;
-      smartd = {
-        enable = true;
-        autodetect = false;
-        devices = map (drive: {device = drive;}) (systemdrives ++ storagedrives);
-        notifications.systembus-notify.enable = true;
-        notifications.mail = {
-          enable = true;
-          sender = "alexandria@wudika.de";
-          recipient = "christian@wudika.de";
-        };
-      };
-
-      xserver.videoDrivers = ["amdgpu"];
-      resolved = {
-        enable = true;
-      };
-    };
     systemd.network = {
       enable = true;
       links = {
         "20-persistent-net-name-eth0" = {
-          matchConfig.PermanentMACAddress = "70:20:84:06:50:50";
+          matchConfig.PermanentMACAddress = "00:1e:67:54:25:6c";
           linkConfig.Name = "eth0";
+        };
+        "20-persistent-net-name-eth1" = {
+          matchConfig.PermanentMACAddress = "00:1e:67:54:25:6d";
+          linkConfig.Name = "eth1";
         };
         "25-br0" = {
           matchConfig.OriginalName = "br0";
@@ -147,6 +123,10 @@
       };
       netdevs = {
         "10-br0" = {
+          bridgeConfig = {
+            STP = false;
+            MulticastSnooping = false;
+          };
           netdevConfig = {
             Kind = "bridge";
             Name = "br0";
@@ -160,9 +140,16 @@
           networkConfig.Bridge = "br0";
           linkConfig.RequiredForOnline = "enslaved";
         };
+        "30-eth1" = {
+          matchConfig.Name = "eth1";
+          networkConfig.DHCP = "yes";
+          linkConfig.RequiredForOnline = "no";
+        };
         "40-br0" = {
           matchConfig.Name = "br0";
-          bridgeConfig = {};
+          bridgeConfig = {
+            MulticastRouter = "permanent";
+          };
           networkConfig = {
             DHCP = "ipv4";
             IPv6AcceptRA = true;
@@ -174,61 +161,83 @@
     };
 
     networking = {
-      enableIPv6 = true;
       hostId = "d22d38ba";
       hostName = "alexandria";
-      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
-      tempAddresses = "disabled";
       useDHCP = lib.mkDefault true;
-      useHostResolvConf = lib.mkForce false;
-
       useNetworkd = true;
     };
 
-    services.minidlna = {
-      enable = true;
-      settings = {
-        notify_interval = 60;
-        friendly_name = "Alexandria";
-        media_dir = [
-          "V,/media/video"
-        ];
-        inotify = "yes";
-      };
-      openFirewall = true;
-    };
-    hardware = {
-      cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-      graphics = {
+    services = {
+      systembus-notify.enable = true;
+      smartd = {
         enable = true;
-        extraPackages = with pkgs; [
-          libvdpau-va-gl
-        ];
-        extraPackages32 = with pkgs; [
-          driversi686Linux.libvdpau-va-gl
-        ];
+        autodetect = false;
+        devices = map (drive: {device = drive;}) (systemdrives ++ storagedrives);
+        notifications.systembus-notify.enable = true;
+        notifications.mail = {
+          enable = true;
+          sender = "alexandria@catbertsen.de";
+          recipient = "christian@wudika.de";
+        };
       };
+      fwupd = {
+        extraRemotes = ["lvfs-testing"];
+        uefiCapsuleSettings.DisableCapsuleUpdateOnDisk = true;
+      };
+      xserver.videoDrivers = ["nvidia"];
+      zfs.autoSnapshot = {
+        enable = true;
+        flags = "-k -p -u";
+      };
+    };
+    cadlna = {
+      enable = true;
+      name = "Alexandria";
+      nvidiaAccelerationPath = "/dev/dri/by-path/pci-0000:01:00.0-render";
+    };
+    users.groups.media.members = [ "christian" "marianne" "jellyfin" ];
+    systemd.services.rasdaemon.path = with pkgs; [
+      ipmitool
+    ];
+    hardware = {
+      cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+      rasdaemon = {
+        enable = true;
+        mainboard = ''
+          vendor = Intel Corporation
+          model = S1200SP
+        '';
+        config = ''
+          PAGE_CE_REFRESH_CYCLE="24H"
+          PAGE_CE_THRESHOLD="50"
+          PAGE_CE_ACTION="soft"
+        '';
+        extraModules = ["ie31200_edac"];
+      };
+      nvidia.open = true;
     };
 
-    environment.systemPackages = let
-      mkvpkgs = import nixpkgs-makemkv {
-        inherit (pkgs.stdenv.hostPlatform) system;
-        config.allowUnfreePredicate = pkg:
-          builtins.elem (lib.getName pkg) [
-            "makemkv"
-          ];
-      };
-    in
+    programs.nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+        ncurses5
+        gccNGPackages_15.libstdcxx
+        openipmi
+      ];
+    };
+    environment.systemPackages =
       with pkgs; [
-        file
-        git
+        efitools
+        fdupes
         git-crypt
-        mkvpkgs.makemkv
+        ipmitool
+        makemkv
         neovim
+        rasdaemon
         ripgrep
         sbctl
+        sbsigntool
         tpm2-tss
-        vulkan-validation-layers
         xterm # for resize command
       ];
 

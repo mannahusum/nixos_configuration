@@ -70,6 +70,15 @@ in {
         depending on desktopManager and therefore displayManager
       '';
     };
+
+    filebotLicense = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      example = "null";
+      description = ''
+        Path to a license file for filebot
+      '';
+    };
   };
 
   config = let
@@ -167,6 +176,7 @@ in {
                 pinentry = cfg.defaultPinentry;
                 forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
                 createForwardPath = true;
+                filebotLicense = cfg.filebotLicense;
               }
               // {
                 home.stateVersion = "24.11";
@@ -186,11 +196,13 @@ in {
                 packages = with pkgs; [
                   alacritty
                   google-chrome
+                  gscan2pdf
                   libreoffice
                   nautilus
                   neovide
+                  sane-backends
                   thunderbird
-                  gscan2pdf
+                  weasis
                 ];
                 stateVersion = "26.05";
               };

@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   automatic-ripping-machine,
   ...
 }: let
@@ -19,6 +20,13 @@ in {
         Whether to enable the automatic ripping-machine docker image
       '';
     };
+    name = lib.mkOption {
+      type = lib.types.str;
+      default = "Alexandretta";
+      description = ''
+        Friendly name of the encoding computer
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -27,9 +35,9 @@ in {
 
     fileSystems = builtins.listToAttrs (lib.lists.forEach (lib.lists.range 0 10) (
       count: {
-        name = "/mnt/dev/sr${builtins.toString count}";
+        name = "/mnt/dev/sr${toString count}";
         value = {
-          device = "/dev/sr${builtins.toString count}";
+          device = "/dev/sr${toString count}";
           fsType = "udf,iso9660";
           options = ["defaults" "utf8" "noauto" "ro" "user" "X-mount.mkdir"];
         };
@@ -41,17 +49,24 @@ in {
       homeMode = "755";
       extraGroups = ["cdrom" "video"];
     };
+    users.groups.media = {
+      gid = 978;
+    };
 
     services.automatic-ripping-machine = {
+      user = "arm";
+      group = "media";
       enable = true;
       enableTranscoding = true;
       appriseSettings = {
         NTFY_TOPIC = "ootu1ipiexodohphu6zoo7Aedeifooseayozoa3the4thar1zoh1vahKimohH8ee";
       };
-      settings = {
+      settings = let
+        handbreaksettings = "--subtitle-lang-list und --all-subtitles --subtitle scan -F --audio-lang-list und --all-audio --native-language deu --native-dub";
+      in {
         ALLOW_DUPLICATES = true;
         ARM_CHECK_UDF = false;
-        ARM_NAME = "Alexandretta";
+        ARM_NAME = cfg.name;
         AUTO_EJECT = true;
         COMPLETED_PATH = "${baseFolder}/completed/";
         DATE_FORMAT = "%Y-%m-%d %H:%M:%S";
@@ -62,6 +77,8 @@ in {
         EXTRAS_SUB = "extras";
         GET_AUDIO_TITLE = "musicbrainz";
         GET_VIDEO_TITLE = true;
+        HB_ARGS_DVD = handbreaksettings;
+        HB_ARGS_BD = handbreaksettings;
         LOGLEVEL = "DEBUG";
         MAINFEATURE = false;
         MANUAL_WAIT_TIME = 60;
@@ -120,5 +137,9 @@ in {
     networking.firewall = {
       allowedTCPPorts = [28982];
     };
+    environment.systemPackages =
+      with pkgs; [
+        mkvtoolnix-cli
+      ];
   };
 }

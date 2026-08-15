@@ -26,12 +26,13 @@
       inherit overlays;
       config.allowUnfreePredicate = pkg:
         builtins.elem (lib.getName pkg) [
+          "canon-cups-ufr2"
+          "filebot"
           "google-chrome"
-          "unrar"
           "makemkv"
           "nvidia-settings"
           "nvidia-x11"
-          "canon-cups-ufr2"
+          "unrar"
         ];
     };
     boot = {
@@ -65,6 +66,7 @@
         trusted-public-keys = [
           "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+          "ulpia.catbertsen.de-1:kk+3H0S5sKZB1zD93xh6adWxtJ+CgV6mvd+Dw227hpQ="
         ];
       };
     };
@@ -93,6 +95,7 @@
           Domains = ["~."];
           FallbackDNS = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
           LLMNR = "true";
+          MulticastDNS = "false";
         };
       };
     };

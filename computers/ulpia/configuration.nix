@@ -5,7 +5,6 @@
   lib,
   modulesPath,
   nixpkgs,
-  nixpkgs-makemkv,
   pkgs,
   sops-nix,
   ...
@@ -18,11 +17,13 @@
     ../../modules/acme.nix
     ../../modules/arm.nix
     ../../modules/backup-server.nix
+    ../../modules/dlna.nix
     ../../modules/postfix.nix
     ../../modules/keyboard.nix
     ../../modules/nginx.nix
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/base.nix")
+    ../../modules/postfix.nix
     ../../modules/saned.nix
     ../../modules/sshd.nix
     ../../modules/users.nix
@@ -68,7 +69,6 @@
         };
       };
       kernelModules = ["kvm-intel"];
-      # extraModulePackages = [ config.boot.kernelModules.nvidia ];
       kernelParams = [
         "console=ttyS0,115200"
       ];
@@ -79,7 +79,10 @@
         '';
       };
     };
-    caarm.enable = true;
+    caarm = {
+      enable = true;
+      name = "Ulpia";
+    };
     cadrives = {
       enable = true;
       boot = bootdrive;
@@ -112,7 +115,6 @@
       links = {
         "20-persistent-net-name-eth0" = {
           matchConfig.PermanentMACAddress = "00:1e:67:54:16:8a";
-
           linkConfig.Name = "eth0";
         };
         "20-persistent-net-name-eth1" = {
@@ -126,6 +128,10 @@
       };
       netdevs = {
         "10-br0" = {
+          bridgeConfig = {
+            STP = false;
+            MulticastSnooping = false;
+          };
           netdevConfig = {
             Kind = "bridge";
             Name = "br0";
@@ -146,10 +152,13 @@
         };
         "40-br0" = {
           matchConfig.Name = "br0";
-          bridgeConfig = {};
+          bridgeConfig = {
+            MulticastRouter = "permanent";
+          };
           networkConfig = {
             DHCP = "ipv4";
             IPv6AcceptRA = true;
+            MulticastDNS = true;
           };
           linkConfig.RequiredForOnline = "routable";
         };
@@ -180,24 +189,18 @@
         extraRemotes = ["lvfs-testing"];
         uefiCapsuleSettings.DisableCapsuleUpdateOnDisk = true;
       };
-      minidlna = {
-        enable = true;
-        settings = {
-          notify_interval = 60;
-          friendly_name = "Ulpia";
-          media_dir = [
-            "V,/media/video"
-          ];
-          inotify = "yes";
-        };
-        openFirewall = true;
-      };
       xserver.videoDrivers = ["nvidia"];
       zfs.autoSnapshot = {
         enable = true;
         flags = "-k -p -u";
       };
     };
+    cadlna = {
+      enable = true;
+      name = "Ulpia";
+      nvidiaAccelerationPath = "/dev/dri/by-path/pci-0000:01:00.0-render";
+    };
+    users.groups.media.members = [ "christian" "marianne" "jellyfin" ];
     systemd.services.rasdaemon.path = with pkgs; [
       ipmitool
     ];
@@ -227,22 +230,12 @@
         openipmi
       ];
     };
-    # environment.systemPackages = let
-    #   mkvpkgs = import nixpkgs-makemkv {
-    #     inherit (pkgs.stdenv.hostPlatform) system;
-    #     config.allowUnfreePredicate = pkg:
-    #       builtins.elem (lib.getName pkg) [
-    #         "makemkv"
-    #       ];
-    #   };
-    # in
     environment.systemPackages =
       with pkgs; [
         efitools
         fdupes
         git-crypt
         ipmitool
-        # mkvpkgs.makemkv
         makemkv
         neovim
         rasdaemon
