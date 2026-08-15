@@ -108,6 +108,17 @@ with lib; let
         user = "root";
       };
     };
+    "icinga" = {
+      hostname = "icinga.itiv.kit.edu";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDagdNsTeAq9vakji5Ou7eyexz/7t5COZnWlD9PmSfiYvVjGMIpx1NLY1TZUrKEFNi032RYH/3+b6P0rtbXuecSq5Pm89AUv2VQKO2NLjrgvWUhUNs3sh31GLuO8w4+/5uDerez6sV0yK8ddlrEz1RToAR9PNbloiL2xP3XKfIbgzwyWSJOvG0DFg+47GEkugAUNUEpHkzQZSHrxcMoBMBKEHRX7jAxD7eEIIm2KmQmam+a6/jsAbiWEev9JZ/EH3F2fIJ0l8Gm+T7h998GleAbQse7qBFI8nzy8wqD1jP7JUTfhIUO/Ph9nKM1UUXp2jm/sSL9qZJG34W8Di87YdfSG7ENYXc/mQw6EL/zHCIiGL9gLASEsxZxdSDS2HSTbrqueUU7oM7K4sPRmV3JwSzbHXIwd2gzjpdIeBprF2c8+vimx2n7vmbhoKetI/0BM6RV0qvUM0IPVQxX7WXhOnLTv/SdtofH8noZ5CXoyHUHOY2kxQhd47cK1Woa3RPjvdtMmC22EIp0jVnYge4HGJcpfNKVtuaEtyMFvn6amWEbFkpmxU5D/lFkBeBSzx9NrszXprONjnRchHZzqh2KTl9P7U+JMMFNHEfXQb8I+SCp4MATweGe33K9/dwYI9DHC77H3tZu2fBlvfP0/ZsnHYcU4lzlnvYeu6eLQFXzEz3UfQ=="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILfF3VpSBtZjbpxkbk7lTc6eZX+IbNgSqv0NkSJQ5t4J"
+      ];
+      gpgSocket = null;
+      overrides = {
+        proxyJump = "gitlab";
+      };
+    };
     "invasicrgb" = {
       hostname = "invasicrgb.itiv.kit.edu";
       hostkeys = [

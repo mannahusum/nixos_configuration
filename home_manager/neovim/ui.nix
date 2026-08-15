@@ -90,10 +90,13 @@
       }
       vim-signify
       {
-        type = "viml";
+        type = "lua";
         plugin = solarized-nvim;
         config = ''
-          colorscheme solarized
+          require('solarized')
+          vim.o.termguicolors = true
+          vim.o.background = 'light'
+          vim.cmd.colorscheme('solarized')
         '';
       }
       fidget-nvim
