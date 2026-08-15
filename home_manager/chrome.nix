@@ -20,7 +20,7 @@ in
       home.packages = with pkgs; [
         google-chrome
       ];
-      programs = {
+      programs = optionalAttrs (pkgs.stdenv.isLinux) {
         chromium = {
           enable = true;
         };

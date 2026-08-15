@@ -19,38 +19,31 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable (lib.mkMerge [
-    (lib.mkIf (lib.strings.hasSuffix "-linux" pkgs.stdenv.hostPlatform.system)
-      {
-        programs.ssh = {
-          setXAuthLocation = true;
-          enableAskPassword = true;
+  config = lib.mkIf cfg.enable {
+    programs.ssh = (lib.optionalAttrs (pkgs.stdenv.hostPlatform.isLinux) {
+      setXAuthLocation = true;
+      enableAskPassword = true;
+    }) //
+    (lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin) {
+      extraConfig = ''
+        XAuthLocation ${pkgs.xauth}/bin/xauth
+      '';
+    });
+    services = {
+      openssh.enable = true;
+    } // lib.optionalAttrs (pkgs.stdenv.hostPlatform.isLinux) {
+      openssh = {
+        openFirewall = true;
+        settings = {
+          X11Forwarding = true;
+          PasswordAuthentication = false;
+          PermitRootLogin = lib.mkDefault "no";
+          KbdInteractiveAuthentication = false;
+          GatewayPorts = "yes";
+          StreamLocalBindUnlink = "yes";
         };
-
-        services.openssh = {
-          enable = true;
-          openFirewall = true;
-          settings = {
-            X11Forwarding = true;
-            PasswordAuthentication = false;
-            PermitRootLogin = lib.mkDefault "no";
-            KbdInteractiveAuthentication = false;
-            GatewayPorts = "yes";
-            StreamLocalBindUnlink = "yes";
-          };
-        };
-      })
-    (lib.mkIf (lib.strings.hasSuffix "-darwin" pkgs.stdenv.hostPlatform.system)
-      {
-        services.openssh = {
-          enable = true;
-        };
-        environment.systemPackages = with pkgs; [
-          ssh_askpass
-        ];
-        programs.ssh.extraConfig = ''
-          XAuthLocation ${pkgs.xorg.xauth}/bin/xauth
-        '';
-      })
-  ]);
+      };
+    };
+    environment.systemPackages = lib.optional (pkgs.stdenv.hostPlatform.isDarwin) pkgs.ssh_askpass;
+  };
 }

@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   home.packages = with pkgs; let
     homePythonPackages = python-packages:
       with python-packages; [
@@ -13,27 +13,22 @@
 
     homePython3 = python314.withPackages homePythonPackages;
   in [
-    adoptopenjdk-icedtea-web
     bashInteractive
     bat # cat clone
     black
-    cadaver
     coreutils-full
     cyrus_sasl
     detect-secrets
-    disktype
-    dmidecode
     enscript
     texliveFull
     file
     fzf
-    home-manager
+    # home-manager
     homePython3
     inetutils
     ipmitool
     jq
     lsof
-    lsscsi
     man-pages
     mkpasswd
     ncdu
@@ -46,7 +41,6 @@
     pciutils
     pdftk
     perl
-    psmisc
     pwgen
     qrcode
     ranger
@@ -57,7 +51,6 @@
     tcl
     tclreadline
     tcpdump
-    tk-8_5
     tldr
     units
     unrar
@@ -69,6 +62,13 @@
     xauth
     yarn
     yubikey-manager
+  ] ++ lib.optionals (stdenv.hostPlatform.isLinux) [
+    adoptopenjdk-icedtea-web
+    cadaver
+    dmidecode
+    lsscsi
+    psmisc
+    tk-8_5
     zathura
   ];
 }

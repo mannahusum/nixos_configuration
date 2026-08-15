@@ -67,8 +67,9 @@ self: super: {
       };
     };
 
-  epsonscan2 = {
+  epsonscan2 = self.stdenv.mkDerivation {
     pname = "epsonscan2";
+    version = "0.0.1";
     src = self.fetchurl {
       url = "https://download.epson-europe.com/pub/download/6747/epson674793eu.dmg";
       hash = "sha256-Dzf0X4apccIE/M8EJs8V0VBxTIl8A6snKoJUsL3E/MY=";
@@ -89,7 +90,7 @@ self: super: {
       ];
     };
 
-    nativeBuildInputs = with self; [xar];
+    nativeBuildInputs = with self; [xar _7zz];
 
     unpackPhase = ''
       7zz x $src

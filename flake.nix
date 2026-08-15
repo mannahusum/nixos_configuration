@@ -31,7 +31,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-darwin = {
-      url = "github:LnL7/nix-darwin/nix-darwin-25.11";
+      url = "github:LnL7/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-luks-yk = {
@@ -56,7 +56,6 @@
     automatic-ripping-machine,
     disko,
     flake-utils,
-    # home-config,
     home-manager,
     lanzaboote,
     nix-darwin,
@@ -86,9 +85,11 @@
           ];
       };
   in
-    flake-utils.lib.eachDefaultSystem (system: {
+    {
       homeConfigurations = {
-        christian_at_hydra = home-manager.lib.homeManagerConfiguration {
+        christian_at_hydra = let
+          system = "x86_64-linux";
+        in home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.${system};
           modules = [
             ./home_manager/caHomeConfig.nix
@@ -111,9 +112,12 @@
             forwardTo = "/home/christian/.forwarded-sockets";
             createForwardPath = true;
             withExtraSocket = false;
+            filebotLicense = null;
           };
         };
-        to6338 = home-manager.lib.homeManagerConfiguration {
+        to6338 = let
+          system = "x86_64-linux";
+        in home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.${system};
           modules = [
             ./home-manager/caHomeConfig.nix
@@ -135,9 +139,40 @@
             forwardTo = "/home/to6338/.forwarded-sockets";
             createForwardPath = true;
             withExtraSocket = false;
+            filebotLicense = null;
+          };
+        };
+        christian_at_mini = let
+          system = "aarch64-darwin";
+        in home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.${system};
+          modules = [
+            ./home_manager/caHomeConfig.nix
+            {
+              programs = {
+                home-manager.enable = true;
+                git.enable = true;
+              };
+              home = {
+                username = "christianalbertsen";
+                homeDirectory = "/Users/christianalbertsen";
+                stateVersion = "24.11";
+              };
+            }
+          ];
+
+          extraSpecialArgs = {
+            inherit system inputs overlays nixpkgs;
+              system_type = "aarch64-darwin";
+              createForwardPath = true;
+              forwardTo = "/Users/christianalbertsen/.forwarded-sockets";
+              pinentry = "noagent";
+              withExtraSocket = false;
+              filebotLicense = null;
           };
         };
       };
+    } // flake-utils.lib.eachDefaultSystem (system: {
 
       checks = let
         pkgs = mypkgs system;
@@ -313,7 +348,7 @@
           ./computers/mini/configuration.nix
         ];
         specialArgs = {
-          inherit home-manager self overlays;
+          inherit home-manager nixpkgs self overlays;
           system = "aarch64-darwin";
         };
       };

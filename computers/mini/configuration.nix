@@ -1,14 +1,17 @@
 {
+  config,
+  home-manager,
+  nixpkgs,
   overlays,
   pkgs,
   self,
   ...
 }: {
   imports = [
-    ../shared-config.nix
-    ../../modules/keyboard.nix
+    ../shared-config-combined.nix
+    ../../modules/keyboardDarwin.nix
     ../../modules/sshd.nix
-    ../../modules/saned.nix
+    home-manager.darwinModules.home-manager
   ];
 
   nixpkgs = {
@@ -27,6 +30,7 @@
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
+    epsonscan2
     _7zz
     alacritty # GPU-accelerated terminal emulator
     darwin.xcode
@@ -100,6 +104,27 @@
     direnv = {
       enable = true;
       nix-direnv.enable = true;
+    };
+  };
+
+  users.users.christianalbertsen = {
+    home = "/Users/christianalbertsen";
+  };
+  home-manager = {
+    useUserPackages = true;
+    users = {
+      christianalbertsen =
+        import ../../home_manager/caHomeConfig.nix {
+          inherit config nixpkgs overlays;
+          system_type = pkgs.stdenv.hostPlatform.system;
+          pinentry = "noagent";
+          forwardTo = "/Users/christianalbertsen/.forwarded-sockets";
+          createForwardPath = true;
+          filebotLicense = null;
+        }
+        // {
+          home.stateVersion = "24.11";
+        };
     };
   };
 

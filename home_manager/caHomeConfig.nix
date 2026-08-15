@@ -15,6 +15,7 @@
     ./cagpg.nix
     ./cassh.nix
     ./chrome.nix
+    ./filebot.nix
     ./neovim.nix
     ./packages.nix
     ./passwordstore.nix
@@ -35,6 +36,7 @@
   ca = {
     bash.enable = true;
     chrome.enable = true;
+    filebot.license = filebotLicense;
     git.enable = true;
     gpg = {
       inherit forwardTo createForwardPath pinentry withExtraSocket;
@@ -49,6 +51,4 @@
       enable = true;
     };
   };
-} // nixpkgs.lib.mkIf (filebotLicense != null) {
-  xdg.dataFile.".local/share/filebot/data/.license".source = filebotLicense;
 })

@@ -1,4 +1,4 @@
-({
+{
   home-manager,
   modulesPath,
   lib,
@@ -9,6 +9,7 @@
   imports = [
     home-manager.nixosModules.home-manager
     (modulesPath + "/profiles/base.nix")
+    ./shared-config-combined.nix
     ../modules/gitea.nix
     ../modules/keyboard.nix
     ../modules/nginx.nix
@@ -55,21 +56,6 @@
         '';
       };
     };
-    nix = {
-      settings = {
-        keep-outputs = true;
-        keep-derivations = true;
-        experimental-features = "nix-command flakes";
-        substituters = [
-          "https://nix-community.cachix.org"
-        ];
-        trusted-public-keys = [
-          "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
-          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-          "ulpia.catbertsen.de-1:kk+3H0S5sKZB1zD93xh6adWxtJ+CgV6mvd+Dw227hpQ="
-        ];
-      };
-    };
 
     services = {
       avahi = {
@@ -107,7 +93,6 @@
     cawayland.enable = true;
     cayubikey.enable = true;
     cakeyboard.enable = true;
-    time.timeZone = "Europe/Berlin";
     i18n = {
       defaultLocale = "de_DE.UTF-8";
       extraLocaleSettings = {
@@ -130,7 +115,6 @@
       bat.enable = true;
       cdemu.enable = true;
       direnv = {
-        enable = true;
         enableBashIntegration = true;
         nix-direnv.enable = true;
       };
@@ -145,7 +129,6 @@
       less.enable = true;
       minipro.enable = true;
       nix-index = {
-        enable = true;
         enableBashIntegration = true;
       };
       screen.enable = true;
@@ -161,16 +144,9 @@
     };
 
     environment.systemPackages = with pkgs; [
-      file
-      git
-      git-crypt
-      neovim
       psmisc
-      ripgrep
       sbctl
       tpm2-tools
-      tpm2-tss
-      xterm # for resize command
     ];
   };
-})
+}

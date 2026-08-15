@@ -1,16 +1,22 @@
 {
   lib,
   pkgs,
+  config,
   ...
 }: {
   imports = [
   ];
 
   options.ca.sway = {
-    enable = lib.mkEnableOption "Generate Sway configuration";
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = pkgs.stdenv.hostPlatform.isLinux;
+      description =  "Generate Sway configuration";
+    };
   };
 
   config = let
+    cfg = config.ca.sway;
     image = pkgs.fetchurl {
       url = "https://upload.wikimedia.org/wikipedia/commons/9/9a/Stevia_plant.jpg";
       sha256 = "1p15zlvrrayp0r4qpa4154kw12x4g9g8hyilwzv50xd0h4y736cf";
@@ -19,7 +25,7 @@
     bemenu = "${lib.getExe' pkgs.bemenu "bemenu-run"}";
     shotman = "${pkgs.shotman.out}/bin/shotman";
     zenity = "${pkgs.zenity.out}/bin/zenity";
-  in {
+  in lib.mkIf cfg.enable {
     home.sessionVariables = {
       XKB_DEFAULT_LAYOUT = "de,de,gr";
       XKB_DEFAULT_MODEL = "pc105";
