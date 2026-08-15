@@ -51,6 +51,7 @@
         p.svelte
         p.tcl
         p.toml
+        p.tree-sitter-norg
         p.tsx
         p.typst
         p.udev
