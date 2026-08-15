@@ -74,11 +74,13 @@
     services = {
       avahi = {
         enable = true;
-        nssmdns4 = true;
-        nssmdns6 = true;
+        nssmdns4 = false;
+        nssmdns6 = false;
         openFirewall = true;
         publish = {
           enable = true;
+          addresses = true;
+          workstation = true;
           userServices = true;
           hinfo = true;
         };
@@ -90,12 +92,13 @@
       resolved = {
         enable = true;
         settings.Resolve = {
+          DNSStubListenerExtra = "[::1]:53";
           DNSOverTLS = "true";
           DNSSEC = "true";
           Domains = ["~."];
           FallbackDNS = ["1.1.1.1#one.one.one.one.one" "1.0.0.1#one.one.one.one"];
           LLMNR = "true";
-          MulticastDNS = "false";
+          MulticastDNS = "resolve";
         };
       };
     };
