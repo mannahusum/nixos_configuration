@@ -114,6 +114,7 @@
       nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       useHostResolvConf = lib.mkForce false;
     };
+    causers.adminUsers = [ "christian" "marianne" ];
     causermount.enable = true;
 
     hardware.graphics.enable = true;

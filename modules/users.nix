@@ -1,6 +1,5 @@
 {
   config,
-  home-manager,
   lib,
   nixpkgs,
   overlays,
@@ -101,6 +100,17 @@ in {
         ];
         openssh.authorizedKeys.keys = pkgs.al_public_keys;
       };
+      marianne = {
+        createHome = true;
+        group = "marianne";
+        description = "Marianne Lorenzen";
+        home = "/home/marianne";
+        isNormalUser = true;
+        uid = 1006;
+        packages = with pkgs; [
+          coreutils-full
+        ];
+      };
     };
   in
     lib.mkMerge [
@@ -148,7 +158,7 @@ in {
           mutableUsers = true;
         };
 
-        home-manager = {
+         home-manager = {
           users = {
             christian =
               import ../home_manager/caHomeConfig.nix {
@@ -161,6 +171,30 @@ in {
               // {
                 home.stateVersion = "24.11";
               };
+            marianne = {
+              nixpkgs = {
+                inherit overlays;
+                system = pkgs.stdenv.hostPlatform.system;
+                config.allowUnfreePredicate = pkg:
+                  builtins.elem (nixpkgs.lib.getName pkg) [
+                    "google-chrome"
+                    "makemkv"
+                    "unrar"
+                  ];
+              };
+              home = {
+                packages = with pkgs; [
+                  alacritty
+                  google-chrome
+                  libreoffice
+                  nautilus
+                  neovide
+                  thunderbird
+                  gscan2pdf
+                ];
+                stateVersion = "26.05";
+              };
+            };
           };
         };
 

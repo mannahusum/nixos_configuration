@@ -154,7 +154,7 @@ in {
                     Comment=Sway run from a login shell
                     Exec=${pkgs.dbus}/bin/dbus-run-session -- bash -l -c sway
                     Type=Application''
-                ).overrideAttrs (oldAttrs: rec {
+                ).overrideAttrs (oldAttrs:  {
                   passthru = {
                     providedSessions = ["sway"];
                   };
@@ -180,6 +180,23 @@ in {
           gnome-tweaks
           windows-theme-gtk
           windows-theme-icons
+          (writeShellApplication {
+            name = "switchLogin";
+            text = ''
+              gdbus call \
+                  --system \
+                  --object-path /org/gnome/DisplayManager/LocalDisplayFactory \
+                  --dest org.gnome.DisplayManager \
+                  --method org.gnome.DisplayManager.LocalDisplayFactory.CreateTransientDisplay \
+                  > /dev/null
+            '';
+            runtimeInputs = [
+              gawk
+              glib
+              gnugrep
+              systemd
+            ];
+          })
         ];
         hardware.sensor.iio.enable = true;
         programs = {
@@ -195,8 +212,8 @@ in {
                   "org/gnome/shell" = {
                     enabled-extensions = [
                       "appindicatorsupport@rgcjonas.gmail.com"
-                      "arcmenu@arcmenu.com"
                       "dash-to-panel@jderose9.github.com"
+                      "arcmenu@arcmenu.com"
                       "ding@rastersoft.com"
                       "topiconsfix@aleskva@devnullmail.com"
                       "user-theme@gnome-shell-extensions.gcampax.github.com"
@@ -204,6 +221,9 @@ in {
                     favorite-apps = [
                       "org.gnome.Nautilus.desktop"
                       "google-chrome.desktop"
+                      "thunderbird.desktop"
+                      "startcenter.desktop"
+                      "net.sourceforge.gscan2pdf.desktop"
                       "Alacritty.desktop"
                       "neovide.desktop"
                     ];
@@ -215,6 +235,10 @@ in {
                     menu-button-appearance = "Icon";
                     windows-layout-extra-shortcuts = lib.gvariant.mkArray [
                       (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "org.gnome.Nautilus.desktop"))
+                      (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "google-chrome.desktop"))
+                      (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "startcenter.desktop"))
+                      (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "thunderbird.desktop"))
+                      (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "net.sourceforge.gscan2pdf.desktop"))
                       (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "Alacritty.desktop"))
                       (lib.gvariant.mkDictionaryEntry "id" (lib.gvariant.mkVariant "org.gnome.Settings.desktop"))
                     ];
