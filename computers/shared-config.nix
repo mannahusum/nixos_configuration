@@ -31,6 +31,7 @@
           "makemkv"
           "nvidia-settings"
           "nvidia-x11"
+          "canon-cups-ufr2"
         ];
     };
     boot = {

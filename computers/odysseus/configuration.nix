@@ -1,4 +1,5 @@
 {
+  config,
   disko,
   lanzaboote,
   modulesPath,
@@ -49,12 +50,34 @@
 
     services = {
       pcscd.enable = true;
+      printing = {
+        enable = true;
+        drivers = with pkgs; [
+          canon-cups-ufr2
+        ];
+      };
     };
     networking = {
       firewall.enable = false;
       hostId = "31c099d4";
       hostName = "odysseus";
-      networkmanager.enable = true;
+      networkmanager = {
+        enable = true;
+        ensureProfiles = {
+          environmentFiles = [
+            config.sops.secrets."networks/variables".path
+          ];
+          profiles = {
+            Ginsterweg12Lorenzen = {
+              connection = {
+                id = "Ginsterweg12Lorenzen";
+                password = "$Ginsterweg12Lorenzen";
+                type = "wifi";
+              };
+            };
+          };
+        };
+      };
     };
 
     hardware = {

@@ -4,6 +4,16 @@
       defaultSopsFile = ./secrets.yaml;
       age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
       secrets = {
+        "ripping/omdbapi.key" = {
+          owner = "arm";
+          group = "media";
+          mode = "0644";
+        };
+        "ripping/makemkv.key" = {
+          owner = "arm";
+          group = "media";
+          mode = "0644";
+        };
         "secureboot/GUID" = {
           owner = "root";
           group = "root";

@@ -11,26 +11,27 @@
   ...
 }: {
   imports = [
-    lanzaboote.nixosModules.lanzaboote
     disko.nixosModules.disko
-    (modulesPath + "/installer/scan/not-detected.nix")
-    sops-nix.nixosModules.sops
-    ./sops.nix
-    (modulesPath + "/profiles/base.nix")
-    ../shared-config.nix
     ../disko-config.nix
-    ../../modules/acme.nix
-    ../../modules/keyboard.nix
-    ../../modules/postfix.nix
-    ../../modules/wayland.nix
-    ../../modules/sshd.nix
-    ../../modules/saned.nix
-    ../../modules/nginx.nix
-    ../../modules/yubikey.nix
-    # ../../modules/system_administration/debug.nix
-    ../../modules/users.nix
     ./fileshare-classic.nix
+    lanzaboote.nixosModules.lanzaboote
+    ../../modules/acme.nix
+    ../../modules/arm.nix
+    ../../modules/backup-server.nix
+    ../../modules/postfix.nix
+    ../../modules/keyboard.nix
+    ../../modules/nginx.nix
+    (modulesPath + "/installer/scan/not-detected.nix")
+    (modulesPath + "/profiles/base.nix")
+    ../../modules/saned.nix
+    ../../modules/sshd.nix
+    ../../modules/users.nix
+    ../../modules/wayland.nix
+    ../../modules/yubikey.nix
+    ../shared-config.nix
     # ./smb-fileserver.nix
+    ./sops.nix
+    sops-nix.nixosModules.sops
   ];
 
   config = let
@@ -59,7 +60,7 @@
         efiSysMountPoint = "/boot";
       };
       initrd = {
-        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "ie31200_edac" "intel_pch_thermal"];
+        availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "ie31200_edac" "intel_pch_thermal" "nvidia"];
         supportedFilesystems = ["zfs"];
         systemd = {
           enable = true;
@@ -67,7 +68,7 @@
         };
       };
       kernelModules = ["kvm-intel"];
-      extraModulePackages = [];
+      # extraModulePackages = [ config.boot.kernelModules.nvidia ];
       kernelParams = [
         "console=ttyS0,115200"
       ];
@@ -78,6 +79,7 @@
         '';
       };
     };
+    caarm.enable = true;
     cadrives = {
       enable = true;
       boot = bootdrive;
@@ -93,31 +95,18 @@
       connection = "smtp.protonmail.ch:587";
       mydomain = "catbertsen.de";
     };
-    nix = {
-      settings = {
-        substituters = [
-          # "https://hydra.catbertsen.de:5000/"
-          # "http://mannahusum.catbertsen.de:5000/"
-          "https://nix-community.cachix.org"
-        ];
-        trusted-public-keys = [
-          "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
-          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-        ];
-      };
+    cabackupserver = {
+      enable = true;
+      username = "ulpia-backup";
+      sshkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIENuJozoOGUX38alQSsfLhXGUQ/bj+LMBYtz4AU4mPJM syncoid@alexandria";
     };
-    casshd.enable = true;
-    cawayland.enable = true;
-    # cayubikey.enable = true;
-    cakeyboard.enable = true;
-    time.timeZone = "Europe/Berlin";
-    i18n = {
-      defaultLocale = "de_DE.UTF-8";
-      extraLocaleSettings = {
-        LC_COLLATE = "de_DE.UTF-8";
-        LC_CTYPE = "de_DE.UTF-8";
-      };
+    cawayland = {
+      enable = true;
+      graphicsSettings = ''
+        export WLR_DRM_DEVICES="/dev/dri/$(${pkgs.intel-gpu-tools}/bin/lsgpu | grep 102b:0522 | head -n 1 | cut -d' ' -f1)"
+      '';
     };
+
     systemd.network = {
       enable = true;
       links = {
@@ -167,49 +156,15 @@
       };
     };
 
-    # containers.rex = {
-    #   privateNetwork = true;
-    #   hostBridge = "br0";
-    #   localAddress = "192.168.10.251/24";
-    #   autoStart = true;
-    #   config = { config, pkgs, lib, ... }: {
-    #     imports = [
-    #       ./active-directory.nix
-    #     ];
-    #
-    #     system.stateVersion = "24.11";
-    #
-    #     networking = {
-    #       firewall = {
-    #         enable = true;
-    #         allowedTCPPorts = [ 80 ];
-    #       };
-    #       # Use systemd-resolved inside the container
-    #       # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
-    #       useHostResolvConf = lib.mkForce false;
-    #     };
-    #   };
-    # };
-
     networking = {
-      enableIPv6 = true;
       hostId = "d22d38ba";
       hostName = "ulpia";
-      nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
-      tempAddresses = "disabled";
       useDHCP = lib.mkDefault true;
-      useHostResolvConf = lib.mkForce false;
-
       useNetworkd = true;
     };
 
-    hardware = {
-      cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-      graphics = {
-        enable = true;
-      };
-    };
     services = {
+      systembus-notify.enable = true;
       smartd = {
         enable = true;
         autodetect = false;
@@ -220,6 +175,10 @@
           sender = "ulpia@catbertsen.de";
           recipient = "christian@wudika.de";
         };
+      };
+      fwupd = {
+        extraRemotes = ["lvfs-testing"];
+        uefiCapsuleSettings.DisableCapsuleUpdateOnDisk = true;
       };
       minidlna = {
         enable = true;
@@ -233,36 +192,33 @@
         };
         openFirewall = true;
       };
+      xserver.videoDrivers = ["nvidia"];
       zfs.autoSnapshot = {
         enable = true;
         flags = "-k -p -u";
       };
     };
-
-    environment.systemPackages = let
-      mkvpkgs = import nixpkgs-makemkv {
-        inherit (pkgs.stdenv.hostPlatform) system;
-        config.allowUnfreePredicate = pkg:
-          builtins.elem (lib.getName pkg) [
-            "makemkv"
-          ];
+    systemd.services.rasdaemon.path = with pkgs; [
+      ipmitool
+    ];
+    hardware = {
+      cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+      rasdaemon = {
+        enable = true;
+        mainboard = ''
+          vendor = Intel Corporation
+          model = S1200SP
+        '';
+        config = ''
+          PAGE_CE_REFRESH_CYCLE="24H"
+          PAGE_CE_THRESHOLD="50"
+          PAGE_CE_ACTION="soft"
+        '';
+        extraModules = ["ie31200_edac"];
       };
-    in
-      with pkgs; [
-        efitools
-        file
-        git
-        git-crypt
-        mkvpkgs.makemkv
-        neovim
-        ripgrep
-        sbctl
-        sbsigntool
-        tpm2-tss
-        xterm # for resize command
-      ];
+      nvidia.open = true;
+    };
 
-    system.stateVersion = "23.11";
     programs.nix-ld = {
       enable = true;
       libraries = with pkgs; [
@@ -271,5 +227,32 @@
         openipmi
       ];
     };
+    # environment.systemPackages = let
+    #   mkvpkgs = import nixpkgs-makemkv {
+    #     inherit (pkgs.stdenv.hostPlatform) system;
+    #     config.allowUnfreePredicate = pkg:
+    #       builtins.elem (lib.getName pkg) [
+    #         "makemkv"
+    #       ];
+    #   };
+    # in
+    environment.systemPackages =
+      with pkgs; [
+        efitools
+        fdupes
+        git-crypt
+        ipmitool
+        # mkvpkgs.makemkv
+        makemkv
+        neovim
+        rasdaemon
+        ripgrep
+        sbctl
+        sbsigntool
+        tpm2-tss
+        xterm # for resize command
+      ];
+
+    system.stateVersion = "23.11";
   };
 })

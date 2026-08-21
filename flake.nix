@@ -240,7 +240,7 @@
               ./computers/ulpia/configuration.nix
             ];
             specialArgs = {
-              inherit disko home-manager lanzaboote nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix;
+              inherit automatic-ripping-machine disko home-manager lanzaboote nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix;
             };
           };
         alexandretta = let
