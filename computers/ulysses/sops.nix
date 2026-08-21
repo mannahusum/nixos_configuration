@@ -41,6 +41,11 @@
         };
         "mailserver/user" = {};
         "mailserver/token" = {};
+        "networks/variables" = {
+          owner = "root";
+          group = "root";
+          mode = "0600";
+        };
       };
     };
     systemd.tmpfiles.rules = [
