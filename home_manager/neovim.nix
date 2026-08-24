@@ -172,6 +172,7 @@ in {
         # direnv
         # fd
         # jq
+        lua
         # nixpkgs-fmt
         # ripgrep
         # texliveFull
