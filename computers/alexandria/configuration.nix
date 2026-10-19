@@ -4,7 +4,6 @@
   lanzaboote,
   lib,
   modulesPath,
-  nixpkgs,
   pkgs,
   sops-nix,
   ...
@@ -49,14 +48,16 @@
   in {
     boot = {
       bootspec.enable = true;
-      loader.systemd-boot.enable = nixpkgs.lib.mkForce false;
       lanzaboote = {
         enable = true;
       };
       supportedFilesystems = ["zfs"];
-      loader.efi = {
-        canTouchEfiVariables = true;
-        efiSysMountPoint = "/boot";
+      loader = {
+        systemd-boot.enable = lib.mkForce false;
+        efi = {
+          canTouchEfiVariables = true;
+          efiSysMountPoint = "/boot";
+        };
       };
       initrd = {
         availableKernelModules = ["nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" "mgag200" "igb" "i2c_i801" "ahci" "mei_me" "ie31200_edac" "intel_pch_thermal" "nvidia"];
