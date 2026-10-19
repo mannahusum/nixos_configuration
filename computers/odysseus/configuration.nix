@@ -138,10 +138,6 @@
       surface-control
       wimlib
     ];
-    # environment.etc."sway/config.d/monitors.conf".text = ''
-    #   output "DP-1" mode 3840x2160@30Hz pos 0 0
-    #   output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61
-    # '';
     system.stateVersion = "25.11";
   };
 }

@@ -172,6 +172,8 @@
               pinentry = "noagent";
               withExtraSocket = false;
               filebotLicense = null;
+              desktop = true;
+              ui = false;
             };
           };
       };
