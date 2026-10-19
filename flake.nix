@@ -89,91 +89,94 @@
       homeConfigurations = {
         christian_at_hydra = let
           system = "x86_64-linux";
-        in home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.${system};
-          modules = [
-            ./home_manager/caHomeConfig.nix
-            {
-              programs = {
-                home-manager.enable = true;
-                git.enable = true;
-              };
-              home = {
-                username = "christian";
-                homeDirectory = "/home/christian";
-                stateVersion = "24.11";
-              };
-            }
-          ];
+        in
+          home-manager.lib.homeManagerConfiguration {
+            pkgs = nixpkgs.legacyPackages.${system};
+            modules = [
+              ./home_manager/caHomeConfig.nix
+              {
+                programs = {
+                  home-manager.enable = true;
+                  git.enable = true;
+                };
+                home = {
+                  username = "christian";
+                  homeDirectory = "/home/christian";
+                  stateVersion = "25.11";
+                };
+              }
+            ];
 
-          extraSpecialArgs = {
-            inherit system inputs overlays nixpkgs;
-            pinentry = "bemenu";
-            forwardTo = "/home/christian/.forwarded-sockets";
-            createForwardPath = true;
-            withExtraSocket = false;
-            filebotLicense = null;
+            extraSpecialArgs = {
+              inherit system inputs overlays nixpkgs;
+              pinentry = "bemenu";
+              forwardTo = "/home/christian/.forwarded-sockets";
+              createForwardPath = true;
+              withExtraSocket = false;
+              filebotLicense = null;
+            };
           };
-        };
         to6338 = let
           system = "x86_64-linux";
-        in home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.${system};
-          modules = [
-            ./home-manager/caHomeConfig.nix
-            {
-              programs = {
-                home-manager.enable = true;
-                git.enable = true;
-              };
-              home = {
-                username = "to6338";
-                homeDirectory = "/home/to6338";
-                stateVersion = "25.11";
-              };
-            }
-          ];
+        in
+          home-manager.lib.homeManagerConfiguration {
+            pkgs = nixpkgs.legacyPackages.${system};
+            modules = [
+              ./home-manager/caHomeConfig.nix
+              {
+                programs = {
+                  home-manager.enable = true;
+                  git.enable = true;
+                };
+                home = {
+                  username = "to6338";
+                  homeDirectory = "/home/to6338";
+                  stateVersion = "25.11";
+                };
+              }
+            ];
 
-          extraSpecialArgs = {
-            inherit system inputs overlays nixpkgs;
-            forwardTo = "/home/to6338/.forwarded-sockets";
-            createForwardPath = true;
-            withExtraSocket = false;
-            filebotLicense = null;
+            extraSpecialArgs = {
+              inherit system inputs overlays nixpkgs;
+              forwardTo = "/home/to6338/.forwarded-sockets";
+              createForwardPath = true;
+              withExtraSocket = false;
+              filebotLicense = null;
+            };
           };
-        };
         christian_at_mini = let
           system = "aarch64-darwin";
-        in home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.${system};
-          modules = [
-            ./home_manager/caHomeConfig.nix
-            {
-              programs = {
-                home-manager.enable = true;
-                git.enable = true;
-              };
-              home = {
-                username = "christianalbertsen";
-                homeDirectory = "/Users/christianalbertsen";
-                stateVersion = "24.11";
-              };
-            }
-          ];
+        in
+          home-manager.lib.homeManagerConfiguration {
+            pkgs = nixpkgs.legacyPackages.${system};
+            modules = [
+              ./home_manager/caHomeConfig.nix
+              {
+                programs = {
+                  home-manager.enable = true;
+                  git.enable = true;
+                };
+                home = {
+                  username = "christianalbertsen";
+                  homeDirectory = "/Users/christianalbertsen";
+                  stateVersion = "24.11";
+                };
+              }
+            ];
 
-          extraSpecialArgs = {
-            inherit system inputs overlays nixpkgs;
+            extraSpecialArgs = {
+              inherit system inputs overlays nixpkgs;
               system_type = "aarch64-darwin";
               createForwardPath = true;
               forwardTo = "/Users/christianalbertsen/.forwarded-sockets";
               pinentry = "noagent";
               withExtraSocket = false;
               filebotLicense = null;
+            };
           };
-        };
       };
-    } // flake-utils.lib.eachDefaultSystem (system: {
-
+    }
+    // flake-utils.lib.eachDefaultSystem (system: {
       checks = let
         pkgs = mypkgs system;
       in {
@@ -230,11 +233,12 @@
             ++ (
               if pkgs.lib.strings.hasSuffix "-linux" system
               then [
-                hextorb
-                rbtohex
-                pbkdf2-sha512
+                cloud-utils
                 cryptsetup
+                hextorb
                 install_remote
+                pbkdf2-sha512
+                rbtohex
               ]
               else []
             );
@@ -322,23 +326,12 @@
             modules = [
               ./computers/axum/configuration.nix
               nixos-hardware.nixosModules.raspberry-pi-4
-              disko.nixosModules.disko
-              lanzaboote.nixosModules.lanzaboote
-              # {
-              #   boot = {
-              #     bootspec.enable = true;
-              #     loader.systemd-boot.enable = inputs.nixpkgs.lib.mkForce = false;
-              #     lanzaboote = {
-              #       enable = true;
-              #     };
-              #   };
-              # }
               {
                 nixpkgs.hostPlatform = system;
               }
             ];
             specialArgs = {
-              inherit home-manager nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix;
+              inherit disko home-manager nixpkgs overlays sops-nix;
             };
           };
       };
@@ -353,9 +346,7 @@
         };
       };
 
-      homeManagerModules.caUserEnvironment = {
-        ...
-      }: {
+      homeManagerModules.caUserEnvironment = {...}: {
         imports = [
           ./home_manager/bashprofile.nix
           ./home_manager/cagpg.nix

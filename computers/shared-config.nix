@@ -1,5 +1,4 @@
 {
-  home-manager,
   modulesPath,
   lib,
   overlays,
@@ -7,7 +6,6 @@
   ...
 }: {
   imports = [
-    home-manager.nixosModules.home-manager
     (modulesPath + "/profiles/base.nix")
     ./shared-config-combined.nix
     ../modules/gitea.nix
@@ -25,16 +23,25 @@
   config = {
     nixpkgs = {
       inherit overlays;
-      config.allowUnfreePredicate = pkg:
-        builtins.elem (lib.getName pkg) [
-          "canon-cups-ufr2"
-          "filebot"
-          "google-chrome"
-          "makemkv"
-          "nvidia-settings"
-          "nvidia-x11"
-          "unrar"
+      config = {
+        allowUnfreePredicate = pkg:
+          builtins.elem (lib.getName pkg) [
+            "canon-cups-ufr2"
+            "filebot"
+            "google-chrome"
+            "makemkv"
+            "nrf-command-line-tools"
+            "nrf-udev"
+            "nvidia-settings"
+            "nvidia-x11"
+            "segger-jlink"
+            "unrar"
+          ];
+        permittedInsecurePackages = [
+          "segger-jlink-qt4-874"
         ];
+        segger-jlink.acceptLicense = true;
+      };
     };
     boot = {
       supportedFilesystems = ["zfs"];
@@ -106,7 +113,6 @@
       nameservers = ["1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one"];
       useHostResolvConf = lib.mkForce false;
     };
-    causers.adminUsers = [ "christian" "marianne" ];
     causermount.enable = true;
 
     hardware.graphics.enable = true;

@@ -1,5 +1,5 @@
 final: _prev: let
-  version = "20260716";
+  version = "20261018";
   keys_to_file = name: keys:
     builtins.toFile name (
       builtins.concatStringsSep "\n" keys
@@ -7,7 +7,7 @@ final: _prev: let
 
   al_pgp_key = final.fetchurl {
     url = "https://keys.openpgp.org/vks/v1/by-email/christian@wudika.de";
-    hash = "sha256-lQ5GtUi848zbCG1bd+w5nD4AqSvr4qyXrLz8rv3QQP8=";
+    hash = "sha256-GdD0tdgi9Q3DorzQCM4g6Z9AyEOxJ0bzVIQ0IJ3L+hU=";
   };
 
   al_public_keys_file = with final;

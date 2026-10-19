@@ -1,107 +1,125 @@
-{pkgs, ...}: {
-  imports = [
-    ./treesitter.nix
-  ];
-
-  programs.neovim = {
-    extraPackages = with pkgs; [
-      trash-cli
-      kitty
-      imagemagick
-      ghostscript
-      mermaid-cli
-      lazygit
-      fd
-      sqlite
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.ca.neovim.ui;
+in
+  with lib; {
+    imports = [
+      ./treesitter.nix
     ];
 
-    extraLuaPackages = ps:
-      with ps; [
-        ljsyscall
-      ];
+    options = {
+      ca.neovim.ui = {
+        enable = mkEnableOption "Generate Neovim configuration";
+      };
+    };
 
-    plugins = with pkgs.vimPlugins; [
-      vim-airline-themes
-      {
-        type = "lua";
-        plugin = snacks-nvim;
-        config = ''
-          require("snacks").setup({
-            registers = { enabled = true, },
-            notifier = { enabled = true, },
-            input = { enabled = true },
-            picker = {
-              enabled = true,
-              db = {
-                sqlite3_path = '${pkgs.sqlite.out}/lib/libsqlite3.so',
-              },
-            },
-          })
-        '';
-      }
-      {
-        type = "lua";
-        plugin = which-key-nvim;
-        config = ''
-          local wk = require("which-key")
-          wk.add({
-            {
-              "<leader>?",
-              function()
-                require("which-key").show({ global = false })
-              end,
-              desc = "Buffer Local Keymaps (which-key)",
-            },
-          })
-        '';
-      }
-      {
-        type = "viml";
-        plugin = vim-airline;
-        config = ''
-          set laststatus=2 " Always display statusline in all windows
-          set ambiwidth=single " needed for powerfonts
+    config = mkIf cfg.enable {
+      ca.neovim.treesitter.enable = true;
 
-          let g:airline_powerline_fonts = 1
-          let g:airline_detect_modified = 1
-          let g:airline_detect_paste = 1
+      programs.neovim = {
+        extraPackages = with pkgs; [
+          fd
+          ghostscript
+          imagemagick
+          kitty
+          lazygit
+          mermaid-cli
+          sqlite
+          trash-cli
+        ];
 
-          " Extensions
-          let g:airline#extensions#virtualenv#enabled = 1
-          let g:airline#extensions#coc#enabled = 1
+        extraLuaPackages = ps:
+          with ps; [
+            ljsyscall
+          ];
 
-          " Whitespace warnings
-          let g:airline#extensions#whitespace#enabled = 1
-          let g:airline#extensions#whitespace#checks = [
-            \ 'indent',
-            \ 'trailing',
-            \ 'long',
-            \ 'mixed-indent-file',
-            \ ]
+        plugins = with pkgs.vimPlugins; [
+          vim-airline-themes
+          {
+            type = "lua";
+            plugin = snacks-nvim;
+            config = ''
+              require("snacks").setup({
+                registers = { enabled = true, },
+                notifier = { enabled = true, },
+                input = { enabled = true },
+                picker = {
+                  enabled = true,
+                  db = {
+                    sqlite3_path = '${pkgs.sqlite.out}/lib/libsqlite3.so',
+                  },
+                },
+              })
+            '';
+          }
+          {
+            type = "lua";
+            plugin = which-key-nvim;
+            config = ''
+              local wk = require("which-key")
+              wk.add({
+                {
+                  "<leader>?",
+                  function()
+                    require("which-key").show({ global = false })
+                  end,
+                  desc = "Buffer Local Keymaps (which-key)",
+                },
+              })
+            '';
+          }
+          {
+            type = "viml";
+            plugin = vim-airline;
+            config = ''
+              set laststatus=2 " Always display statusline in all windows
+              set ambiwidth=single " needed for powerfonts
 
-          " Titles for special buffers
-          let g:airline#extensions#quickfix#quickfix_text = 'Quickfix'
-          let g:airline#extensions#quickfix#location_text = 'Location'
+              let g:airline_powerline_fonts = 1
+              let g:airline_detect_modified = 1
+              let g:airline_detect_paste = 1
 
-          " Fugitive integration
-          let g:airline#extensions#branch#enabled = 1
-          let g:airline#extensions#branch#format = 2
-        '';
-      }
-      vim-signify
-      {
-        type = "lua";
-        plugin = solarized-nvim;
-        config = ''
-          require('solarized')
-          vim.o.termguicolors = true
-          vim.o.background = 'light'
-          vim.cmd.colorscheme('solarized')
-        '';
-      }
-      fidget-nvim
+              " Extensions
+              let g:airline#extensions#virtualenv#enabled = 1
+              let g:airline#extensions#coc#enabled = 1
 
-      markdown-preview-nvim
-    ];
-  };
-}
+              " Whitespace warnings
+              let g:airline#extensions#whitespace#enabled = 1
+              let g:airline#extensions#whitespace#checks = [
+                \ 'indent',
+                \ 'trailing',
+                \ 'long',
+                \ 'mixed-indent-file',
+                \ ]
+
+              " Titles for special buffers
+              let g:airline#extensions#quickfix#quickfix_text = 'Quickfix'
+              let g:airline#extensions#quickfix#location_text = 'Location'
+
+              " Fugitive integration
+              let g:airline#extensions#branch#enabled = 1
+              let g:airline#extensions#branch#format = 2
+            '';
+          }
+          vim-signify
+          {
+            type = "lua";
+            plugin = solarized-nvim;
+            config = ''
+              vim.o.termguicolors = true
+              vim.o.background = 'light'
+              require('solarized').set()
+            '';
+            # vim.cmd.colorscheme('solarized')
+          }
+          fidget-nvim
+
+          markdown-preview-nvim
+        ];
+      };
+    };
+  }

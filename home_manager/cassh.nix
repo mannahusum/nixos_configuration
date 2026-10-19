@@ -707,7 +707,7 @@ with lib; let
       };
     };
     "mini" = {
-      hostname = "192.168.10.249";
+      hostname = "mini.local";
       hostkeys = [
         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDjn/qTrUmmKbPbHtsjlDfdrkdqOOdIFl9Uc5qbU7q/wilu0+Jx+GWkmZK54qXJwjQmMPFrzXaP7HQGVWBHbD2IBMf3bcMzl7nzk3iZ0tNPG5BjKfe2xWohIdgUWdva0JOlI46fAZKN11Zc4H/4TnXCDS8SwQqyNcAjU8t768vpAfPTTNnE2iYDIJCXsz9Xh3bpHvYd7z8pUB4Zk5TM95bjh2A+bwiQXeYU/ooYEHl3fDmjIWJeQm00CwO1BD4EsvJCRkIzZ0Zjd0P3bzn3dyl5VxKno0V7SWsp/95UCeZm+C7wr/S0NYtLKZ6lWI+fVJRBN1Azh675EMlatxYTCSiTfjlOuCUh47L0Ikqq39Ev6a5nr7VuTc517f3pSyUmPSgKvV3aAZ2aVDIU+RWTUGZFEgonoQo+FUqFUaaR0afMu8ZWBQFpt6OwjgCxIWkvWoub+mG3ZtMWWbrrcGzWOkT7wt7664fEpKHup+zG+5IGZg4Owv3G0mHLqaPnmPk/G50="
         "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBdmI9JovLniVi+D6hIyIeWC1/6RRV5JMK99GwbhBsMGC/pJLW+8nGzypngKRV0RRRijipnoGE2W56TYZjrjLwk="
@@ -719,23 +719,31 @@ with lib; let
         user = "christianalbertsen";
       };
     };
+    "ulpia-remote" = {
+      hostname = "vokigxvs8z2df0jr.myfritz.net";
+      hostkeys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCN03MTs1akcyaPIFNNH/6AlX2BRSxQ5+5ZgNAxApWhwPYiP9v+An9XIb56xxCQ3ftP+rjvtngDGcNcbyarJ0Kt9iMsrFtwFC1PcgDsKLUQGJwsv8H9DBlnUaR4HCAhlMVkPEEoAwkx8qgGrFt1usp8siMlpYYznmjW0skNr9JyHHV73KPhA3F+BTqzX4H4PIJkfs+Cqr0gq8KYI5gp2ZeR+cd4OMxyj1w7lpJ57dlXFrf6D/cZuNCljJnuMBFfTqBMhF5UQwxWxiMqDfHbuDmcZANmCYaMQCMw4K3Yqmrr2azgs1PFezVrOJCx8VDp9+5+CQ7qAOABIotGGgwr2NXTl/qn9tag9r/IcuvT1e6HDFnOQAALOhVCJGdduGynRmSF4n5FJAUSewLq5pR10wBs6pPFRclJwRIDVsJlpQFB2H9re6Hd1TjoZaDn34cHE18p0+tnJ8AW3N9oApr5mt8OiauLTT3Lv7P5Xc1jYnCti4LiGAQ1dnSr+qVVNgf7KEM="
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBbz3h0scxNqi8352cg+ghtBQGXDR50iLcGOe/lhlih8"
+      ];
+      gpgSocket = "/home/christian/.forwarded-sockets/S.gpg-agent";
+    };
   };
   cfg = config.ca.ssh;
 
   known_hosts_for = file_extension: hosts_config:
-    pkgs.writeText file_extension (strings.concatLines (builtins.concatLists (
-      builtins.map (
+    pkgs.writeText file_extension (strings.concatLines (concatLists (
+      map (
         values:
-          builtins.map (
+          map (
             key: "${values.hostname} ${key}"
           )
           values.hostkeys
-      ) (builtins.attrValues hosts_config)
+      ) (attrValues hosts_config)
     )));
   privateKnownHost = known_hosts_for "known_hosts_ca" privateHosts;
   itivKnownHosts = known_hosts_for "itiv_known_hosts" itivHosts;
 
-  identityFiles = map (builtins.toFile "key.pub") pkgs.al_public_keys;
+  identityFiles = map (toFile "key.pub") pkgs.al_public_keys;
 
   host-config = defaults: host: socket: value: (
     let
@@ -833,8 +841,6 @@ in {
             controlPath = "~/.ssh/master-%C";
             controlMaster = "yes";
             userKnownHostsFile = "~/.ssh/known_hosts ${privateKnownHost} ${itivKnownHosts}";
-            forwardAgent = false;
-            addKeysToAgent = "no";
             compression = false;
             serverAliveInterval = 0;
             serverAliveCountMax = 3;

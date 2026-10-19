@@ -140,7 +140,10 @@ in {
           enable = true;
           settings = myregreetconfig;
         };
-        causers.defaultPinentry = "bemenu";
+        causers = {
+          defaultPinentry = "bemenu";
+          ui = true;
+        };
       })
       (lib.mkIf (cfg.displayManager == "gdm") {
         services = {
@@ -154,7 +157,7 @@ in {
                     Comment=Sway run from a login shell
                     Exec=${pkgs.dbus}/bin/dbus-run-session -- bash -l -c sway
                     Type=Application''
-                ).overrideAttrs (oldAttrs:  {
+                ).overrideAttrs (oldAttrs: {
                   passthru = {
                     providedSessions = ["sway"];
                   };
@@ -164,7 +167,10 @@ in {
           };
           desktopManager.gnome.enable = true;
         };
-        causers.defaultPinentry = "gnome3";
+        causers = {
+          defaultPinentry = "gnome3";
+          ui = true;
+        };
         environment.systemPackages = with pkgs; [
           adwaita-icon-theme
           cascadia-code
@@ -178,6 +184,7 @@ in {
           gnome-menus
           gnome-settings-daemon
           gnome-tweaks
+          pavucontrol
           windows-theme-gtk
           windows-theme-icons
           (writeShellApplication {
@@ -198,7 +205,6 @@ in {
             ];
           })
         ];
-        hardware.sensor.iio.enable = true;
         programs = {
           dconf = {
             enable = true;
@@ -283,6 +289,7 @@ in {
             ];
           };
           gnome-disks.enable = true;
+          thunderbird.enable = true;
         };
       })
       {
@@ -292,20 +299,7 @@ in {
             openFirewall = true;
           };
           browserpass.enable = true;
-          # captive-browser.enable = true;
-          firefox = {
-            enable = true;
-            languagePacks = [
-              "de"
-              "en-US"
-              "es-ES"
-              "fi"
-              "fr"
-              "sv-SE"
-            ];
-          };
           system-config-printer.enable = true;
-          thunderbird.enable = true;
           traceroute.enable = true;
           wshowkeys.enable = true;
         };
@@ -318,7 +312,6 @@ in {
           ];
         };
 
-        causers.regularUserGroups = ["input"];
         nixpkgs.config.pulseaudio = true;
       }
     ]);

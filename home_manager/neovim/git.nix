@@ -1,61 +1,79 @@
-{pkgs, ...}: {
-  programs.neovim = {
-    extraPackages = with pkgs; [
-      git
-      lazygit
-    ];
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.ca.neovim.git;
+in
+  with lib; {
+    imports = [];
 
-    plugins = with pkgs.vimPlugins; [
-      {
-        type = "viml";
-        plugin = vim-gist;
-        config = ''
-          let g:gist_detect_filetype = 1
-          let g:gist_show_privates = 1
-          let g:gist_post_private = 1
-        '';
-      }
-      vim-gist
-      {
-        type = "viml";
-        plugin = vim-merginal;
-        config = ''
-          nnoremap <leader>gb :MerginalToggle<CR>
-        '';
-      }
-      vimagit
-      vim-rhubarb
-      fugitive-gitlab-vim
-      {
-        type = "viml";
-        plugin = gv-vim;
-        config = ''
-          nnoremap <leader>gv :GV<CR>
-        '';
-      }
-      {
-        type = "viml";
-        plugin = vim-fugitive;
-        config = ''
-          nnoremap <leader>gc :Git commit<CR>
-          nnoremap <leader>gg :Git<CR>
-          nnoremap <leader>gw :Gwrite<CR>
-          nnoremap <leader>gl :Gclog<CR>
+    options = {
+      ca.neovim.git = {
+        enable = mkEnableOption "Generate Neovim configuration";
+      };
+    };
 
-          " Fugitive Conflict Resolution
-          nnoremap <leader>gd :Gvdiff<CR>
-          nnoremap <leader>h :diffget //2<CR>
-          nnoremap <leader>l :diffget //3<CR>
+    config = mkIf cfg.enable {
+      programs.neovim = {
+        extraPackages = with pkgs; [
+          git
+          lazygit
+        ];
 
-          " Push and pull
-          nnoremap <leader>gf :Git fetch<CR>
-          nnoremap <leader>gp :Git pull<CR>
-          nnoremap <leader>gu :Git push<CR>
-          nnoremap <leader>gL :Git push --force-with-lease<CR>
-          nnoremap <leader>gU :Git -c push.default=current push<CR>
-        '';
-      }
-      lazygit-nvim
-    ];
-  };
-}
+        plugins = with pkgs.vimPlugins; [
+          {
+            type = "viml";
+            plugin = vim-gist;
+            config = ''
+              let g:gist_detect_filetype = 1
+              let g:gist_show_privates = 1
+              let g:gist_post_private = 1
+            '';
+          }
+          vim-gist
+          {
+            type = "viml";
+            plugin = vim-merginal;
+            config = ''
+              nnoremap <leader>gb :MerginalToggle<CR>
+            '';
+          }
+          vimagit
+          vim-rhubarb
+          fugitive-gitlab-vim
+          {
+            type = "viml";
+            plugin = gv-vim;
+            config = ''
+              nnoremap <leader>gv :GV<CR>
+            '';
+          }
+          {
+            type = "viml";
+            plugin = vim-fugitive;
+            config = ''
+              nnoremap <leader>gc :Git commit<CR>
+              nnoremap <leader>gg :Git<CR>
+              nnoremap <leader>gw :Gwrite<CR>
+              nnoremap <leader>gl :Gclog<CR>
+
+              " Fugitive Conflict Resolution
+              nnoremap <leader>gd :Gvdiff<CR>
+              nnoremap <leader>h :diffget //2<CR>
+              nnoremap <leader>l :diffget //3<CR>
+
+              " Push and pull
+              nnoremap <leader>gf :Git fetch<CR>
+              nnoremap <leader>gp :Git pull<CR>
+              nnoremap <leader>gu :Git push<CR>
+              nnoremap <leader>gL :Git push --force-with-lease<CR>
+              nnoremap <leader>gU :Git -c push.default=current push<CR>
+            '';
+          }
+          lazygit-nvim
+        ];
+      };
+    };
+  }

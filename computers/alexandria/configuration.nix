@@ -105,6 +105,11 @@
       '';
     };
 
+    causers = {
+      desktop = true;
+      ui = true;
+    };
+
     systemd.network = {
       enable = true;
       links = {
@@ -194,7 +199,7 @@
       name = "Alexandria";
       nvidiaAccelerationPath = "/dev/dri/by-path/pci-0000:01:00.0-render";
     };
-    users.groups.media.members = [ "christian" "marianne" "jellyfin" ];
+    users.groups.media.members = ["christian" "marianne" "jellyfin"];
     systemd.services.rasdaemon.path = with pkgs; [
       ipmitool
     ];
@@ -224,21 +229,20 @@
         openipmi
       ];
     };
-    environment.systemPackages =
-      with pkgs; [
-        efitools
-        fdupes
-        git-crypt
-        ipmitool
-        makemkv
-        neovim
-        rasdaemon
-        ripgrep
-        sbctl
-        sbsigntool
-        tpm2-tss
-        xterm # for resize command
-      ];
+    environment.systemPackages = with pkgs; [
+      efitools
+      fdupes
+      git-crypt
+      ipmitool
+      makemkv
+      neovim
+      rasdaemon
+      ripgrep
+      sbctl
+      sbsigntool
+      tpm2-tss
+      xterm # for resize command
+    ];
 
     system.stateVersion = "23.11";
   };

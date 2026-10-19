@@ -73,6 +73,10 @@
         export WLR_DRM_DEVICES="/dev/dri/$(${pkgs.intel-gpu-tools}/bin/lsgpu | grep 102b:0522 | head -n 1 | cut -d' ' -f1)"
       '';
     };
+    causers = {
+      desktop = true;
+      ui = true;
+    };
 
     systemd.network = {
       enable = true;

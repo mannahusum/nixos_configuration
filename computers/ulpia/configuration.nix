@@ -109,6 +109,10 @@
         export WLR_DRM_DEVICES="/dev/dri/$(${pkgs.intel-gpu-tools}/bin/lsgpu | grep 102b:0522 | head -n 1 | cut -d' ' -f1)"
       '';
     };
+    causers = {
+      desktop = true;
+      ui = true;
+    };
 
     systemd.network = {
       enable = true;
@@ -193,13 +197,20 @@
         enable = true;
         flags = "-k -p -u";
       };
+      printing = {
+        enable = true;
+        drivers = with pkgs; [
+          canon-cups-ufr2
+          mf660cppd
+        ];
+      };
     };
     cadlna = {
       enable = true;
       name = "Ulpia";
       nvidiaAccelerationPath = "/dev/dri/by-path/pci-0000:01:00.0-render";
     };
-    users.groups.media.members = [ "christian" "marianne" "jellyfin" ];
+    users.groups.media.members = ["christian" "marianne" "jellyfin"];
     systemd.services.rasdaemon.path = with pkgs; [
       ipmitool
     ];
@@ -219,6 +230,17 @@
         extraModules = ["ie31200_edac"];
       };
       nvidia.open = true;
+      printers = {
+        ensurePrinters = [
+          {
+            name = "Canon_MF660C_Series_UFR_II";
+            model = "CNRCUPSMF660CZK.ppd";
+            location = "Ginsterweg 12, Arbeitszimmer";
+            deviceUri = "socket://192.168.178.130";
+          }
+        ];
+        ensureDefaultPrinter = "Canon_MF660C_Series_UFR_II";
+      };
     };
 
     programs.nix-ld = {
@@ -229,21 +251,20 @@
         openipmi
       ];
     };
-    environment.systemPackages =
-      with pkgs; [
-        efitools
-        fdupes
-        git-crypt
-        ipmitool
-        makemkv
-        neovim
-        rasdaemon
-        ripgrep
-        sbctl
-        sbsigntool
-        tpm2-tss
-        xterm # for resize command
-      ];
+    environment.systemPackages = with pkgs; [
+      efitools
+      fdupes
+      git-crypt
+      ipmitool
+      makemkv
+      neovim
+      rasdaemon
+      ripgrep
+      sbctl
+      sbsigntool
+      tpm2-tss
+      xterm # for resize command
+    ];
 
     system.stateVersion = "23.11";
   };

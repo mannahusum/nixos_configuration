@@ -1,5 +1,6 @@
 {
   config,
+  home-manager,
   lib,
   nixpkgs,
   overlays,
@@ -9,56 +10,17 @@
   cfg = config.causers;
 in {
   imports = [
+    home-manager.nixosModules.home-manager
   ];
 
   options.causers = {
-    adminUsers = lib.mkOption {
+    users = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = ["christian"];
-      example = ["christian" "marianne"];
-      description = ''
-        Users with administrative rights on this
-        computer, like modifying printers or
-        becoming root
-      '';
-    };
-
-    regularUsers = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [];
       example = ["marianne"];
       description = ''
-        Users with access to resources to fully use
-        this machine, e.g. acceleration of graphics
-        rendering
+        The users who will be able to login on this machine
       '';
-    };
-
-    regularUserGroups = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = ["camera" "cdrom" "dialout" "disk" "tty"];
-      example = ["cdrom"];
-      description = ''
-        List of groups to be accessible by regular
-        users of the system
-      '';
-    };
-
-    adminUserGroups = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [
-        "docker"
-        "kvm"
-        "libvirtd"
-        "lxd"
-        "qemu-libvirtd"
-        "render"
-        "transmission"
-        "video"
-        "vboxusers"
-        "wheel"
-        "networkmanager"
-      ];
     };
 
     defaultPinentry = lib.mkOption {
@@ -70,6 +32,9 @@ in {
         depending on desktopManager and therefore displayManager
       '';
     };
+
+    ui = lib.mkEnableOption "Install a graphical user interface";
+    desktop = lib.mkEnableOption "Install the packages only needed for desktop computers";
 
     filebotLicense = lib.mkOption {
       type = lib.types.nullOr lib.types.path;
@@ -140,6 +105,7 @@ in {
                       "audio"
                       "cdrom"
                       "dialout"
+                      "disk"
                       "docker"
                       "kvm"
                       "libvirtd"
@@ -147,6 +113,7 @@ in {
                       "qemu-libvirtd"
                       "render"
                       "transmission"
+                      "tss"
                       "video"
                       "vboxusers"
                       "wheel"
@@ -154,7 +121,8 @@ in {
                     ];
                   };
               }
-            ) ((builtins.attrNames myusers) ++ cfg.adminUsers ++ cfg.regularUsers)
+            )
+            cfg.users
           );
 
           groups = builtins.listToAttrs (map (
@@ -167,20 +135,23 @@ in {
           mutableUsers = true;
         };
 
-         home-manager = {
-          users = {
-            christian =
-              import ../home_manager/caHomeConfig.nix {
+        home-manager.users =
+          (lib.optionalAttrs (builtins.elem "christian" cfg.users) {
+            christian = lib.mkMerge [
+              (import ../home_manager/caHomeConfig.nix {
                 inherit config nixpkgs overlays;
+                inherit (cfg) desktop filebotLicense ui;
                 system_type = pkgs.stdenv.hostPlatform.system;
                 pinentry = cfg.defaultPinentry;
                 forwardTo = "${config.users.users.christian.home}/.forwarded-sockets";
                 createForwardPath = true;
-                filebotLicense = cfg.filebotLicense;
+              })
+              {
+                home.stateVersion = "26.05";
               }
-              // {
-                home.stateVersion = "24.11";
-              };
+            ];
+          })
+          // (lib.optionalAttrs (builtins.elem "marianne" cfg.users) {
             marianne = {
               nixpkgs = {
                 inherit overlays;
@@ -207,8 +178,7 @@ in {
                 stateVersion = "26.05";
               };
             };
-          };
-        };
+          });
 
         security.sudo.wheelNeedsPassword = false;
         nix.settings.trusted-users = ["root" "christian"];

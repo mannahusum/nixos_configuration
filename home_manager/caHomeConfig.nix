@@ -1,14 +1,16 @@
 {
   createForwardPath ? false,
+  desktop ? true,
+  filebotLicense ? null,
   forwardTo ? null,
   nixpkgs,
   overlays,
   pinentry,
   system_type,
   withExtraSocket ? false,
-  filebotLicense ? null,
+  ui ? true,
   ...
-}: ({
+}: {
   imports = [
     ./bashprofile.nix
     ./cagit.nix
@@ -35,7 +37,7 @@
 
   ca = {
     bash.enable = true;
-    chrome.enable = true;
+    chrome.enable = ui;
     filebot.license = filebotLicense;
     git.enable = true;
     gpg = {
@@ -43,12 +45,16 @@
       enable = true;
     };
     neovim = {
+      inherit desktop;
       enable = true;
-      backgroundservice = true;
+      backgroundservice = false;
+    };
+    packages = {
+      inherit desktop;
+      enable = true;
     };
     pass.enable = true;
-    ssh = {
-      enable = true;
-    };
+    ssh.enable = true;
+    sway.enable = ui;
   };
-})
+}

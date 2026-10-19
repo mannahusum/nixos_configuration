@@ -47,10 +47,14 @@ in {
         device = cfg.nvidiaAccelerationPath;
       };
     };
-    environment.systemPackages = with pkgs; [
-      ffmpeg-full
-      filebot
-    ];
+    environment = {
+      systemPackages = with pkgs; [
+        ffmpeg-full
+        filebot
+      ];
+      sessionVariables = {
+        "_JAVA_AWT_WM_NONREPARENTING" = "1";
+      };
+    };
   };
 }
-

@@ -15,6 +15,7 @@
     lanzaboote.nixosModules.lanzaboote
     (modulesPath + "/profiles/base.nix")
     ../../modules/postfix.nix
+    ../../modules/embeddeddev.nix
     nixos-hardware.nixosModules.microsoft-surface-pro-intel
     ../shared-config.nix
     ./sops.nix
@@ -37,6 +38,10 @@
       espsize = "1G";
       homesFor = ["christian" "marianne"];
     };
+    caembedded = {
+      enable = true;
+      sshKey = "/etc/ssh/ssh_host_ed25519_key";
+    };
     capostfix = {
       enable = true;
       connection = "smtp.protonmail.ch:587";
@@ -48,6 +53,11 @@
       displayManager = "gdm";
     };
 
+    causers = {
+      desktop = true;
+      ui = true;
+    };
+
     services = {
       pcscd.enable = true;
       printing = {
@@ -55,6 +65,9 @@
         drivers = with pkgs; [
           canon-cups-ufr2
         ];
+      };
+      fwupd = {
+        enable = true;
       };
     };
     networking = {
@@ -106,6 +119,25 @@
       microsoft-surface.kernelVersion = "stable";
     };
 
+    virtualisation.libvirtd = {
+      enable = true;
+      qemu = {
+        swtpm.enable = true;
+      };
+    };
+    programs.virt-manager.enable = true;
+    virtualisation.spiceUSBRedirection.enable = true;
+    users.groups.libvirtd.members = ["christian"];
+    users.groups.kvm.members = ["christian"];
+    environment.systemPackages = with pkgs; [
+      gnome-boxes
+      dnsmasq
+      phodav
+      dos2unix
+      gcab
+      surface-control
+      wimlib
+    ];
     # environment.etc."sway/config.d/monitors.conf".text = ''
     #   output "DP-1" mode 3840x2160@30Hz pos 0 0
     #   output "HDMI-A-1" mode 1600x1200@60Hz pos 3840 0 scale 0.61

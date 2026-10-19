@@ -11,7 +11,7 @@
     enable = lib.mkOption {
       type = lib.types.bool;
       default = pkgs.stdenv.hostPlatform.isLinux;
-      description =  "Generate Sway configuration";
+      description = "Generate Sway configuration";
     };
   };
 
@@ -25,85 +25,85 @@
     bemenu = "${lib.getExe' pkgs.bemenu "bemenu-run"}";
     shotman = "${pkgs.shotman.out}/bin/shotman";
     zenity = "${pkgs.zenity.out}/bin/zenity";
-  in lib.mkIf cfg.enable {
-    home.sessionVariables = {
-      XKB_DEFAULT_LAYOUT = "de,de,gr";
-      XKB_DEFAULT_MODEL = "pc105";
-      XKB_DEFAULT_VARIANT = "neo,,";
-      XKB_DEFAULT_OPTIONS = ",,";
-      NIXOS_OZONE_WL = 1;
-    };
-    programs.swaylock = {
-      enable = true;
-      settings = {
-        ignore-empty-password = true;
-        show-failed-attempts = true;
-        image = "${image.out}";
-        show-keyboard-layout = true;
-        scaling = "stretch";
+  in
+    lib.mkIf cfg.enable {
+      home.sessionVariables = {
+        XKB_DEFAULT_LAYOUT = "de,de,gr";
+        XKB_DEFAULT_MODEL = "pc105";
+        XKB_DEFAULT_VARIANT = "neo,,";
+        XKB_DEFAULT_OPTIONS = ",,";
+        NIXOS_OZONE_WL = 1;
       };
-    };
-    services.swayidle = {
-      enable = true;
-      timeouts = [
-        {
-          timeout = 300;
-          command = "${pkgs.swaylock}/bin/swaylock -f";
-        }
-        {
-          timeout = 600;
-          command = "${pkgs.sway}/bin/swaymsg output * power off";
-        }
-      ];
-      events = {
-        "before-sleep" = "${pkgs.swaylock}/bin/swaylock -f";
-        "after-resume" = "${pkgs.sway}/bin/swaymsg output * power on";
-      };
-    };
-
-    wayland.windowManager.sway = {
-      enable = true;
-      config = {
-        inherit modifier;
-
-        menu = bemenu;
-        terminal = "${pkgs.alacritty.out}/bin/alacritty";
-        keybindings = lib.mkOptionDefault {
-          "${modifier}+Shift+e" = "exec ${zenity} --question --text='You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' && swaymsg exit";
-          "${modifier}+p" = "exec ${shotman} --capture window";
-          "${modifier}+Shift+p" = "exec ${shotman} --capture region";
-          "${modifier}+Ctrl+p" = "exec ${shotman} --capture output";
+      programs.swaylock = {
+        enable = true;
+        settings = {
+          ignore-empty-password = true;
+          show-failed-attempts = true;
+          image = "${image.out}";
+          show-keyboard-layout = true;
+          scaling = "stretch";
         };
       };
-      extraSessionCommands = ''
-               XKB_DEFAULT_LAYOUT="de,de,gr";
-               XKB_DEFAULT_MODEL="pc105";
-               XKB_DEFAULT_VARIANT="neo,,";
-               XKB_DEFAULT_OPTIONS=",,";
-        WLR_RENDERER=vulkan;
-      '';
-      extraConfig = ''
-        input "type:keyboard" {
-          xkb_layout de,de,gr
-          xkb_model pc105
-          xkb_variant neo,,
-          xkb_options ,,
-        }
-      '';
+      services.swayidle = {
+        enable = true;
+        timeouts = [
+          {
+            timeout = 300;
+            command = "${pkgs.swaylock}/bin/swaylock -f";
+          }
+          {
+            timeout = 600;
+            command = "${pkgs.sway}/bin/swaymsg output * power off";
+          }
+        ];
+        events = {
+          "before-sleep" = "${pkgs.swaylock}/bin/swaylock -f";
+          "after-resume" = "${pkgs.sway}/bin/swaymsg output * power on";
+        };
+      };
+
+      wayland.windowManager.sway = {
+        enable = true;
+        config = {
+          inherit modifier;
+
+          menu = bemenu;
+          terminal = "${lib.getExe pkgs.wezterm}";
+          keybindings = lib.mkOptionDefault {
+            "${modifier}+Shift+e" = "exec ${zenity} --question --text='You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' && swaymsg exit";
+            "${modifier}+p" = "exec ${shotman} --capture window";
+            "${modifier}+Shift+p" = "exec ${shotman} --capture region";
+            "${modifier}+Ctrl+p" = "exec ${shotman} --capture output";
+          };
+        };
+        extraSessionCommands = ''
+                 XKB_DEFAULT_LAYOUT="de,de,gr";
+                 XKB_DEFAULT_MODEL="pc105";
+                 XKB_DEFAULT_VARIANT="neo,,";
+                 XKB_DEFAULT_OPTIONS=",,";
+          WLR_RENDERER=vulkan;
+        '';
+        extraConfig = ''
+          input "type:keyboard" {
+            xkb_layout de,de,gr
+            xkb_model pc105
+            xkb_variant neo,,
+            xkb_options ,,
+          }
+        '';
+      };
+      fonts.fontconfig.enable = true;
+      home.packages = with pkgs;
+        [
+          grim
+          imv
+          mako
+          mpv
+          wayland
+          wezterm
+          wl-clipboard
+          xdg-utils
+        ]
+        ++ (builtins.filter lib.attrsets.isDerivation (builtins.attrValues nerd-fonts));
     };
-    fonts.fontconfig.enable = true;
-    home.packages = with pkgs;
-      [
-        alacritty
-        grim
-        imv
-        mako
-        mpv
-        neovide
-        wayland
-        wl-clipboard
-        xdg-utils
-      ]
-      ++ (builtins.filter lib.attrsets.isDerivation (builtins.attrValues nerd-fonts));
-  };
 }

@@ -1,47 +1,66 @@
-{pkgs, ...}: {
-  programs.neovim = {
-    extraPackages = with pkgs; [
-      aider-chat-full
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.ca.neovim.ai;
+in
+  with lib; {
+    imports = [
     ];
 
-    extraPython3Packages = ps:
-      with ps; [
-        botocore
-      ];
+    options = {
+      ca.neovim.ai = {
+        enable = mkEnableOption "Generate Neovim configuration";
+      };
+    };
 
-    plugins = with pkgs.vimPlugins; [
-      {
-        type = "lua";
-        plugin = aider-nvim;
-        config = ''
-          require('aider').setup({
-            auto_manage_context = true,
-            default_bindings = true,
-            debug = true,
-            vim = true,
-            ignore_buffers = {
-              '^term:',
-            },
-            border = {
-              style = {
-                "╭", "─", "╮", "│", "╯", "─", "╰", "│"
-              },
-              color = "#fab387",
-            },
+    config = mkIf cfg.enable {
+      programs.neovim = {
+        extraPackages = with pkgs; [
+          aider-chat-full
+        ];
 
-          })
+        extraPython3Packages = ps:
+          with ps; [
+            botocore
+          ];
 
-          vim.api.nvim_set_keymap(
-            'n',
-            '<leader>Ao',
-            ':AiderOpen --model openai/kit.qwen3.5-397b-A17b<CR>',
-            {
-              noremap = true,
-              silent = true,
-            }
-          )
-        '';
-      }
-    ];
-  };
-}
+        plugins = with pkgs.vimPlugins; [
+          {
+            type = "lua";
+            plugin = aider-nvim;
+            config = ''
+              require('aider').setup({
+                auto_manage_context = true,
+                default_bindings = true,
+                debug = true,
+                vim = true,
+                ignore_buffers = {
+                  '^term:',
+                },
+                border = {
+                  style = {
+                    "╭", "─", "╮", "│", "╯", "─", "╰", "│"
+                  },
+                  color = "#fab387",
+                },
+
+              })
+
+              vim.api.nvim_set_keymap(
+                'n',
+                '<leader>Ao',
+                ':AiderOpen --model openai/kit.qwen3.5-397b-A17b<CR>',
+                {
+                  noremap = true,
+                  silent = true,
+                }
+              )
+            '';
+          }
+        ];
+      };
+    };
+  }

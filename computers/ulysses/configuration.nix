@@ -126,17 +126,17 @@
       };
       sensor.iio.enable = true;
       microsoft-surface.kernelVersion = "stable";
-      # printers = {
-      #   ensurePrinters = [
-      #     {
-      #       name = "canon";
-      #       location = "Ginsterweg 12, Arbeitszimmer";
-      #       deviceUri = "socket";
-      #       model = "everywhere";
-      #     }
-      #   ];
-      #   ensureDefaultPrinter = "kyocera5021cdw";
-      # };
+      printers = {
+        ensurePrinters = [
+          {
+            name = "Canon_MF660C_Series_UFR_II";
+            model = "Canon MF660C Series UFR II";
+            location = "Ginsterweg 12, Arbeitszimmer";
+            deviceUri = "socket://192.168.178.13";
+          }
+        ];
+        ensureDefaultPrinter = "kyocera5021cdw";
+      };
     };
 
     environment.systemPackages = with pkgs; [

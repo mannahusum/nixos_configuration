@@ -108,11 +108,19 @@ in {
   options = {
     ca.neovim = {
       enable = mkEnableOption "Generate Neovim configuration";
+      desktop = mkEnableOption "Assume the current computer is used as a desktop";
       backgroundservice = mkEnableOption "Run a nvim listening in the background";
     };
   };
 
   config = mkIf cfg.enable {
+    ca.neovim.functionality.enable = cfg.desktop;
+    ca.neovim.git.enable = cfg.desktop;
+    ca.neovim.integration.enable = cfg.desktop;
+    ca.neovim.ui.enable = cfg.desktop;
+    ca.neovim.completion.enable = cfg.desktop;
+    ca.neovim.ai.enable = cfg.desktop;
+
     systemd.user.services = {
       nvim = mkIf cfg.backgroundservice {
         Unit = {
@@ -186,7 +194,7 @@ in {
           lua
           # lua-curl
           # mimetypes
-          # nvim-nio
+          nvim-nio
           # xml2lua
           luarocks
         ];
@@ -260,36 +268,6 @@ in {
             let $AIDER_OPENAI_API_KEY = trim(system("${pkgs.pass.out}/bin/pass kit.edu/ki-toolbox.scc.kit.edu/API-Key 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
             let $AIDER_OPENAI_API_BASE = "https://ki-toolbox.scc.kit.edu/api/v1"
         endif
-        let g:powerShellPath ="${pkgs.powershell.out}/bin/pwsh"
-        let g:bashLSPPath = "${pkgs.bash-language-server.out}/bin/bash-language-server"
-        let g:vimtex_view_method = "zathura"
-        let g:vimtex_view_automatic = 1
-        let g:vimtex_compiler_latexmk_engines = {
-                \ '_'                : "",
-                \ 'pdflatex'         : '-pdf',
-                \ 'dvipdfex'         : '-pdfdvi',
-                \ 'lualatex'         : '-lualatex',
-                \ 'xelatex'          : '-xelatex',
-                \ 'context (pdftex)' : '-pdf -pdflatex=texexec',
-                \ 'context (luatex)' : '-pdf -pdflatex=context',
-                \ }
-        let g:cmakePath = "${pkgs.cmake-format.out}/bin/cmake-format"
-        let g:gist_clip_command = "${pkgs.xclip.out}/bin/xclip -selection primary"
-        let g:nilPath = "${pkgs.nil.out}/bin/nil"
-        let g:openscadlspPath = "${pkgs.openscad-lsp.out}/bin/openscad-lsp"
-        let g:alejandraPath = "${pkgs.alejandra.out}/bin/alejandra"
-        let g:clangdPath = "${pkgs.clang-tools.out}/bin/clangd"
-        let g:pylintPath = "${pkgs.pylint.out}/bin/pylint"
-        let g:ctagsPath = "${pkgs.universal-ctags.out}/bin/ctags"
-        let g:coc_node_path = "${pkgs.nodejs.out}/bin/node"
-        let g:gitlabCiLs = "${pkgs.gitlab-ci-ls.out}/bin/gitlab-ci-ls"
-        let g:vimtex_compiler_latexmk = {
-            \ 'callback' : 1,
-            \ 'continuous' : 1,
-            \ 'executable' : "${pkgs.texliveFull.out}/bin/latexmk",
-            \}
-        let g:fugitive_gitlab_domains = ['https://gitlab.itiv.kit.edu/', 'https://gitlab.kit.edu/']
-        let g:fugitive_gitea_domains = ['https://gitea.catbertsen.de']
       '';
     };
 

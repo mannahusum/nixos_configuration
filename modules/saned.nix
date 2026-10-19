@@ -26,6 +26,5 @@ in {
       openFirewall = true;
     };
     services.saned.enable = true;
-    causers.regularUserGroups = ["lp" "scanner"];
   };
 }

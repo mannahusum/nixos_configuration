@@ -81,9 +81,11 @@
           };
           cores = 6;
         };
-        users.users.builder.openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZNkkeqW+JI+r839524+sYNRvTxqbYeaspvOufWEtHf christian@hydra"
-        ] ++ pkgs.al_public_keys;
+        users.users.builder.openssh.authorizedKeys.keys =
+          [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZNkkeqW+JI+r839524+sYNRvTxqbYeaspvOufWEtHf Hostkey odysseus
+          ]
+          ++ pkgs.al_public_keys;
       };
       ephemeral = true;
       maxJobs = 4;
@@ -111,23 +113,27 @@
   };
 
   users = {
-    knownUsers = [ "nixbuild" ];
+    knownUsers = ["nixbuild"];
     users.christianalbertsen = {
       home = "/Users/christianalbertsen";
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZNkkeqW+JI+r839524+sYNRvTxqbYeaspvOufWEtHf christian@hydra"
-      ] ++ pkgs.al_public_keys;
+      openssh.authorizedKeys.keys =
+        [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZNkkeqW+JI+r839524+sYNRvTxqbYeaspvOufWEtHf Hostkey odysseus"
+        ]
+        ++ pkgs.al_public_keys;
     };
     users.nixbuild = {
       createHome = true;
       description = "Building without having my root access";
       home = "/Users/nixbuild";
       isHidden = true;
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZNkkeqW+JI+r839524+sYNRvTxqbYeaspvOufWEtHf christian@hydra"
-      ] ++ pkgs.al_public_keys;
+      openssh.authorizedKeys.keys =
+        [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZNkkeqW+JI+r839524+sYNRvTxqbYeaspvOufWEtHf Hostkey odysseus"
+        ]
+        ++ pkgs.al_public_keys;
       shell = pkgs.bashInteractive;
-      uid=502;
+      uid = 502;
     };
   };
   home-manager = {
@@ -147,6 +153,8 @@
         };
     };
   };
+
+  power.sleep.computer = "never";
 
   system = {
     primaryUser = "christianalbertsen";
