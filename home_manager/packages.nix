@@ -33,7 +33,6 @@ in {
       homePython3 = python314.withPackages homePythonPackages;
     in
       [
-        bmaptool
         bashInteractive
         bat # cat clone
         black
@@ -80,6 +79,7 @@ in {
         yubikey-manager
       ]
       ++ lib.optionals (stdenv.hostPlatform.isLinux) [
+        bmaptool
         cadaver
         dmidecode
         lsscsi

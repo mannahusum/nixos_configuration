@@ -83,7 +83,7 @@
         };
         users.users.builder.openssh.authorizedKeys.keys =
           [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZNkkeqW+JI+r839524+sYNRvTxqbYeaspvOufWEtHf Hostkey odysseus
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJZNkkeqW+JI+r839524+sYNRvTxqbYeaspvOufWEtHf Hostkey odysseus"
           ]
           ++ pkgs.al_public_keys;
       };
@@ -147,6 +147,8 @@
           forwardTo = "/Users/christianalbertsen/.forwarded-sockets";
           createForwardPath = true;
           filebotLicense = null;
+          ui = false;
+          desktop = false;
         }
         // {
           home.stateVersion = "24.11";
