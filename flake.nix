@@ -257,7 +257,7 @@
               ./computers/hydra/configuration.nix
             ];
             specialArgs = {
-              inherit disko home-manager lanzaboote nixos-anywhere nixos-luks-yk nixpkgs overlays self sops-nix;
+              inherit disko home-manager lanzaboote nixos-anywhere nixpkgs overlays self sops-nix;
             };
           };
         alexandria = let
@@ -269,7 +269,7 @@
               ./computers/alexandria/configuration.nix
             ];
             specialArgs = {
-              inherit automatic-ripping-machine disko home-manager lanzaboote nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix;
+              inherit automatic-ripping-machine disko home-manager lanzaboote nixpkgs nixpkgs-makemkv overlays sops-nix;
             };
           };
         ulpia = let
@@ -281,7 +281,7 @@
               ./computers/ulpia/configuration.nix
             ];
             specialArgs = {
-              inherit automatic-ripping-machine disko home-manager lanzaboote nixos-luks-yk nixpkgs nixpkgs-makemkv overlays sops-nix;
+              inherit automatic-ripping-machine disko home-manager lanzaboote nixpkgs nixpkgs-makemkv overlays sops-nix;
             };
           };
         alexandretta = let

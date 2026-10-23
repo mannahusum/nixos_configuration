@@ -4,7 +4,6 @@
   nixpkgs,
   nixos-anywhere,
   home-manager,
-  nixos-luks-yk,
   overlays,
   sops-nix,
   ...
@@ -179,7 +178,7 @@ in {
         })
       ];
       specialArgs = {
-        inherit home-manager nixos-luks-yk nixpkgs overlays sops-nix;
+        inherit home-manager nixpkgs overlays sops-nix;
         system = "x86_64-linux";
       };
     };
