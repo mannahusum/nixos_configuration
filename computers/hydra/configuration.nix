@@ -21,6 +21,7 @@
     ../../modules/postfix.nix
     ../../modules/serial-console.nix
     ../../modules/gigabyte_nuc_thermal_cap.nix
+    ../../modules/embeddeddev.nix
   ];
 
   options.hydra = {
@@ -51,6 +52,7 @@
       enable = true;
       credentialsfile = config.sops.templates."route53Credentials".path;
     };
+    caembedded.enable = true;
     cagitea = {
       enable = true;
       domain = "gitea.catbertsen.de";

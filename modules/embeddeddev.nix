@@ -18,8 +18,8 @@ in {
       '';
     };
     sshKey = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
-      default = /etc/ssh/ssh_host_ed25519_key;
+      type = lib.types.nullOr lib.types.str;
+      default = "/etc/ssh/ssh_host_ed25519_key";
       description = ''
         Path of the ssh key to use for connecting to build machines
       '';
@@ -75,28 +75,32 @@ in {
       })
     ];
 
-    programs.ssh.extraConfig = let
-      builderConfig = pkgs.writeTextFile {
-        name = "10-mini-builder.conf";
-        text = ''
-          Host mini-builder
-            hostname mini.local
-            identityFile ${cfg.sshKey}
-            user christianalbertsen
+    programs.ssh =  lib.optionalAttrs (! isNull cfg.sshKey) {
+      extraConfig = let
+        builderConfig = pkgs.writeTextFile {
+          name = "10-mini-builder.conf";
+          text = ''
+            Host mini-builder
+              hostname mini.local
+              identityFile ${cfg.sshKey}
+              user christianalbertsen
 
-          Host mini-linux
-            proxyJump mini-builder
-            User builder
-            hostname localhost
-            Port 31022
-            identityFile ${cfg.sshKey}
-        '';
-        destination = "/10-mini-builder.conf";
-      };
-    in ''
-      Include ${builderConfig.out}/10-mini-builder.conf
-    '';
+            Host mini-linux
+              proxyJump mini-builder
+              User builder
+              hostname localhost
+              Port 31022
+              identityFile ${cfg.sshKey}
+          '';
+          destination = "/10-mini-builder.conf";
+        };
+      in ''
+        Include ${builderConfig.out}/10-mini-builder.conf
+      '';
+    };
     nix = {
+      settings.extra-platforms = [ "armv7l-linux" ];
+    } // lib.optionalAttrs (! isNull cfg.sshKey) {
       buildMachines = [
         {
           hostName = "mini-builder";
@@ -119,5 +123,6 @@ in {
       ];
       distributedBuilds = true;
     };
+    boot.binfmt.emulatedSystems = [ "armv7l-linux" ];
   };
 }
