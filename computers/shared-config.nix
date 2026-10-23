@@ -27,8 +27,14 @@
         allowUnfreePredicate = pkg:
           builtins.elem (lib.getName pkg) [
             "canon-cups-ufr2"
+            "cuda_cccl"
+            "cuda_cudart"
+            "cuda_nvcc"
             "filebot"
             "google-chrome"
+            "libcublas"
+            "libcufft"
+            "libnpp"
             "makemkv"
             "nrf-command-line-tools"
             "nrf-udev"
