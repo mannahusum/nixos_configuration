@@ -20,6 +20,7 @@
     ../../modules/pixiecore.nix
     ../../modules/postfix.nix
     ../../modules/serial-console.nix
+    ../../modules/gigabyte_nuc_thermal_cap.nix
   ];
 
   options.hydra = {
@@ -45,6 +46,7 @@
       extraModulePackages = [];
     };
 
+    gigabyte_heating.enable = true;
     caacme = {
       enable = true;
       credentialsfile = config.sops.templates."route53Credentials".path;
