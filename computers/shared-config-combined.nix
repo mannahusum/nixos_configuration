@@ -13,13 +13,13 @@
         experimental-features = "nix-command flakes";
         substituters = [
           "https://nix-community.cachix.org"
-          "https://cuda-maintainers.cachix.org"
+          "https://cache.nixos-cuda.org"
         ];
         trusted-public-keys = [
           "mannahusum.catbertsen.de:vzQcMgkUCDNjjLkZmSAlpzi9c0qZQEc/hoYz2Qb+PrY="
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "ulpia.catbertsen.de-1:kk+3H0S5sKZB1zD93xh6adWxtJ+CgV6mvd+Dw227hpQ="
-          "cuda-maintainers.cachix.org-1:0dgv71QidhkqnEx633mcl24w6w6f5SUEgA4Y8c66t7Y="
+          "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
         ];
       };
     };
