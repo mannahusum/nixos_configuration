@@ -173,6 +173,17 @@
     };
 
     services = {
+      ollama = {
+        package = pkgs.ollama-cuda;
+        enable = true;
+        host = "[::]";
+        openFirewall = true;
+
+        loadModels = [
+          "qwen2.5-coder:7b"
+          "qwen2.5-coder:32b"
+        ];
+      };
       systembus-notify.enable = true;
       smartd = {
         enable = true;
