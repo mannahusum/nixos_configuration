@@ -84,6 +84,11 @@
             "google-chrome"
           ];
       };
+
+    sshHostKeyPubFiles = map builtins.readFile (map (value: value + "/extra-files/etc/ssh/ssh_host_ed25519_key.pub") (builtins.filter (value: builtins.hasAttr "extra-files" (builtins.readDir value)) (builtins.filter (value: !isNull value) (nixpkgs.lib.mapAttrsToList (name: type:
+      if type == "directory"
+      then (./computers + "/${name}")
+      else null) (builtins.readDir ./computers)))));
   in
     {
       homeConfigurations = {
@@ -257,7 +262,7 @@
               ./computers/hydra/configuration.nix
             ];
             specialArgs = {
-              inherit disko home-manager lanzaboote nixos-anywhere nixpkgs overlays self sops-nix;
+              inherit disko home-manager lanzaboote nixos-anywhere nixpkgs overlays self sops-nix sshHostKeyPubFiles;
             };
           };
         alexandria = let
@@ -343,7 +348,7 @@
           ./computers/mini/configuration.nix
         ];
         specialArgs = {
-          inherit home-manager nixpkgs self overlays;
+          inherit home-manager nixpkgs self overlays sshHostKeyPubFiles;
           system = "aarch64-darwin";
         };
       };
