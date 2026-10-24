@@ -56,5 +56,19 @@ in {
         "_JAVA_AWT_WM_NONREPARENTING" = "1";
       };
     };
+    systemd.services.jellyfin.serviceConfig = {
+      PrivateDevices = lib.mkForce false;
+      DevicePolicy = lib.mkForce "auto";
+      DeviceAllow = [
+        "/dev/dri/card0"
+        "/dev/dri/card1"
+        "/dev/dri/renderD128"
+        "/dev/nvidia0 rwm"
+        "/dev/nvidiactl rwm"
+        "/dev/nvidia-uvm rwm"
+        "/dev/nvidia-uvm-tools rwm"
+        "/dev/nvidia-modeset rwm"
+      ];
+    };
   };
 }
