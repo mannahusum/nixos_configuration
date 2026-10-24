@@ -70,6 +70,7 @@
     settings = {
       system-features = ["nixos-test" "apple-virt"];
       extra-platforms = ["x86_64-darwin" "aarch64-darwin"];
+      trusted-users = ["christianalbertsen"];
     };
     linux-builder = {
       enable = true;
