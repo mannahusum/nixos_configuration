@@ -20,8 +20,8 @@ in {
     programs.git = {
       enable = true;
       settings.user = {
-        name = "Christian Albertsen";
-        email = "christian@wudika.de";
+        name = lib.mkDefault "Christian Albertsen";
+        email = lib.mkDefault "christian@wudika.de";
       };
     };
     home.packages = with pkgs; [

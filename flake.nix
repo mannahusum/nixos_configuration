@@ -356,11 +356,16 @@
       homeManagerModules.caUserEnvironment = {...}: {
         imports = [
           ./home_manager/bashprofile.nix
+          ./home_manager/cagit.nix
           ./home_manager/cagpg.nix
           ./home_manager/cassh.nix
+          ./home_manager/chrome.nix
+          ./home_manager/filebot.nix
+          ./home_manager/neovim.nix
+          ./home_manager/neovim.nix
           ./home_manager/packages.nix
           ./home_manager/passwordstore.nix
-          ./home_manager/neovim.nix
+          ./home_manager/sway.nix
         ];
       };
 
