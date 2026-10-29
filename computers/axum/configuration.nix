@@ -9,7 +9,6 @@
   ...
 }: {
   imports = [
-    # (modulesPath + "/installer/sd-card/sd-image.nix")
     (modulesPath + "/profiles/base.nix")
     ../../modules/sshd.nix
     ../../modules/postfix.nix
