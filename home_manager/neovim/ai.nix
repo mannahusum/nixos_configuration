@@ -13,6 +13,11 @@ in
     options = {
       ca.neovim.ai = {
         enable = mkEnableOption "Generate Neovim configuration";
+        model = mkOption {
+          type = types.str;
+          default = "openai/kit.qwen3.5-397b-A17b";
+          description = "which model to run for AI";
+        };
       };
     };
 
@@ -52,7 +57,7 @@ in
               vim.api.nvim_set_keymap(
                 'n',
                 '<leader>Ao',
-                ':AiderOpen --model openai/kit.qwen3.5-397b-A17b<CR>',
+                ':AiderOpen --model ${cfg.model}<CR>',
                 {
                   noremap = true,
                   silent = true,
