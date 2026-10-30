@@ -24,7 +24,7 @@ in
     config = mkIf cfg.enable {
       programs.neovim = {
         extraPackages = with pkgs; [
-          aider-chat-full
+          aider-chat
         ];
 
         extraPython3Packages = ps:
