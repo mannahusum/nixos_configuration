@@ -96,6 +96,9 @@
       maxJobs = 4;
       supportedFeatures = ["kvm" "benchmark" "big-parallel" "nixos-test"];
     };
+    trustedUsers = [
+      "christianalbertsen"
+    ];
   };
 
   launchd.daemons.linux-builder = {
