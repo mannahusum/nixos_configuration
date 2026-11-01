@@ -236,9 +236,17 @@
     programs.nix-ld = {
       enable = true;
       libraries = with pkgs; [
+        # gccNGPackages_15.libstdcxx
+        glib
+        glibc
+        libGL
         ncurses5
-        gccNGPackages_15.libstdcxx
         openipmi
+        openssl
+        stdenv.cc.cc.lib
+        xorg.libX11
+        zlib
+        config.hardware.nvidia.package
       ];
     };
     environment.systemPackages = with pkgs; [
