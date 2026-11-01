@@ -16,13 +16,6 @@ in {
         Whether there are domains to request a certificate for
       '';
     };
-    # domains = lib.mkOption {
-    #   type = lib.types.listOf lib.types.str;
-    #   default = [];
-    #   description = ''
-    #     Domains for which to request certificates
-    #   '';
-    # };
   };
 
   config = lib.mkIf cfg.enable {

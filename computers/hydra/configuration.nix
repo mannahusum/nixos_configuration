@@ -122,7 +122,7 @@
     };
 
     networking = {
-      firewall.enable = false;
+      firewall.enable = true;
       hostId = "b800626c";
       hostName = "hydra";
       useDHCP = nixpkgs.lib.mkDefault true;
