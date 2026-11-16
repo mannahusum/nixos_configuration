@@ -1,4 +1,4 @@
-final: _prev: {
+final: prev: {
   disktype = final.callPackage ./disktype.nix {};
 
   mf660cppd = let
@@ -24,4 +24,19 @@ final: _prev: {
         platforms = final.lib.platforms.all;
       };
     };
+    dpt-rp1-py = let
+      version = "0.1.20";
+      sha256 = "sha256-d3SvKtoEq0+Ojs0jy8xWsiErFpKNVL0g8lfUTjYJww8=";
+    in prev.dpt-rp1-py.overrideAttrs (
+      _finalAttrs: _previousAttrs: {
+        inherit version;
+        src = final.fetchFromGitHub {
+          inherit sha256;
+          owner = "janten";
+          repo = "dpt-rp1-py";
+          rev = "v${version}";
+        };
+      }
+    );
+
 }

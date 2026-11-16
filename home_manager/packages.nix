@@ -21,6 +21,7 @@ in {
     home.packages = with pkgs; let
       homePythonPackages = python-packages:
         with python-packages; [
+          dpt-rp1-py
           pathspec
           pyaudio
           pyserial
@@ -39,6 +40,7 @@ in {
         coreutils-full
         cyrus_sasl
         detect-secrets
+        dpt-rp1-py
         enscript
         file
         fzf
