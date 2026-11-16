@@ -113,12 +113,15 @@
             ];
 
             extraSpecialArgs = {
-              inherit system inputs overlays nixpkgs;
+              inherit inputs overlays nixpkgs;
               pinentry = "bemenu";
               forwardTo = "/home/christian/.forwarded-sockets";
               createForwardPath = true;
               withExtraSocket = false;
               filebotLicense = null;
+              system_type = system;
+              ui = true;
+              desktop = true;
             };
           };
         to6338 = let
