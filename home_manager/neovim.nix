@@ -271,8 +271,8 @@ in {
             let $GH_TOKEN = s:github_token
             let $TODOIST_API_KEY = trim(system("${pkgs.pass.out}/bin/pass todoist.com/ApiToken 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
       '' + (if cfg.openai_endpoint == "kit" then ''
-            let $AIDER_OPENAI_API_KEY = trim(system("${pkgs.pass.out}/bin/pass kit.edu/ki-toolbox.scc.kit.edu/API-Key 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
-            let $AIDER_OPENAI_API_BASE = "https://ki-toolbox.scc.kit.edu/api/v1"
+            let $OPENAI_API_KEY = trim(system("${pkgs.pass.out}/bin/pass kit.edu/ki-toolbox.scc.kit.edu/API-Key 2>/dev/null | ${pkgs.coreutils.out}/bin/head -n 1"))
+            let $OPENAI_API_BASE = "https://ki-toolbox.scc.kit.edu/api/v1"
       '' else (if cfg.openai_endpoint == "yorkstr" then ''
             let $OLLAMA_API_BASE = "http://alexandria.local:11434"
       '' else "")) + ''

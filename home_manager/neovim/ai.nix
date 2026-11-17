@@ -5,6 +5,17 @@
   ...
 }: let
   cfg = config.ca.neovim.ai;
+  aider_model_metadata_json = pkgs.writers.writeJSON ".aider.model.metadata.json" {
+    "openai/kit.deepseek-v4-flash" = let
+      context_size = 512 * 1024;
+    in {
+      max_input_tokens = context_size;
+      max_tokens = context_size;
+      max_output_tokens = context_size;
+      input_cost_per_token = 0;
+      output_cost_por_token = 0;
+    };
+  };
 in
   with lib; {
     imports = [
@@ -56,8 +67,8 @@ in
 
               vim.api.nvim_set_keymap(
                 'n',
-                '<leader>Ao',
-                ':AiderOpen --model ${cfg.model}<CR>',
+                '<leader>AO',
+                ':AiderOpen --model ${cfg.model} --model-metadata-file ${aider_model_metadata_json}<CR>',
                 {
                   noremap = true,
                   silent = true,
