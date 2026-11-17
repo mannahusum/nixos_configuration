@@ -54,6 +54,11 @@ in {
         enable = true;
       };
 
+      fzf = {
+        enable = true;
+        enableBashIntegration = true;
+      };
+
       bash.profileExtra = let
         sortedProfileExtras = hm.dag.topoSort cfg.extraProfile;
         sortedProfileExtrasStr = builtins.toJSON sortedProfileExtras;
