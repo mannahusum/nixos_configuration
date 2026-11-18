@@ -124,6 +124,9 @@ in {
                       fi
                       fi
                   done
+                  if [ -n "''${gpg_replacement_paths[agent-ssh-socket]}" ]; then
+                      export SSH_AUTH_SOCK="''${gpg_replacement_paths[agent-ssh-socket]}"
+                  fi
               }
 
               test_socket() {
